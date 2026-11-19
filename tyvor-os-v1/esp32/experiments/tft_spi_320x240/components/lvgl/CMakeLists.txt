@@ -1,0 +1,8 @@
+get_filename_component(TYVOR_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
+set(LVGL_ROOT "${TYVOR_ROOT}/.tools/sdk/lvgl-9.2.2")
+if(NOT EXISTS "${LVGL_ROOT}/lvgl.h")
+  message(FATAL_ERROR "Missing pinned LVGL9.2.2; see scripts/fetch-tft-dependencies.py")
+endif()
+file(GLOB_RECURSE LVGL_SOURCES "${LVGL_ROOT}/src/*.c")
+idf_component_register(SRCS ${LVGL_SOURCES} INCLUDE_DIRS "${LVGL_ROOT}" "${TYVOR_ROOT}/experiments/tft_spi_320x240")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_CONF_INCLUDE_SIMPLE=1 LV_KCONFIG_IGNORE=1)

@@ -1,0 +1,13 @@
+menu "TYVOR bench bridge"
+    config TYVOR_UART_PINOUT_VERIFIED
+        bool "Actual board UART pins and electrical wiring have been verified"
+        default y
+    config TYVOR_UART_TX_GPIO
+        int "Verified UART TX GPIO (-1 = disabled)"
+        range -1 48
+        default 17
+    config TYVOR_UART_RX_GPIO
+        int "Verified UART RX GPIO (-1 = disabled)"
+        range -1 48
+        default 18
+endmenu

@@ -1,0 +1,2 @@
+# Existing OFF defaults, separate sdkconfig/build directory.
+rsource "../../tft_spi_320x240/main/Kconfig.projbuild"

@@ -1,0 +1,24 @@
+# Gimbal and switch source is software only. Safe startup, then local ARM edge.
+expect safety STARTUP
+expect rf 0
+advance 200
+expect safety DISARMED
+expect ui_valid 1
+expect ui_model 1
+expect channel 3 -1000
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+gimbal roll 1000
+gimbal throttle 1000
+advance 150
+expect channel 1 1000
+expect channel 3 1000
+expect rf 0
+page 0
+page 2
+page 3
+page 1
+page 4
+page 5
+page 6

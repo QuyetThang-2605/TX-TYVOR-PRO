@@ -1,0 +1,16 @@
+menu "TYVOR bench bridge"
+    config TYVOR_UART_PINOUT_VERIFIED
+        bool "Actual board UART pins and electrical wiring have been verified"
+        default n
+        help
+            Keep disabled until both board schematics and 3.3 V levels are checked.
+            No panel/touch pins are configured by this project.
+    config TYVOR_UART_TX_GPIO
+        int "Verified UART TX GPIO (-1 = disabled)"
+        range -1 48
+        default -1
+    config TYVOR_UART_RX_GPIO
+        int "Verified UART RX GPIO (-1 = disabled)"
+        range -1 48
+        default -1
+endmenu

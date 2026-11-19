@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/JulietaUla/Montserrat",
+  "commit": "555facfb2a18c72c3c0380f0d9c0f060453a9058",
+  "files": [
+    {
+      "name": "Montserrat-SemiBold.ttf",
+      "url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/555facfb2a18c72c3c0380f0d9c0f060453a9058/fonts/ttf/Montserrat-SemiBold.ttf",
+      "sha256": "b4e1563393d73fdff491a869441245aef31add2ec03d9c97a6dae4de07c52fd0"
+    },
+    {
+      "name": "OFL.txt",
+      "url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/555facfb2a18c72c3c0380f0d9c0f060453a9058/OFL.txt",
+      "sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e"
+    },
+    {
+      "name": "Montserrat-Bold.ttf",
+      "url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/555facfb2a18c72c3c0380f0d9c0f060453a9058/fonts/ttf/Montserrat-Bold.ttf",
+      "sha256": "bc6e854971cea46b463be6f9eef4d9cd52f51cfc1fc0dd90c9d3e6483dc0ec61"
+    }
+  ]
+}

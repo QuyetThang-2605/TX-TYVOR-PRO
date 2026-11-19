@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "archives": [
+    {
+      "file": "cmake-3.30.9-windows-x86_64.zip",
+      "url": "https://github.com/Kitware/CMake/releases/download/v3.30.9/cmake-3.30.9-windows-x86_64.zip",
+      "sha256": "b60b316b4827852b3f49f3a6e35e1a9c2301f8c2dca81d135ba0731d4fd9338b",
+      "destination": ".",
+      "marker": "cmake-3.30.9-windows-x86_64/bin/cmake.exe",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "ninja-win.zip",
+      "url": "https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-win.zip",
+      "sha256": "f550fec705b6d6ff58f2db3c374c2277a37691678d6aba463adcbb129108467a",
+      "destination": "ninja",
+      "marker": "ninja/ninja.exe",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "llvm-mingw-20250613-ucrt-x86_64.zip",
+      "url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20250613/llvm-mingw-20250613-ucrt-x86_64.zip",
+      "sha256": "45145c035d9246e1de16f1873aa9afa863d93909f4a8f363e2eb38a04031d3c3",
+      "destination": ".",
+      "marker": "llvm-mingw-20250613-ucrt-x86_64/bin/clang.exe",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi.zip",
+      "url": "https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi.zip",
+      "sha256": "f074615953f76036e9a51b87f6577fdb4ed8e77d3322a6f68214e92e7859888f",
+      "destination": ".",
+      "marker": "bin/arm-none-eabi-gcc.exe",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "cmsis-5.9.0.zip",
+      "url": "https://github.com/ARM-software/CMSIS_5/archive/refs/tags/5.9.0.zip",
+      "sha256": "3d4bfaf8783c633149510d098630a9d2f273dc090ea5e807103cc9b7acbb6708",
+      "destination": "sdk",
+      "marker": "sdk/CMSIS_5-5.9.0/CMSIS/Core/Include/core_cm4.h",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "cmsis-device-f4-v2.6.10.zip",
+      "url": "https://github.com/STMicroelectronics/cmsis-device-f4/archive/refs/tags/v2.6.10.zip",
+      "sha256": "27417faf91fe45cdac11bd4f5b94a8c6f58512cfd37d3a879f07f055feb82725",
+      "destination": "sdk",
+      "marker": "sdk/cmsis-device-f4-2.6.10/Include/stm32f407xx.h",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "stm32f4xx-hal-v1.8.3.zip",
+      "url": "https://github.com/STMicroelectronics/stm32f4xx-hal-driver/archive/refs/tags/v1.8.3.zip",
+      "sha256": "e2ef0eac54507fcc7bf2fbd45328aeb8c4005da4337ee33ce717c6ffba0b69df",
+      "destination": "sdk",
+      "marker": "sdk/stm32f4xx-hal-driver-1.8.3/Src/stm32f4xx_hal.c",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "uv-x86_64-pc-windows-msvc.zip",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.8.22/uv-x86_64-pc-windows-msvc.zip",
+      "sha256": "5049375aa2a5162f132b2c1cb992e25d42d47d934cab8c174dbe6f60973dcc12",
+      "destination": "uv",
+      "marker": "uv/uv.exe",
+      "group": "base",
+      "strip": false
+    },
+    {
+      "file": "esp-idf-source-v5.5.1.zip",
+      "url": "https://github.com/espressif/esp-idf/archive/refs/tags/v5.5.1.zip",
+      "sha256": "b0c90916ec778437366fe456ad4d7d4a3c34424bc0245907e1e23c889ea24b90",
+      "destination": "idf-source",
+      "marker": "idf-source/esp-idf-5.5.1/tools/idf.py",
+      "group": "esp32",
+      "strip": false
+    },
+    {
+      "file": "xtensa-esp-elf.zip",
+      "url": "https://dl.espressif.com/github_assets/espressif/crosstool-NG/releases/download/esp-14.2.0_20241119/xtensa-esp-elf-14.2.0_20241119-x86_64-w64-mingw32.zip",
+      "sha256": "62ae704777d73c30689efff6e81178632a1ca44d1a2d60f4621eb997e040e028",
+      "destination": "espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119",
+      "marker": "espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc.exe",
+      "group": "esp32",
+      "strip": false
+    },
+    {
+      "file": "esp32ulp-elf.zip",
+      "url": "https://github.com/espressif/binutils-gdb/releases/download/esp32ulp-elf-2.38_20240113/esp32ulp-elf-2.38_20240113-win64.zip",
+      "sha256": "3a7627008ac92d1580542b95c696449e56aaa1d0881dc3ef5fd5c60afc77a49d",
+      "destination": "espressif/tools/esp32ulp-elf/2.38_20240113",
+      "marker": "espressif/tools/esp32ulp-elf/2.38_20240113/esp32ulp-elf/bin/esp32ulp-elf-as.exe",
+      "group": "esp32",
+      "strip": false
+    },
+    {
+      "file": "esp-rom-elfs-20241011.tar.gz",
+      "url": "https://dl.espressif.com/github_assets/espressif/esp-rom-elfs/releases/download/20241011/esp-rom-elfs-20241011.tar.gz",
+      "sha256": "921f000164a421c7628fbfee55b173384aafaa51883adc65cd27bf9b0af9e9a9",
+      "destination": "espressif/tools/esp-rom-elfs/20241011",
+      "marker": "espressif/tools/esp-rom-elfs/20241011/esp32s3_rev0_rom.elf",
+      "group": "esp32",
+      "strip": false
+    },
+    {
+      "file": "mbedtls.zip",
+      "url": "https://github.com/espressif/mbedtls/archive/b5d87eaa6748b7a6fa70593178c08b4480e9b71e.zip",
+      "sha256": "037adce2dc78bd8c4d42a781454da0605cbff0d3b763b3b30328f2706b24fc30",
+      "destination": "idf-source/esp-idf-5.5.1/components/mbedtls/mbedtls",
+      "marker": "idf-source/esp-idf-5.5.1/components/mbedtls/mbedtls/include/mbedtls/version.h",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "tlsf.zip",
+      "url": "https://github.com/espressif/tlsf/archive/2867f6883a12920b1969ff9624c0ab0e4185c2ce.zip",
+      "sha256": "48f7b6848ca2430b0fa73fef33795bca78f42f016d196a4d10be369a08a82e9e",
+      "destination": "idf-source/esp-idf-5.5.1/components/heap/tlsf",
+      "marker": "idf-source/esp-idf-5.5.1/components/heap/tlsf/tlsf.c",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "micro-ecc.zip",
+      "url": "https://github.com/kmackay/micro-ecc/archive/24c60e243580c7868f4334a1ba3123481fe1aa48.zip",
+      "sha256": "5c7883ae2c1f8c124442a2b859ad883ba46240ad23eb474586a5038ea80c23e1",
+      "destination": "idf-source/esp-idf-5.5.1/components/bootloader/subproject/components/micro-ecc/micro-ecc",
+      "marker": "idf-source/esp-idf-5.5.1/components/bootloader/subproject/components/micro-ecc/micro-ecc/uECC.c",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "mqtt.zip",
+      "url": "https://github.com/espressif/esp-mqtt/archive/6af4446a48ea7fa54948edc4e62277ed70abb6e1.zip",
+      "sha256": "6238ff61847b612a2e862920f20df40c54dc0d4bb181e93acc56f480273768fb",
+      "destination": "idf-source/esp-idf-5.5.1/components/mqtt/esp-mqtt",
+      "marker": "idf-source/esp-idf-5.5.1/components/mqtt/esp-mqtt/CMakeLists.txt",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "cjson.zip",
+      "url": "https://github.com/DaveGamble/cJSON/archive/8f2beb57ddad1f94bed899790b00f46df893ccac.zip",
+      "sha256": "abf2d21f66682c394ed8bf9a804fe350df6cf675c3747fda2b0d58173eafbab1",
+      "destination": "idf-source/esp-idf-5.5.1/components/json/cJSON",
+      "marker": "idf-source/esp-idf-5.5.1/components/json/cJSON/cJSON.c",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "unity.zip",
+      "url": "https://github.com/ThrowTheSwitch/Unity/archive/bf560290f6020737eafaa8b5cbd2177c3956c03f.zip",
+      "sha256": "57fca310570e8a9a4ad65a8feb41135c7ad3a66aac302f89fc42396bfdf63950",
+      "destination": "idf-source/esp-idf-5.5.1/components/unity/unity",
+      "marker": "idf-source/esp-idf-5.5.1/components/unity/unity/src/unity.c",
+      "group": "esp32",
+      "strip": true
+    },
+    {
+      "file": "lwip.zip",
+      "url": "https://github.com/espressif/esp-lwip/archive/ebabd6d79c120c5d4415755aab1d908d8b5fa372.zip",
+      "sha256": "97feac1a7cbc5c0d90e5673249b555fb4f00c1452f6c06328d11f0ede295cadd",
+      "destination": "idf-source/esp-idf-5.5.1/components/lwip/lwip",
+      "marker": "idf-source/esp-idf-5.5.1/components/lwip/lwip/src/core/init.c",
+      "group": "esp32",
+      "strip": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "profiles": [
+    {
+      "id": "TFT_SPI_320X240",
+      "logical_width": 320,
+      "logical_height": 240,
+      "orientation": "LANDSCAPE",
+      "driver": "ILI9341_CANDIDATE",
+      "rotation_config": "CONFIG_TYVOR_TFT_ROTATION",
+      "rotation_default": 1,
+      "hardware_verified": false,
+      "hardware_gate": "OFF"
+    },
+    {
+      "id": "AMOLED_448X368_SOFTWARE_ONLY",
+      "logical_width": 448,
+      "logical_height": 368,
+      "orientation": "LANDSCAPE",
+      "driver": "UNIMPLEMENTED_CO5300_UNVERIFIED",
+      "hardware_rotation": null,
+      "reason": "Panel init, swap/mirror and actual orientation need verified controller/module evidence",
+      "hardware_verified": false,
+      "hardware_gate": "OFF"
+    }
+  ]
+}

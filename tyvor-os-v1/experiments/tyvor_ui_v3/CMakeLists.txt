@@ -1,0 +1,27 @@
+set(LVGL_SOURCE "${PROJECT_SOURCE_DIR}/.tools/sdk/lvgl-9.2.2")
+file(GLOB_RECURSE UI3_LVGL_SOURCES CONFIGURE_DEPENDS "${LVGL_SOURCE}/src/*.c")
+add_library(tyvor_ui3_lvgl STATIC ${UI3_LVGL_SOURCES})
+target_include_directories(tyvor_ui3_lvgl SYSTEM PUBLIC "${LVGL_SOURCE}")
+target_include_directories(tyvor_ui3_lvgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(tyvor_ui3_lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE=1 LV_KCONFIG_IGNORE=1)
+target_compile_options(tyvor_ui3_lvgl PRIVATE -w)
+add_library(tyvor_ui3 ui.c ui_view.c ui_theme.c ui_widgets.c ui_pages.c ui_shapes.c timer_font.c
+    ../tyvor_ui_v2/ui_view.c ../tft_spi_320x240/tft_presenter.c ../tft_spi_320x240/display_contract.c)
+target_include_directories(tyvor_ui3 PUBLIC . ../tft_spi_320x240)
+target_link_libraries(tyvor_ui3 PUBLIC tyvor_ui_endpoint tyvor_ui3_lvgl)
+add_executable(test_ui3 native/test_ui.c native/mock.c)
+target_link_libraries(test_ui3 PRIVATE tyvor_ui3 tyvor_sim_runtime)
+set(TYVOR_UI3_CASES ui3_profiles ui3_geometry ui3_no_footer ui3_home_valid ui3_stale ui3_disconnect ui3_invalid_model ui3_live_unknown
+    ui3_field_expiry ui3_input_expiry ui3_mix_expiry ui3_layout ui3_detail_layout ui3_long_model ui3_input_bounds ui3_font ui3_navigation ui3_back ui3_home
+    ui3_gestures ui3_quick ui3_disabled_bind ui3_mouse_buttons ui3_pagination ui3_stale_detail ui3_partial ui3_idle ui3_memory ui3_readonly
+    ui3_reset_control ui3_reset_ui ui3_reset_both ui3_loss_recovery)
+foreach(case IN LISTS TYVOR_UI3_CASES)
+  add_test(NAME ${case} COMMAND test_ui3 ${case})
+endforeach()
+add_executable(tyvor_ui3_render native/render.c native/mock.c)
+target_link_libraries(tyvor_ui3_render PRIVATE tyvor_ui3)
+if(WIN32)
+  add_executable(tyvor_ui3_simulator native/simulator_win32.c native/mock.c)
+  target_link_libraries(tyvor_ui3_simulator PRIVATE tyvor_ui3 user32 gdi32)
+  add_test(NAME ui3_pc_mouse_keyboard COMMAND tyvor_ui3_simulator --smoke)
+endif()

@@ -1,0 +1,3402 @@
+{
+  "lvgl_version": "9.2.2",
+  "lvgl_commit": "7f07a129e8d77f4984fff8e623fd5be18ff42e74",
+  "ili9341_version": "2.1.0",
+  "ili9341_commit": "67f41a169401d1f23e827188dd08fb351cb0febe",
+  "downloads": [
+    {
+      "url": "https://codeload.github.com/lvgl/lvgl/tar.gz/7f07a129e8d77f4984fff8e623fd5be18ff42e74",
+      "path": ".tools/downloads/lvgl-9.2.2.tar.gz",
+      "bytes": 71181752,
+      "sha256": "8a5e30223fd5b08cdeccb060f45b37a29868d6b1fdfc5bdbdf0dd89aaefb5a0e"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/espressif/esp-bsp/67f41a169401d1f23e827188dd08fb351cb0febe/components/lcd/esp_lcd_ili9341/esp_lcd_ili9341.c",
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/esp_lcd_ili9341.c",
+      "bytes": 15371,
+      "sha256": "0155a9421945bb68ad66308e7d060cfeb15f569eacb1d2bb6b0d6d5196970382"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/espressif/esp-bsp/67f41a169401d1f23e827188dd08fb351cb0febe/components/lcd/esp_lcd_ili9341/include/esp_lcd_ili9341.h",
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/include/esp_lcd_ili9341.h",
+      "bytes": 3911,
+      "sha256": "ebb60162c4708cfbd675b6c09a0e09e251f555156b90822fd764eff01cdd6c92"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/espressif/esp-bsp/67f41a169401d1f23e827188dd08fb351cb0febe/components/lcd/esp_lcd_ili9341/license.txt",
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/license.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/espressif/esp-bsp/67f41a169401d1f23e827188dd08fb351cb0febe/components/lcd/esp_lcd_ili9341/idf_component.yml",
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/idf_component.yml",
+      "bytes": 185,
+      "sha256": "015cf82cd5127b9cdcb9a7c6e422479b0d995b1b68125d7f5a620b9a1538ac61"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/espressif/esp-bsp/67f41a169401d1f23e827188dd08fb351cb0febe/components/lcd/esp_lcd_ili9341/README.md",
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/README.md",
+      "bytes": 4162,
+      "sha256": "f628e081511c01f85400ef26a6175e8392a4dff1cc353f5bd18f2cfb3c0186c4"
+    }
+  ],
+  "files": [
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/CMakeLists.txt",
+      "sha256": "fec2e2954725d69c1045c3946e62827d610e28e908e4435d01d0f84d2b864e47"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmake/custom.cmake",
+      "sha256": "404fd0b0ff0b1722637d63f5cf5862afff3c778c42f38746a4420d192dfa89cf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmake/esp.cmake",
+      "sha256": "67675cfc396e9c92a61ed22a52b22a3dc736e1bf60c3f60fce41059c7305655c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmake/micropython.cmake",
+      "sha256": "05409f94110a86b4c761c50ef75bcad76d645dd1e230e02a29f8c9b921ba2a19"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmake/version.cmake",
+      "sha256": "350cbcf3cee36e602f755dd83c7af10697f1a0130f30eb51c1fd1ac9f6b1a32b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmake/zephyr.cmake",
+      "sha256": "de79ef7a5ba5d61ec6eb50da16486cb974802f3e1e9fa6a690570c24a12a002c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/gen_pack.sh",
+      "sha256": "7d137035eb426882a21e0c860ff80552a075032ce5b96528ceb1e14cc7a74e2d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/lv_cmsis_pack.txt",
+      "sha256": "362408cba83dbcfeeb94dca369b5a77188c7db549562563cfcacf2d3f0a1a22b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/lv_conf_cmsis.h",
+      "sha256": "defe518b7277dd3a18723898088dc8cef8ad61236583d41ed52f9a8b95500fc1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/lv_os_custom_c.txt",
+      "sha256": "c1a0af86ff75cc2ecd1f1e33c6bde8d602bf58e43b205951336fe3fcf97a369e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/lv_os_custom_h.txt",
+      "sha256": "9f4e7eabcd7172783c5541c4ab66446a59c8ddf813fb84fe39e1d05d01212020"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/LVGL.lvgl.9.2.2.pack",
+      "sha256": "5b65e8757c67f7ff9013d6700220ac45adb42c37c9ae5c688e66ab176395a19e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/LVGL.lvgl.pdsc",
+      "sha256": "7cf1c4418f99afff3d9ca58407ed7666f6d89f60063b9c3d2627329200d801e0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/LVGL.pidx",
+      "sha256": "3ad04849b8c527b8df9e0ad26f73e64cf327e2577a3acf45fe7ceec9e9094db6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/cmsis-pack/README.md",
+      "sha256": "e5e2fdc55901220042d8faf8ef2ace3cff92674b4e627f159fe30c0168bc6ae6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/esp/rlottie/0001-changes-to-compile-with-esp-idf.patch",
+      "sha256": "0f946fc26671e7f5692d5325131130d9309b1ae6b0ee9d9fd19479f8ae870022"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/esp/rlottie/CMakeLists.txt",
+      "sha256": "31c515a2b5291c6615e7907f0622e61588bd4b2d6a6f43f74b4cd4f49735c802"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lv_point_t.c",
+      "sha256": "85d246f40965bafbbcb48bf36c544bd85ff82b94cfbb4340c112b4b8f7bdd19b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lv_timer_t.c",
+      "sha256": "4237a13e337846c3c8690d27098b65cc0390732da614394d28cdae97b7f21061"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lv_wegit.c",
+      "sha256": "56941aed303d49db2a722ab443125ed3c1d10ac8f8180c2f3cf6129f2fb23727"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl.c",
+      "sha256": "1fde6d4e5d8c6cd930a55b6266242b77a159e93ad9b77426de1dd8d11e9721d9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl.pyi",
+      "sha256": "fbe85f4a9f952607fdb3007091cf63c149e4de12e78f70dfb7139001a9ac902e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl_indev_t.c",
+      "sha256": "f21c09c63b5475ba768d7b25d5d34b0c6c0da557c50d00907d4444db800bb4e0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl_lv_event.c",
+      "sha256": "25ac679fa36c0393379d128c7985be6310c4781694791717fb0b1e5532f28090"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl_lv_obj.c",
+      "sha256": "a9788269f563d2b228fc7d97e3518f77d682a47b97069f3757c5afc9219f3270"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/pika_lvgl_lv_style_t.c",
+      "sha256": "5f2c4adabae75e3045a518ed0bdfd49d4beb8afa6f586d3bef1579db08d9d3d2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/pikascript/README.md",
+      "sha256": "ad21ef2c2ec9eed6aca33ac9d2c13c60079f285985d861d3811a3df389931af7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/aarch64/a.le/Makefile",
+      "sha256": "3af0eb7f2b5ac46eab75d4cbc744f1baf2c2d176dcc28b62ce0baa697fe6fb60"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/aarch64/Makefile",
+      "sha256": "519bf19f967145b55640d0310fd89014fa1890f597c89db70753a6fd956e6ce8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/aarch64/so.le/Makefile",
+      "sha256": "3af0eb7f2b5ac46eab75d4cbc744f1baf2c2d176dcc28b62ce0baa697fe6fb60"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/common.mk",
+      "sha256": "35b2da4ba4f3657ea39a728a09804740771ee1a8d48181a99b9eb34a21dfacc6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/Makefile",
+      "sha256": "81a826668fecffcad1f8f6804017dd3babda30402c125167336ce11167efa2ca"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/x86_64/a/Makefile",
+      "sha256": "3af0eb7f2b5ac46eab75d4cbc744f1baf2c2d176dcc28b62ce0baa697fe6fb60"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/x86_64/Makefile",
+      "sha256": "519bf19f967145b55640d0310fd89014fa1890f597c89db70753a6fd956e6ce8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/qnx/x86_64/so/Makefile",
+      "sha256": "3af0eb7f2b5ac46eab75d4cbc744f1baf2c2d176dcc28b62ce0baa697fe6fb60"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/lv_rt_thread_conf.h",
+      "sha256": "8cad8d615b627e27a7d4ab176fedb686d24fccdb54b27409314fba0a9d63b2b7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/lv_rt_thread_port.c",
+      "sha256": "098718c060699ff59c339f2beb269830c1d3c9a41045877a55d16a1408e51e53"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/SConscript",
+      "sha256": "1e3b4677c4f18ac6284e25c06ce3ae88436b704dd770de80e9200b7e11779756"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/squareline/lv_ui_entry.c",
+      "sha256": "d9652420881c304d9ec81667af9aa7a7608263c5733e39e8c35e19cc62aee380"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/squareline/README.md",
+      "sha256": "ee73055a482c9b98ec07698ad6033816a04961de35635de79a7d1786b3a483c9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/squareline/SConscript",
+      "sha256": "d0f691c891de350b69456560f9944f2a84c6a5f8aafdde1aa77d47859f55046e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/env_support/rt-thread/squareline/ui/lvgl/lvgl.h",
+      "sha256": "c946643df67fa07b5b170d7bb04321671ef839347e3fbb4efa2571327fcfaf66"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/Kconfig",
+      "sha256": "e55fa970fd159ae6a14f1e5f86a734c26791d24a34212768e40b5ece582bacfb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/LICENCE.txt",
+      "sha256": "6a916130a36e83a79bb0dca6c6a7bfe60a67af7d118605e2b7b23bd5ad5c4eb0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/lv_conf_template.h",
+      "sha256": "f4bbf315409ef4fe6a2c6aa2b7859e75289032f4c7b1f085f996815a80c6fca7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/lv_version.h",
+      "sha256": "aee0c9bb962e6c23d609e144c2fbc6a9ec0e4ce01da6d788edbb618e42dbf082"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/lvgl.h",
+      "sha256": "e183b111a74bd653a03f9c1e7541cc4da5243a2ab863e4ac3aa8f4ef098b2a4c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_global.h",
+      "sha256": "df649d6e1ae6bd246e0d6c27b3270c21ebe1a384999cfb43084602d4f39740e7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_group.c",
+      "sha256": "9e41401ac5dd23fd359f21bdf740aee0d4fea16275568bd42383d88e30818e3f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_group.h",
+      "sha256": "0093ddf9a171c4193c4d49f6bc6f9dfc953e584d540d8e787ea0a88a52248b6a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_group_private.h",
+      "sha256": "94a0a2496d97702aa8dd76a6935ffc9cd947f8d67146d83c4eee0e14ef012153"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj.c",
+      "sha256": "56acf6b69b5391eb84ed8a4582a2243b59b720ef3bdde7f0edad3414072d938e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj.h",
+      "sha256": "b3c1488687ea2966c83c640f2b3b0cc94bce01baa0df309f02807f62e0b9fd14"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_class.c",
+      "sha256": "5c33b982c91c13cd7a2baa26b5bb523af51f9c81ff18cd83c80828735eeb7e1f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_class.h",
+      "sha256": "51448cfa46f8b0b3031bf3552a031e5c07ce0db5caf4a5f65ffc73ae8d929f27"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_class_private.h",
+      "sha256": "6e903261b5ff68cdd6ee435df02b6b0347d92eb01d67c38e06b55362bb6d5201"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_draw.c",
+      "sha256": "c733779c64c8cacb94a5c00bab8872a54eebf5bdb7bc195f7818afab44dabc7b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_draw.h",
+      "sha256": "43d999c64a61555ffd0240f0a95713e29b2f491c3258c366146c3cb9a078a90c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_draw_private.h",
+      "sha256": "6f6076a40e5e733aab92b5ac705c54b7f3e6b13a0b8d5a3daaf0471e83143550"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_event.c",
+      "sha256": "fd16b61b275eefc001f3b794bcbd45bdf191aac87591904cdd0f542621932f45"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_event.h",
+      "sha256": "5102cbefc6c62ba48e593ed0c99ff88c9fa0f0e3cde7ff75eb34027f78aeacc2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_event_private.h",
+      "sha256": "bd55d628505f4983f5dac87ba0e54e0ef7ca50d8f7e4d8202c9ded7d5656f66e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_id_builtin.c",
+      "sha256": "31111f982af672975217055dadadc3d0076510cbdbdade8d968e3f5253298eae"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_pos.c",
+      "sha256": "e59d8e5ce11413ccfd2d8cc3c374196f47b30615719d33706c75c3714a19541a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_pos.h",
+      "sha256": "119b2413899d49f1ea02f54b74c5e60c6b4ddefacd977ee53bad13e4d8bf0528"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_private.h",
+      "sha256": "7865ed67285315aa17e9e6e10fda0438b7386ed5c59d186a14aab82a472064ef"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_property.c",
+      "sha256": "34229990230fc28251832ebbe16a124b5d5a66c41c54980979b76a9236ebaef2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_property.h",
+      "sha256": "9a993d0a809636ccb5c3f145a6c62898db8a6963ca707a953b53698d48e400c4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_scroll.c",
+      "sha256": "6809a9bcb47d81c38bd26fcd5c5a0e68cfa02d53892c0286b36e1643b9fcb66b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_scroll.h",
+      "sha256": "a1dd5269f13607b110bd63005c83f9c72d0c54217256d6e9d5b917eb9e98d08c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_scroll_private.h",
+      "sha256": "621f784b8783cafaf7c4f9b31cbf488c0506479aa0e3496e031fe6cb65fdfcfa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_style.c",
+      "sha256": "7b94e1c126b6afe859801084907ab306df9dc9b79db8b8701bff24616bd72dbe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_style.h",
+      "sha256": "fda53fefe06e3c5d4788c8dd2050738e27a470694868170018c6485cf17502e9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_style_gen.c",
+      "sha256": "91874fb661fa9bed40d0a972c8349730fe940f51e58668771bed062fb5e0a143"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_style_gen.h",
+      "sha256": "a71f09bbd93bd255ddea4ca0933afa0adc92fb559cd95c91dad0aee54c837937"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_style_private.h",
+      "sha256": "ccd3cb933bc191c28e6627a132cac2c2be7d215c9d0b26f96f71727223e3be46"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_tree.c",
+      "sha256": "4334044329338340b46a975296b78389d0ed6c39d0d73a9cea8f81a3644e6870"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_obj_tree.h",
+      "sha256": "13dff62312a183c957ff8a6fc68de40420c7cec0e8b2f6cbe6cf0ba38a52d149"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_refr.c",
+      "sha256": "28b3fe522bc627e2905d6dba3944edf4ab5dd6493ca643e430a3acaa7cc19474"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_refr.h",
+      "sha256": "9982469efa2ae89a42599d9e5d7d19a89e6cc9f9245a092c6331878efc6fc8c3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/core/lv_refr_private.h",
+      "sha256": "06d2ef58f93dae6d516f1688cced4166e659a350780a9a43421ff9ff06e008a7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/display/lv_display.c",
+      "sha256": "c59142dac474e0ffa8cea5a98ed8731e9819a1b57afc4cb8756c3aa8849d4dd2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/display/lv_display.h",
+      "sha256": "8448278fc760f56587d81ae58e08f9635d1555076494337a679d9554a9d28ed9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/display/lv_display_private.h",
+      "sha256": "462d1b48ad35ebe18f8d972e8eff340c7e0e255daa4a38b9c8d9e28eeb20b8d8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw.c",
+      "sha256": "7bd9cc743c8d164f17f2908856d333dd9bc2fb02451ce962c856b0301a38eb69"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw.h",
+      "sha256": "c82a38544e5237cc571454e12efdb163dcd0d17abbce5f94b3656496c831d43a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_arc.c",
+      "sha256": "1809dbbe56e0e040fdcf285bcfa30098af7e3d76fc433c79d0e3d770dccbf3c2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_arc.h",
+      "sha256": "3dadca7735c8b4cd5b05e1e14de1f17edbf258b0f502702d7a86523467aaa526"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_buf.c",
+      "sha256": "c652d5e117fd5bd337ad9a2b232dda85c5956f95a1c4a7ebcca6d203ba5b2d23"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_buf.h",
+      "sha256": "9bd342df8d1ca44ad2bc7ddd78359066353d883289d0dd81f0f4e3086f70a3db"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_buf_private.h",
+      "sha256": "1edc7fa6ebf7149f2545908f4d6f5e1d17b773c0c6cdc70d2ce4d8aa6e619694"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_image.c",
+      "sha256": "7283366e7d64bb52e3b74ca8c8576674c0d1c0c5551d18b677aa7e100981d974"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_image.h",
+      "sha256": "a9f69e327ad8ba4635d467fbd5115478c9968342279ba08a9614d22b702a61b6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_image_private.h",
+      "sha256": "92eb7cb67c7f8921684c02a6970d7293d2e738386af16b6f867c24ea60890716"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_label.c",
+      "sha256": "8dec6445215ed08a7c79a498018ec29cea0cd3b4cca6909fa168d40626921313"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_label.h",
+      "sha256": "88c514637d30737bbabb6245bec0ddf7ec03e32fb3e4ce2954964d41add7c60f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_label_private.h",
+      "sha256": "f5c5ba28084c6f04bbf1254c6d30df04cfbd6c846d7f1ad17e1f08857381d796"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_line.c",
+      "sha256": "964c57396b86e875799b611b1b13d9f99dcae60b633c1bcb82882fd813a70074"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_line.h",
+      "sha256": "0a24171cc8aefa2958d68f9bfa43713efd5cf9b82e81c4aa97955ed40088d6cb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_mask.c",
+      "sha256": "452c0624028d70a32320eef5f5a4b984ade6ed741d1c254b75ccaa8ec95ff351"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_mask.h",
+      "sha256": "d09a5b02620c8ad2d2ddfdcd5c6df1dbfdc2ced66841fa55f9bb64a920e41618"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_mask_private.h",
+      "sha256": "12a840574f8b516e93cf5d618eaee076f2e2817c0cbafc6f202767b8c655e6c9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_private.h",
+      "sha256": "e62d631caa51e13019cb153b670b6703941e3563f29a54591771457ae7d03fdf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_rect.c",
+      "sha256": "585ee29aa8063e69b106cee32f6d339b324c86e407113905812a99054e975574"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_rect.h",
+      "sha256": "858bb8be3488cbb6d7ec41af340a4ce5ca2c49888230b069691d8b832bec1022"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_rect_private.h",
+      "sha256": "e7c2b4e419878a865c065cfaf00825c4c00d551657fb5d09b04f3943058f3478"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_triangle.c",
+      "sha256": "b6491998ef075326ca0f42c30f675690fe4f764ff5b3115c70f25cb14545e363"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_triangle.h",
+      "sha256": "e74d8bec89caf485ed03d3ad0b1c8a3e4272c06405cae8f314894fc09b1d8f25"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_triangle_private.h",
+      "sha256": "c920e5df472e2a018ef1da0b5a293d2f119b3c72e9017cdff44f8edab5dde3f4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_vector.c",
+      "sha256": "dee3a89ceaba3efc2fea9bf163a68767d855dbef55c45be2766c6d7733564493"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_vector.h",
+      "sha256": "0dacc7afbd0fc228cb6c24c04e2f3b619328a97f91e971e1c872cb494853039d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_draw_vector_private.h",
+      "sha256": "a72c2e8fbe412d8d2f44644db8c93d1b6d2d77e39450bdef084d2554fed4c8e0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_image_decoder.c",
+      "sha256": "4bb543d40d68d85069968153d51504d85d0709149a8127abb523e63f414348a0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_image_decoder.h",
+      "sha256": "ffdb75ffff69486314d919a6e79f19659dc8e3b28e25d7b7d61cc58d10c220dc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_image_decoder_private.h",
+      "sha256": "7a8b13297c63c22b833e69d761bb7bea570e7c524096bcf991a34e644a7ff499"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/lv_image_dsc.h",
+      "sha256": "763570bc57320d155801b0eca1f1713605491c33c53e58343d91f019d7a742f1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_buf_pxp.c",
+      "sha256": "269229ba3058851aa647217b7e6e01794f911400b66b92833031cd6ee71b2e89"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_pxp.c",
+      "sha256": "f0ac4cb2170f408c198cc03ea65955ac4fcebd5ccb11e26aafe532a0bf12cebe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_pxp.h",
+      "sha256": "0b49167f2664404438f049e827f204e885475f88f25398a2703ffb76d45d453a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_pxp_fill.c",
+      "sha256": "f679e4a76298bf2e4b733c2b068711ef0dee7c70740c2504069c4d495300db55"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_pxp_img.c",
+      "sha256": "cd91b780b38ae09928155367fd35292fcf3366546ade090864fd2fb5b19e66b0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_draw_pxp_layer.c",
+      "sha256": "35f1c0a3a9440d39bee6545bce52b901fec15372e3d9127ab6fa854b940ee5f3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_cfg.c",
+      "sha256": "3e6896af0328593ba3a8fac91906c0f044072ddcf9d1fd49f57d9e77fa0c1721"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_cfg.h",
+      "sha256": "bb5e7e1f52f0120a9512866be5ac46df5677eff2ee0353ad1b7e81020fe5e9ad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_osa.c",
+      "sha256": "4dbfa02fa9befbf83258959ef300590b9e89bbb4ae7fbffce2c899beded94ce2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_osa.h",
+      "sha256": "498117629c6f40c98a99ac003f80030ac706d6c8da1f87b3e8fb6980332ef8cb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_utils.c",
+      "sha256": "626787a5ba5ad10201d7fd0113cf082c1bfda7c86a8c32794fc3c99493219ea5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/pxp/lv_pxp_utils.h",
+      "sha256": "d3df2791035e240abfe184521162e18a36c9383bcb62b84932026fe9bc51e9d2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_buf_vglite.c",
+      "sha256": "316a9bd4ebcc0e8b3c64723e54e49941f75e693e33af7ab8003986b6843703ba"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite.c",
+      "sha256": "c6d61217fa32e317aa2357517fbcb5b2b04d7af1415541f689e5a15a22abf2a9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite.h",
+      "sha256": "d087a172e3b3103503718e024d4d7522ce0d474aa2a4f38b1ff35a2750a31a2e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_arc.c",
+      "sha256": "0c7f3b01d691d36979e617a5fb7c014050c8294861f86a1f63132fd4619d407e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_border.c",
+      "sha256": "6e0690ac4d2d6b23e6cd502123691fa9572fa73f88786e3b034286ce0d8a2ca1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_fill.c",
+      "sha256": "7bd68a66bf72bf0ceb0755b54d3c590bdc0ee35a49289160c0d361441a306a9d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_img.c",
+      "sha256": "01547bcd8699c3c4fb2993c6858af6a8caa51278153a743a83a29798bc18c594"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_label.c",
+      "sha256": "d75ccc3ddb72a419895cc042d716ba63406f3d90f7f4f43db411ffb7f52b4da8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_layer.c",
+      "sha256": "98cf333fc2da49b2bb821e3bcf8eaf44bb31aa978bbefac0d23584a60c4cc93c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_line.c",
+      "sha256": "f975abb901be58dd9c11e574c4919e5f962e733797feb918dedbd2f785113b47"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_draw_vglite_triangle.c",
+      "sha256": "bfb1cb988eeaea2d5f0300df37407dcfefba1199bcb9a0bdbb314cc09b3e083f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_buf.c",
+      "sha256": "3684deaea77b2230e8b81daa2873f00ae4c2e975e80ecebf12f4018ae26bf389"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_buf.h",
+      "sha256": "0ba47d7c7eaa96c99bf4afc11fc19d98c6b73227c2aab42c927f3ea8d9d0e216"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_matrix.c",
+      "sha256": "55423c404c57d09ba6379c2fae9d4161701f88810584dabb34ecbf0e34ad971e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_matrix.h",
+      "sha256": "00c7d810399cf91164a12caf26b869d16278439a82d9e913a9aab4b0355335ab"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_path.c",
+      "sha256": "dad2125550be9f1aac5647a0fad432cc9be45c2ce4ef518f838d1b6f1f061ddb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_path.h",
+      "sha256": "9d6202e00663d6f4f8f541c6ffcac1fab650d1ab4e4946c6dc2b9e23e90b7872"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_utils.c",
+      "sha256": "11c4b1929b41d03d48562ffb5cce9e0ffe973484155442148b9c83ba6f51cd91"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/nxp/vglite/lv_vglite_utils.h",
+      "sha256": "13bddea60fc4345a966bfda6a3695af27312099a52bfe664bb7c17eade594a48"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d.c",
+      "sha256": "b36a7f91c9a77e8edbd1f9c09a5d0a0efb8209821f9716a652614200a9a9ee85"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d.h",
+      "sha256": "ede601425acc4646b536166fd6529a978d7c2ece412fac3139c040b85aef4f5e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_arc.c",
+      "sha256": "679ed88ef59547b832abbf24e03870c3b350e9ab3c61848b9d6b8091ee06d864"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_border.c",
+      "sha256": "7cf79df73b7d9811ee248d69e2e631601f7753b215d4d2da6c88b25efa6ed148"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_fill.c",
+      "sha256": "128e920a8e2c57f80be0d4cb96b6868498c4c915cbf58d3d33cf7a8d5b0c1a1d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_image.c",
+      "sha256": "b04e6f49a0326e739957a7280abfd437772f11d22401e7ffaa04eeed4017467d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_label.c",
+      "sha256": "290c2da980f908eaf551cb90c4d38e3c7c0562581dcd4d19e36733e6387714b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_line.c",
+      "sha256": "9d7981bf839e69ff6ae12353120e16e44cb891d065f8d972f635cd48f58e785b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_mask_rectangle.c",
+      "sha256": "af4a467571ef0fda3cccb73875a55c6fd87951aba051332c7cd545f2b2eaf5e7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_triangle.c",
+      "sha256": "443f86a9ecaf30d65fe38b02d69ba3cadc25cd7dec12bf50b59ee8932f746da1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_utils.c",
+      "sha256": "66121c35c17e2c77457d25fb91ab537e6a36fc2e8652957056f3094d2dd4461f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/renesas/dave2d/lv_draw_dave2d_utils.h",
+      "sha256": "e1ed0d2884144373a3b12ee9eddbdf81eba965fda052c4b4eff781c9997b158a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sdl/lv_draw_sdl.c",
+      "sha256": "58d4c1a482532b96ebfd12c9b64126c62493f4551815f9070a67bf6026ba8f2e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sdl/lv_draw_sdl.h",
+      "sha256": "b3c1eeaccd065ddeba9a23e6969f6ce58819a2f2fb5663f8405eb3e1a87b1718"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/arm2d/lv_draw_sw_arm2d.h",
+      "sha256": "9bafd5b700597ec84a4d5d464a0d53330680129adced80e50309d979b4abb251"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/arm2d/lv_draw_sw_helium.h",
+      "sha256": "4f035faa6d0959f853f2f53049e1ee32ec8fceb1cc637b4691f5038b4b4d91a3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/arm2d/lv_blend_arm2d.h",
+      "sha256": "37ca545d7e8095ef8df5d01e21d805270c080f07ce9b916caa258d7d47009669"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/helium/lv_blend_helium.h",
+      "sha256": "82aa5e905e3009a60255c5b563fc2e8ed81a7d182536fb97d9f194783f7d585d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/helium/lv_blend_helium.S",
+      "sha256": "8d69a7fc569838e5883984351ec43b8a9a3848fcdda74d1064980a8853925100"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend.c",
+      "sha256": "da24174fbf6695574305e93313aa30446aca9b532ff63e3d1b20a2b1197333b8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend.h",
+      "sha256": "bcbe07778955bd1e5944a7dcb05bae0aa13eac8c8ce77a4243ceb186f010bb75"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_private.h",
+      "sha256": "ac9a7916abc946908f05dd3a69fec53b1a57a25183f975f6dc6ce38244120bd6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_al88.c",
+      "sha256": "8db0c4c555da01cb70c55c41d6e165f99ab8d1a43bdbdc286b589d028401c884"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_al88.h",
+      "sha256": "5c115a229bbd18a634cdf99dcfc9386596576c79a0ebbfcbecbc478eaaddc822"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.c",
+      "sha256": "1f6345c9d28cbfb05d5dbb65dabc91c459f08eb23bd66d6f422defa8a51a35b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.h",
+      "sha256": "dbf68d652e1abc0a8cf7c15ef3d178ae642e35e8c33ad51019246c9cdf95b56e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_i1.c",
+      "sha256": "87214a853c40cd914c5159ab15e871210efced54f46f6e59a06c223c976a5fb2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_i1.h",
+      "sha256": "c0dc5caf960277d2a562675b1f43e08d73cf4f0aaf17958a4b6f0f4da608803f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_l8.c",
+      "sha256": "942e5ae5f903ea8df1a5b6fd331562d2f65868d6a376b1e7ec76a24def61d2e5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_l8.h",
+      "sha256": "04b5e9b0f3273e205eb013804fdd7c1f18975fe778c6f22967dd19bdb8794cdc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c",
+      "sha256": "ab631e20c8ec73d9d23c74038a859d56d5a512fca1336ee57f9efb0ca9eb00da"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.h",
+      "sha256": "c4567efcf56ceb2e1743a0c5174ab84f9ef28371cbce01b39b5cde34d2d3a350"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c",
+      "sha256": "09dbbc97b6175b3328ea4d08103fea848db4d37e6485302470b75e50b075ebfa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.h",
+      "sha256": "dc54eee5def983eceb520fa2f1f5852fa1d3af1b40d55d474166ae1541eb6a49"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/neon/lv_blend_neon.h",
+      "sha256": "4e5650bc16b95a8529cb86bde79481d069eb2a0b186ef07e1bfb9b2ca8077290"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/blend/neon/lv_blend_neon.S",
+      "sha256": "8ca12420d66b0fe5fd2c2cf06f88299c5a92b428891d0e3bf60f96a8ed5a4362"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw.c",
+      "sha256": "767f48e1b91e2922156c5744253e94a551b05244aa7bc0ae3e39eeda88d8a696"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw.h",
+      "sha256": "074aeda028758520571b777dca6df49a5a416ead027a8ab5cb05e7db5a3b1fd4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_arc.c",
+      "sha256": "970d1adf945082e9d9189305b695f62a616ad2fd5a61dbb882733a4282d9bfc1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_border.c",
+      "sha256": "8ec64569ff72863e131ac27ec3be204b85defcc035a7035383f08dd48c27609d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_box_shadow.c",
+      "sha256": "3c3c6ab264931f6a4a059b0056164878f34c332da71d2243006eb9605d10317f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_fill.c",
+      "sha256": "77b4a9bf976ffa4ab0800d764afe75989ec948ff1f270dc4fe1060fce00429a3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_gradient.c",
+      "sha256": "d62ad17d27636259e5892f52f77580d477ea78d46edb21371e302497e3a4698e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_gradient.h",
+      "sha256": "5466ccaf5f4473457b78caebe200fa02518d3cf54292bb13a81afd50a92fb57e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_gradient_private.h",
+      "sha256": "fa6635b627023c865e95157d63c501de5ac1094b65871cd3ed633865c9a441a9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_img.c",
+      "sha256": "5058287fceda899ca7b1b9aaae74231aad8141f9a21f7c57394bddaa7d7ca76b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_letter.c",
+      "sha256": "9bafec263e8fbbc5c4141771be284de92879136ab7fab329877e6a9829f7b51b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_line.c",
+      "sha256": "878263fd8592e4ba3f375a53b0884995b24f8cfd351d985eed879856975a3045"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_mask.c",
+      "sha256": "7baf2a218fad9543fda5f6fecd67d508b03ef6d9fe1268898b9a0aeb448248ca"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_mask.h",
+      "sha256": "ea1666282996a4a50a303520fe928e4a74409d410f737c2efbd9f6072532296b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_mask_private.h",
+      "sha256": "d9642c2d67f794da0e6832dccd627126ce44c149232aa78df84d8ab5dfda6760"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_mask_rect.c",
+      "sha256": "6d92c22807ad51dc8993177a2a95d3348cafc0f54db7ce347ccf8e7a230408d6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_private.h",
+      "sha256": "66ba76a0c0816b01db597ac45f6015feba69bac9799b7ee89a62283fba79a8c3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_transform.c",
+      "sha256": "e7f9eb58e11ccd1dfe0b6f51b181a66a4970ff704ece71af3d0caa96fba7b40f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_triangle.c",
+      "sha256": "8d1f88e6ee2154aba5e31e2751a4b2bde2a037135a778ee36f1a9b80a6e659b8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/sw/lv_draw_sw_vector.c",
+      "sha256": "da11d3e31e914cec0d63e9f469562ee5b3ba5c5cf3cbbe88122a48356af04d28"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_buf_vg_lite.c",
+      "sha256": "838fc61b5fd8e0a281d3b75781e0180bfeda48ad8d5065dd4f98c84189d294f2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite.c",
+      "sha256": "9ee93b256b6c9fd91e009e6b03168e740a3e75fb683323c93a4d28ac03d7741e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite.h",
+      "sha256": "e5f143a200105c13fa72de4f04490d9a1a7e260ecf84a9a4a22f085958d8f25c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_arc.c",
+      "sha256": "a9153e66b4a33f32cfa0e810b161b7fff21455e9fa523402583f8947fc9c89cc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_border.c",
+      "sha256": "fafc3e1c48f1c65d300d5ce41fa585b2a86642889d6f495c796575664bfc2927"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_box_shadow.c",
+      "sha256": "387c6c5539ae4bf37e475680436fe08848a19642f4097d375867cefeb1984c5d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_fill.c",
+      "sha256": "59f6d7ca86836b093ff6b487f7b62557b2b2a9d8346af68838054ad6c3e84daa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_img.c",
+      "sha256": "658d12b1f407ede1c7f54f14c9973345ec5d973f0501b52f843166533f6f747d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_label.c",
+      "sha256": "373623365f9fd9b1277796b0e57e5de4e17fd0ba2fe97276142acd55babbe218"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_layer.c",
+      "sha256": "217f888fc033b3c7b2eb09529825e80d52cc9b47b529b16b52f199c3713f5c38"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_line.c",
+      "sha256": "7699a36581aedfd3f1a1ed132bb19b2eb490f4e1202e3693207ecaf5a268c04c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c",
+      "sha256": "0ad5d63eb094e0b9931cc99d08699a71fefa4cbfeda19c72160642da9bed1c68"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_triangle.c",
+      "sha256": "7e72988f7f81ac7a2d6827c33a25f73dace18c761bebb90f62ad2e68cc962796"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_type.h",
+      "sha256": "242c34c6561244e0fe2c303a0abf3bfca920f901d81d488a334ecbeb9a7b1628"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_draw_vg_lite_vector.c",
+      "sha256": "b9b03d7f9d4b8861313765878fc5cfac7b33e8dbacb609da01ebcc449e7a5476"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_decoder.c",
+      "sha256": "fcf0c0879d79a428226a488360cad4bd7dc61ccb427ae0e1a2d690a691ab85c4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_decoder.h",
+      "sha256": "9bea602776b03689fe5b5f59b934a61fee52293b9d8cd25020850728592df2c8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_grad.c",
+      "sha256": "328c3a8972cd78f39bfcc79f44eb23eda9249f161342c573ed66e0694103718e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_grad.h",
+      "sha256": "938eeac608da719ac738b82b75ae3d428d94378222fab2fafa1ebf9122964db5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_math.c",
+      "sha256": "e1eab903469bf90c478ad89e99e69694f4941b499fa81eebaee58b9817c011aa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_math.h",
+      "sha256": "fc50f8948bfa6e8402db4416e5670bfa8d45c3ebfe19a54166f1a719fd944517"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_path.c",
+      "sha256": "a4a67391ced75a7e6af935b96d429585a1f2b16f190ca6f10b2d369f4cff9099"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_path.h",
+      "sha256": "ad2893ec216d0f9eb95b2c28945433d61a2a0af970b02d062626992befd110a4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_pending.c",
+      "sha256": "091022a273e4bfba6a177f758372971f9e638ebae61205a73d6c037597b6df45"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_pending.h",
+      "sha256": "9669a77bbd882f489c04b6981c03570126a327dc24f6c50daba299f06088f2d0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_stroke.c",
+      "sha256": "9441ce8661cb1302b4ae774178fd63f108a75033340efe2b98835ca1171e3d48"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_stroke.h",
+      "sha256": "55332555797597b6cbb9998c947f437238afadc4c581bfda0bf6bf9daafd49cf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_utils.c",
+      "sha256": "2b25a1555a767fac8f3106bd128c90abae71b725158d6ff5c4c4b6cff56a9fac"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/draw/vg_lite/lv_vg_lite_utils.h",
+      "sha256": "643899b3bf0cd9b18e569ce0a96c3324b3f986ecf78b77aadbfb5352448fe318"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/drm/lv_linux_drm.c",
+      "sha256": "93e8cce7908e55ba7775dd1d7c85f4873fe4d7496a3c89c973a7fdeebead08ba"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/drm/lv_linux_drm.h",
+      "sha256": "1de9d437cfa0f970aa0363bb76c6e52b146f06e6a9c88a717f85b688a256c6d5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/fb/lv_linux_fbdev.c",
+      "sha256": "91a6140b9a364ae123971fe746f19c92732e1f4cca506c3d6dad6d7f7a201339"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/fb/lv_linux_fbdev.h",
+      "sha256": "597c23b9fce5bcbed8a043585872c36adeac86038815b91dd7e313a68bd9d3df"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/ili9341/lv_ili9341.c",
+      "sha256": "1843fc84c50c6cd135864752a42b3ad39fcb979ed38a2346e5f4acfb896b4278"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/ili9341/lv_ili9341.h",
+      "sha256": "dd36cfe3569b49f21c24b0f61001655f9dbe9c8a2346527c46fabef4cadbbec9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/lcd/lv_lcd_generic_mipi.c",
+      "sha256": "78ec8d7cce9512e9ef569e516318facc62fccfea04fc485d46a6d0f94cb2f70e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/lcd/lv_lcd_generic_mipi.h",
+      "sha256": "b16b491bddc922a13d9a1f3b7f9f0a4ec35de6abd726e3a23029a3e153736291"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/renesas_glcdc/lv_renesas_glcdc.c",
+      "sha256": "ce27234eabc8e4d8929b898f21022ec62d54a33153b0a5ac83aff70acb8d3a02"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/renesas_glcdc/lv_renesas_glcdc.h",
+      "sha256": "7f1a3f6c72872faa27e6c0dba93e31cd7e8d213d1100ed365096f877de77eb6e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7735/lv_st7735.c",
+      "sha256": "3e72a08a0cc201252fa932e89bf09f8453b76ab2c62ff82853de6aafc5443912"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7735/lv_st7735.h",
+      "sha256": "96032c6189bcf30bfe41c8242203dc4f0097b0da4e3722679867f571287764a2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7789/lv_st7789.c",
+      "sha256": "fba5a64365089202cc802abf5e5fe267d2670810d1531be3e74142d67451475f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7789/lv_st7789.h",
+      "sha256": "5ce0f888262a42ef3601c31db62d34913024526e128d8e402cee429a59d1e3ca"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7796/lv_st7796.c",
+      "sha256": "1205a543091051367c5f53d1bdbf9feb819d11f95128602278380c063dd72371"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/st7796/lv_st7796.h",
+      "sha256": "380b72df2c628af9c4ee3232c8c34e550b06a20418c9e169a64d3f46e9d3480a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/tft_espi/lv_tft_espi.cpp",
+      "sha256": "a4a80f734a5162f03cc2e0800535f5e29e77455547532fbb675862c20e337fd8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/display/tft_espi/lv_tft_espi.h",
+      "sha256": "fa191eb8b82497016e734c88b0433bc48a94ea9919da7b616402a154037db105"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/evdev/lv_evdev.c",
+      "sha256": "b8e6357705bbc44731de3fa3d6e0d3877181d4d516efb0c0d9b22c41736936f5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/evdev/lv_evdev.h",
+      "sha256": "3680b2daaa8d51bd0404738e46f3fdd876cb2ced776706b6c918fa9f7337199d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_glfw_window.c",
+      "sha256": "1cd4a959ef8e060463ce732a407c029ea3abfce32708fab71402eb7dfabd5c3c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_glfw_window.h",
+      "sha256": "179e60a17acbb726361becf6359689f9eebaf04d2c807b6fac394f9f3c5525b2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_glfw_window_private.h",
+      "sha256": "19304aeae2cc5357d294557af030b4820d49f2558592b575c829d61c334c4d18"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_debug.c",
+      "sha256": "73c3c2bcb3dfebda177facdcb816f002a9ee31260bfc0e704597aa982f1a691f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_debug.h",
+      "sha256": "ddd41377bb1327424b14054024d94991d1349f194c1bf6d7a44eb2cca5387f35"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_driver.c",
+      "sha256": "57a0a870da4dde10ff0a7370a60e176737ed7a5fa0bc448f959fec270aaa4e84"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_driver.h",
+      "sha256": "f89b0bc35eb38a90da6105bb317156d191252868a615cdaed8cd94becf806606"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_texture.c",
+      "sha256": "b021c4b9b7fe6f7f203107d59b5fbe4bba171d72a358c99b37e2fbe1f0d91805"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/glfw/lv_opengles_texture.h",
+      "sha256": "9cb47997e93fd5ae29572f52fa3860d8958ed3219c781710390d91df5bf5d1c2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_libinput.c",
+      "sha256": "597eb93ccdd55573ba049276c8b0787a64590c7bc1c20bf814ca784683837fdb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_libinput.h",
+      "sha256": "35417de00e0b20dd18a394c136b01f02562b930b81b89483302f32c5815ee70a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_libinput_private.h",
+      "sha256": "f1cb345478ed65cea795e708594241233eb9117e3d6f788d46a507dab56e90c3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_xkb.c",
+      "sha256": "7028055834da6aa234ab1578875b7155a0344e42e0140cbbf6730c330d973c89"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_xkb.h",
+      "sha256": "4918b40d2dd2d2ff22af16fa33ea16c7a74e20310345957af88d83836bdfea0f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/libinput/lv_xkb_private.h",
+      "sha256": "68134449cb10b2a8dc907cb16c168b5b83626bb01b1677a4170452c0acccc7a3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/lv_drivers.h",
+      "sha256": "c272485d3de37304946b6102552b73d82c5df7858e4d93d9af0c1c47a00081a0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_cache.c",
+      "sha256": "2236a862e4370003473fd03b7027e01af304997e8262fafbcd789e5c5daab88f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_cache.h",
+      "sha256": "f4c649e574422b470c156103805512db23a38c433f3509f13f877ae8857e17cf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_entry.c",
+      "sha256": "81f23dc20a2cdbb539ab04f28fe49a7ced8aa3e12cd551e801e0768bbaef0a32"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_entry.h",
+      "sha256": "c8ae3945a9c3998b38f1f578501174483c5dc8421489264c2be83bf93fcea2de"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_fbdev.c",
+      "sha256": "13e9c728bb7f9a699fd9ca20031a2ca7f522f6ec1b91a898d9c60311cd94481a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_fbdev.h",
+      "sha256": "548617e25ae1c45417b4dda90698c0f39be1f9056d34672a5cd238a4decfad89"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_image_cache.c",
+      "sha256": "0200af1feb5c581ea356d52ba467824a6bf39576f94623e4224982c887d593d9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_image_cache.h",
+      "sha256": "ebeb825cd4011ffa2335abc7a566640287eb387b781cf7ad1a9f7f7811f28ff6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_lcd.c",
+      "sha256": "c14866117838a6b2a0b79960b21056b962cf30b44c753545f53c483b69695bce"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_lcd.h",
+      "sha256": "2b5b27d1dce048517247b981fa39bdcd58601e8f3eef4d031ccd5f3772aa569a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_libuv.c",
+      "sha256": "a6fba319836cdf22bbd024d7320c2999969766f7f3d53f5abd3afb2406dd5e59"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_libuv.h",
+      "sha256": "1cbc89bff67c97fa70897c03a2964517f25e8f9c80eb29ef37b04b73ace42896"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_profiler.c",
+      "sha256": "1334dc226fcf03fe82c485f644211e71841491036d4d5c4e39abe574e8095e0e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_profiler.h",
+      "sha256": "d2cc5085f3348af669fe8988f7548d2a3bc1ee7e3a9d0a4d18150108b340fe91"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_touchscreen.c",
+      "sha256": "44a4ec1f2b108a672d5b8366cf6b2424a2ea1c9ccd952401988b90593c57497d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/nuttx/lv_nuttx_touchscreen.h",
+      "sha256": "6cb7ccca66b96c6f6f8928ca9c8bd6462201c5dbf8e1d20d60680f729728cdfe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/qnx/lv_qnx.c",
+      "sha256": "c56a8d45841ab43202ad2d25e4138fa69fcdd4b51baebb2d3d9cdd5cf364778f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/qnx/lv_qnx.h",
+      "sha256": "f6c1bcefce8be2e657197f1a36983d823b90db23839b96f54c9edcd604abbc6f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/README.md",
+      "sha256": "2a9ad36e968e1b69061bd9e8dd88ac4ec6d48ff2b463441ae81bfa4dc67bdc3c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_keyboard.c",
+      "sha256": "8f0b86028150dce4019722edd8af195ae688a2878f490f71d86d5a83c7f36282"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_keyboard.h",
+      "sha256": "53fa5ef7779bca17c50de2cb9badd964bf9146fda373655f53fce86b1ec18405"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_mouse.c",
+      "sha256": "db74633324429e8cc14938761d3e79d8a9bacb212ca70f2559f2d61d28645b65"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_mouse.h",
+      "sha256": "a6bb44241ba8de6768c6d59e3afa87787c4a2c53b84332ce47caa627d831f7fd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_mousewheel.c",
+      "sha256": "123686ece1ec519bea67bca09fb66de7e415617e4ffa3f2003a57122201ee221"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_mousewheel.h",
+      "sha256": "9b0ddd0e11d86be5c38280c95a99d75346ba9323f3c6152114e0c1aae0793a11"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_private.h",
+      "sha256": "be020917737a650ddd16505414b9026adafe4dea383ca106ebb0710e6d5eac7f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_window.c",
+      "sha256": "2616887002ca0f15de86c2380eb3e4104573313e7a5a4211c040fe978dcbca70"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/sdl/lv_sdl_window.h",
+      "sha256": "0cc003dce1930104760f1bf7a95b32b3e7e00ee4acbdd31ecaa792dd3d886b4a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/wayland/lv_wayland.c",
+      "sha256": "5e92b27be80b7dcdc94ecc3463122fe44246cfa0fd59a935c84116603f371821"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/wayland/lv_wayland.h",
+      "sha256": "e63c48fdd5ac495ba7d5a653bf9459e80996548cc7068cc2a31a7c3aef7689e9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/wayland/lv_wayland_smm.c",
+      "sha256": "547f0fb87232f2441de60f7bafc83ce10e7ef759347abf32c45e6bfe9446fe4d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/wayland/lv_wayland_smm.h",
+      "sha256": "8faac54c09e51e43124fd066a22e30bf67ec58c970515a1e1d10b245766d65ce"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_context.c",
+      "sha256": "429b9674875bb9e2d2a93ed62e7a94941ad5103e355b847651b307d4c0494624"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_context.h",
+      "sha256": "00c3612499f01de33ce26f0893b3742b37c0d4140df3e3e263ef7b6d38704389"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_display.c",
+      "sha256": "1667db6e1dc30858cc29b56c5831a908e87bbbd69309bc529fd73321aac60e22"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_display.h",
+      "sha256": "815204e108a6995af9884d3872eb2ddcf4ebadec5e230a05f7f89f0b081fabcd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_input.c",
+      "sha256": "d3814ce232254540be829ea1f16f62741a1545aa068249cb71e8204bcbd4ee86"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_input.h",
+      "sha256": "32eda79c6b62e5107ea7033678993985d256b871589a4781254e7355f789d245"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/windows/lv_windows_input_private.h",
+      "sha256": "2756efae19fb95a24537c49c69ac68ce240403230aeed8f4d452b6274919da72"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/x11/lv_x11.h",
+      "sha256": "20778b7ad2167122b26ede0bf4728bc17c59bfb7be96e40d1142c7c477cd7c84"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/x11/lv_x11_display.c",
+      "sha256": "a93768471b80284b363177a24526341796762558cf716dd655695a3748f5d4ea"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/drivers/x11/lv_x11_input.c",
+      "sha256": "c9f7ce3a8ce0a32f69dd20c4cd562d69d06c5ff2e071949bfad3f024608c019c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_binfont_loader.c",
+      "sha256": "1d9d487ab984644bea26b1a0938e9f9e00d807f30d54d7a643d4d9e6661eb6cf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_binfont_loader.h",
+      "sha256": "ae7fd54de4e25cc11cfd133ae9c5d7dcd8c855f601f3aff9287582e67d21ca0c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font.c",
+      "sha256": "6c99062395430f8b180217f32e30e45dc93d0989376fe9e2e62a69e49d214065"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font.h",
+      "sha256": "7b5893398939350ddfaaf20f40e561b9964244aca3876a8133b03e2fb0677815"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_dejavu_16_persian_hebrew.c",
+      "sha256": "8599edbcdd1d2facbade0f07d09c6ab8bc82e8944bafc3668cd7219653cfca7c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_fmt_txt.c",
+      "sha256": "9c6073ed5105bfba417fca86ba794712db00c498f88ce1d20b555b66a23c5054"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_fmt_txt.h",
+      "sha256": "419013f9169305a19bf2a7820347a817f49fe4106c66107a4dbf0dc9e56e225e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_fmt_txt_private.h",
+      "sha256": "509384e80e9a679c82cc533b895594e02d1da9461faca3b89a908e1fae7a21ef"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_10.c",
+      "sha256": "afc14fefad31c0fe072fd6d3846c89df1277b77713d458e8b3e4ceaafec30d39"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_12.c",
+      "sha256": "5be9c2a8878c694e8abd55643352023a7071e5bac474423337ed2e2eefcd8b7e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_14.c",
+      "sha256": "140f65aa4327f17d587bb51b63e3f731523e4d9a24e40a9219d21ca7c84f0f11"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_16.c",
+      "sha256": "bfe04c1059a2cb310c8c7a69e72d52e720f743e26065fd0ddc4561f2423ed372"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_18.c",
+      "sha256": "cc3b22b9d8c7689d4250e319136d26f4808ed59da1ca753f06305d3f2ff22248"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_20.c",
+      "sha256": "d8b67ea4c76ae2c71bf8203521de9f74fe17ac01fd6eb7fff4918057d5c59f34"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_22.c",
+      "sha256": "43c3c6d4b39cb1884dbacec21c4cfee820466e39523acf082f9128e06e0899f0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_24.c",
+      "sha256": "530fb723e9f225b8d203f359fdb70ec59ef2e1a043a6bc6ebaad0768050ec91e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_26.c",
+      "sha256": "6a0ab0686efc751cc41c0df15e77cff137c4f515d1674b65943d71bfffc17908"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_28.c",
+      "sha256": "779d47f0eb18c2563fb8bffe50dd9f797fcebced2abfe7edb9c961413f9fbce8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_28_compressed.c",
+      "sha256": "6e104239c45fb0ddbcfb1fabd8125c1cfd33ea582c85588a7fb9871c4c749e4f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_30.c",
+      "sha256": "d9dfc1bf226beb682eef29b3f0d72f69d36395df5258b2834a13d92af23505ab"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_32.c",
+      "sha256": "0f0b77e61b63d712b728e523d9139dcee810794055773d8699d9787c48aa63f7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_34.c",
+      "sha256": "fce37859b82016ace4d1482319d31a227824b81779e3696befb809e828ed7aef"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_36.c",
+      "sha256": "2388d7a652aa52a479c6410bd0ebdf31e2e6d0f8be58f61ecf5b41e1981fc159"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_38.c",
+      "sha256": "823f2450ddca033e38addd2a08dd9cf2f01e840ab1a0a917444391f234976e8d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_40.c",
+      "sha256": "0e13032310141859ec8c337358488d85af560e96d0dc18c81138e25212ddd25a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_42.c",
+      "sha256": "b4fe50b53c59078d46db3315afee59559e629ef6fbb52c6cc80010a0b834ea27"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_44.c",
+      "sha256": "bb5b7ef84e4878ce37c64f3149afa956ee05b5ef284a89ceda33f73c2cc8354f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_46.c",
+      "sha256": "75e6da97e36ef8d7c3c17d6e0b7b4f880265ef408bcb279521bf69092d674933"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_48.c",
+      "sha256": "e68fa0e706d2a18d66dfbe536d9fab83068145159b40091fd261e8be21ace985"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_montserrat_8.c",
+      "sha256": "334eb715262c7d7df7b91a610a29afcc359f1a3c206b388cbf5294ba2219a7bb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_simsun_14_cjk.c",
+      "sha256": "b8fe8466d95a2c291bdfbeba6490e5c5e1897275fb03053aa2cb77e7d1c980c8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_simsun_16_cjk.c",
+      "sha256": "06abc4bf64e9b4d18aa268e18af71b8b8cc5e41148c2905d179773b1293449b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_unscii_16.c",
+      "sha256": "e794d86db88db9a1a9216ac6a564dece6f78e71eca6915f122bca97d0f0ff792"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_font_unscii_8.c",
+      "sha256": "fc22dae14096a1a6f9365dbcd646c62216cc693cb89c77e22d66a205e61ffba6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/font/lv_symbol_def.h",
+      "sha256": "099865a543a36383c6ca4377f9e16acf955c0a34e860bbc3f4d97127b742d5dc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/indev/lv_indev.c",
+      "sha256": "04b5c26ae2999f9eb268f23bfd55df9d28bfb5075214201ae519d757276354dc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/indev/lv_indev.h",
+      "sha256": "9e0517e62459a0130339fb561c77ed221fdce498694f082096f7c1f6ae2f8453"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/indev/lv_indev_private.h",
+      "sha256": "9bab635f0187a3ed4dcc96e6155e6dc4a4d263a8e105001ba931608fa84e3675"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/indev/lv_indev_scroll.c",
+      "sha256": "3b342010567871850c795da9df550a4b1ea60037a51c6cde33638defa08b8131"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/indev/lv_indev_scroll.h",
+      "sha256": "278f8447c6dc5823a19ee63b8e1459454c091e31b7e22231f0edfac8092785cc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/flex/lv_flex.c",
+      "sha256": "124610b9ac818f160c2d71fd3b2daf9b6047ddbb53ddbc7f810a36c33ade6756"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/flex/lv_flex.h",
+      "sha256": "e20e9d294f2f91f47dae2a1d176b0f00deb17c40fe2b39df8b4e1c8d2fe6cfa3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/grid/lv_grid.c",
+      "sha256": "2f434cae9ebcbf0265480be67b6ddc97e4860fe397da3dabd159e114101407f9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/grid/lv_grid.h",
+      "sha256": "d8676b7913973640068eeb387c651264017f6fb0465ca854185752004f6613f6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/lv_layout.c",
+      "sha256": "d083c1b1f92085aad955a8a1f292c57e00c37ff39ef4a68b8af71893e1aeaf77"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/lv_layout.h",
+      "sha256": "6414fb1124d73dd912bc9120916a6fdfb6c49c0cd1d0012382a3584e53c5a8f5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/layouts/lv_layout_private.h",
+      "sha256": "a77ddd34114a69c2d4c725ffc7a03c08a25a09086b862742dcc71775edf97877"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/barcode/code128.c",
+      "sha256": "c7ce6a8685ea560b5896f27f2a6764110639b03d968ae710dc4f67d8880e902f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/barcode/code128.h",
+      "sha256": "cbbc24883857d1191321863b0dc55bba797d524992c41a1390c476e436237642"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/barcode/lv_barcode.c",
+      "sha256": "08ca0282c0f2961e5d59fd563c6380312b082610c1d14813633a7b6c09376411"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/barcode/lv_barcode.h",
+      "sha256": "99df3ca7d3514163c53a31f94e95a4ff9f10e54544bb1091f9f6bdda3c08512b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/barcode/lv_barcode_private.h",
+      "sha256": "c046bdf29f5ac0f762d571711391188cac9e8cb7655c1f6db1f04fa737e39e0d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/bin_decoder/lv_bin_decoder.c",
+      "sha256": "118bf9b0cedc2276d85210480ade0415b21d63b17093da596a7c2668bb390c9a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/bin_decoder/lv_bin_decoder.h",
+      "sha256": "60588913df80866205d836c5592fc9f427c800a4cccf65683f6e7313a36483cd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/bmp/lv_bmp.c",
+      "sha256": "52f839a5b1a4ed59947572266237f43427b3fe86601fabcb4e23bd3f7fc3f91b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/bmp/lv_bmp.h",
+      "sha256": "f33aa945052d97abc55b810b41d3adcdf59ede566fdcaac7784fb3100043bcfd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/ffmpeg/lv_ffmpeg.c",
+      "sha256": "6074fb3129910f18c4452a5d7d22f9e200036297380b44cdd18c204768df0f3d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/ffmpeg/lv_ffmpeg.h",
+      "sha256": "808f3e3f31af7a4b197d8c114c3df56d8e17e92f4ddcb86d84f83358beb73caa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/ffmpeg/lv_ffmpeg_private.h",
+      "sha256": "175851534ef5983d7ce3adcf19ac943dc4395e8755db22a40ae93a6812f4470b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/arial.ttf",
+      "sha256": "82afb35eda3a52edb10106bcc04af93646384421ded538d38792c1444d816022"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/ftmodule.h",
+      "sha256": "c8d5ec90afe9db74bde516e03f122b1e236adfd8d5b23feb321a1219371acf08"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/ftoption.h",
+      "sha256": "1d10ece952e4b04cab352849300634be9c6cfe3eb5ed60227b0276d5f248d8bd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype.c",
+      "sha256": "037adf00d9a8a43ee32e99ac6a542a85ddc8b3a19c73d3a24232feb67c40c630"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype.h",
+      "sha256": "3389235a7755b6490fc47e84aea1dc718256d116fdf1d741037516cba9f41235"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype_glyph.c",
+      "sha256": "d106d6245c927beb5db88c3741d7c6c7c326a884e16941c2834cd5078784c6ec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype_image.c",
+      "sha256": "ef2536f4c2d4f048a97835208daf1874f8ae30bdcc67a87d493920f472a18aaa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype_outline.c",
+      "sha256": "51bc48693cb85051fdd4b3590d776c1076bb6b5a7c430287b142aa7837239b2c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_freetype_private.h",
+      "sha256": "6d2f69c8d360090ad3e9f9421cd696d52248a11f608e52171fd08462fcbde4db"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/freetype/lv_ftsystem.c",
+      "sha256": "a153a7f684956da3cb0fc31607d9cbb8b23ccaca2c3586a4aa6cad738bc0bb5e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp",
+      "sha256": "3a836d40a194f96c8c1adcadbd67213386d266820b58f15d8d98119c7bc319d1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_arduino_sd.cpp",
+      "sha256": "fbf7245ffa0bdf5a74463ae79f0db84536cad84f7f1294b62232b71edb2c4d9a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_cbfs.c",
+      "sha256": "d5c0b97cee156e0097a22635397a79978146eb6e11e61a69b29cceb89ee8a9e5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_fatfs.c",
+      "sha256": "b1b4e8324d0f39baa4fafe99c8479aa48ec7a773e1af6796a8f760e699e18b4f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_littlefs.c",
+      "sha256": "2177a11edda4aac1cc4fbd7cb8b22afb4921e7487e5c42568f3428d8ae1dc0fa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_memfs.c",
+      "sha256": "0bd267a83fe23bc08ef303a147849b4f20f48c8b7d8dc95b8572ef8c3768f14f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_posix.c",
+      "sha256": "d0636e919dab06763b1f794d5d13486dab21c600e7faebef7dbfc425aca6a43b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_stdio.c",
+      "sha256": "4b23e17ab7dcfb0e42b6701ea87667403d7063ea57b4f2697287a3a4d19bfdcb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fs_win32.c",
+      "sha256": "2ea56e20f8f7c1f3e672b1536f3a8b1f95b6982b7b61deb9b428348781ca228d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/fsdrv/lv_fsdrv.h",
+      "sha256": "03355e747d4bac9a7a9505caf83cdd447f9a107e33dd1b7765689836cc9bd556"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/gifdec.c",
+      "sha256": "029860b48489ac151f51f5311032d17d1261f132e26b70a5fc7cb88c39db4067"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/gifdec.h",
+      "sha256": "1e2fc470043f0147d97282213ae639783cbba3839433a20002451605056f2bd6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/gifdec_mve.h",
+      "sha256": "ca5dd04085fe795e3b33c9e61803f753e41fa6e697d6f079c95dc6be43638595"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/lv_gif.c",
+      "sha256": "1e2fd1f8b5c3d84a69592e68d24b3de532d6071d1ed5598a3fa03655d4f36c2d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/lv_gif.h",
+      "sha256": "f4f42153599b0ad792cf678d1265594da7ee01f7e88dc79d572a6ee77c0b5f07"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/gif/lv_gif_private.h",
+      "sha256": "4b3da42ea343adabf8ee8a6ed2254dfba88f5e56bcff74e704d0a56c0d5b3711"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/libjpeg_turbo/lv_libjpeg_turbo.c",
+      "sha256": "cc13df305fec526861f7dc8b375334d40572196ae9d62fc0268ef2489d48f6ec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/libjpeg_turbo/lv_libjpeg_turbo.h",
+      "sha256": "dda5ec8e9b10055a313d0755c26d85f405e3c16937ef16b06542ebf5dc6d5be2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/libpng/lv_libpng.c",
+      "sha256": "cbcf206a5de2baac36d09a9692629835497833877678934f5213c371512bbf22"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/libpng/lv_libpng.h",
+      "sha256": "f70a2a12727f3ef27521527bf4fef42b4e1526bf772932d86bbd66cec4d180c5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lodepng/lodepng.c",
+      "sha256": "160a73c414aa7f8e3c6f7d977b098bfaecb370f048a7b8e18b67f246549b696b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lodepng/lodepng.h",
+      "sha256": "ec7b736057091301d69c62b026ae40b11be77b3651c0de58044acd9c81eb5917"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lodepng/lv_lodepng.c",
+      "sha256": "932712a189579f179cfab21e0ebca4d474636ffdc53b38758c66f30187f5a020"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lodepng/lv_lodepng.h",
+      "sha256": "6595eb11cdc6ae9f22dbee944e19aebca9660e600cd20116da6929d0d8e5ac0c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lz4/LICENSE",
+      "sha256": "8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lz4/lz4.c",
+      "sha256": "cdbf9d14e13cb36072a3295b18e6a1d3c6c4e2d9dafe6526185b72c6f8aca0ad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/lz4/lz4.h",
+      "sha256": "77a9c7f1ac5e2af4398f07bf983eb6c4c1cab4671b6b96db2eb5ff5cb2ca0b71"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/qrcode/lv_qrcode.c",
+      "sha256": "8ff31bfb35ce407a265eb7bbfa8055235d90001e0c5ad00f15279e344f31313e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/qrcode/lv_qrcode.h",
+      "sha256": "cee9ed00dcdbf20570200df9b19da17d294532a418cb01da913177a0db423d2c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/qrcode/lv_qrcode_private.h",
+      "sha256": "b68b64a17ad6566f1a6241c35fe085f801b527c395e80d872ed3b7a1b11c86fe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/qrcode/qrcodegen.c",
+      "sha256": "53158b9b2dce1ff635e0279ddae975b07fa8d1c57d4ec2445abe12b8bca20f56"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/qrcode/qrcodegen.h",
+      "sha256": "729373268466c90d50ba8bb54c73b95fabe7931807003a8dc428e5af7d73b6ac"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/rle/lv_rle.c",
+      "sha256": "78a35fa1f874f09d3cff77a4d8be3d0a4001dd2d083f064bc46f3931e074e20e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/rle/lv_rle.h",
+      "sha256": "27ec8477769453a02191aebcc7e7dac2bd594cccf3824ae56ff226809b9c6815"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/rlottie/lv_rlottie.c",
+      "sha256": "cec488161a38bd6803425d695eebc2232b4e9a3db9aabedf8e432f1bcd70a677"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/rlottie/lv_rlottie.h",
+      "sha256": "f26327195f2b8187641ba5b8a1295fb5702ec76343d6886ff856811e691b27ff"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/rlottie/lv_rlottie_private.h",
+      "sha256": "5eaad3161459baf0cbc92de0eb162e3aebece17b3d80342f807d9f600709a876"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/add_lvgl_if.sh",
+      "sha256": "e286f5ec715c8b74eb538934be6c08c091e2c6f5ee93b6b9276615c12eb0a754"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/config.h",
+      "sha256": "2b329b42c4d6c5c95ea485d6ffd86b76c119d7190dc89ec5fedc48a2db5af704"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/allocators.h",
+      "sha256": "825cdae4af6e94b6f367d4637dfc04949cbc0c1abbada1b1a71ecee2d6a191b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/cursorstreamwrapper.h",
+      "sha256": "9e619d9a57c2fdf51e89e422668d6fe3065cf227a66261ac2519f1870398fe39"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/document.h",
+      "sha256": "92995df5ea1a67400fe3dd649ac3a5fdf97ddef17005f4f933b242f4f830c0c6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/encodedstream.h",
+      "sha256": "9f966d81e21540888470fe0901b2ba9026b0b662dd29f76f741bafaa9d9c3358"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/encodings.h",
+      "sha256": "766732e0d0f4e08c7667371b3e9e2f172b0d7c35f6501651bc9c35cbaad0a692"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/error/en.h",
+      "sha256": "3cc7a00f9252b1183f3a108a9c7ceed59e408cd7b5a04f4c202a66a84a0fb578"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/error/error.h",
+      "sha256": "648743428973469227f6b419f80a979809c33bb8d66c409c8f3775f4f7381121"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/filereadstream.h",
+      "sha256": "6427374b5f814840d47f7646b5eefcc3286323922713924d0c2aeea4237d1c30"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/filewritestream.h",
+      "sha256": "eab610840c5d225ad29aa6bb1885c6cd612be8555fd00125bd2186dbf68b7107"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/fwd.h",
+      "sha256": "05043f27ea8a2cc773671d90ca80d4d5c2024dfdffcc85b3fe67fd0367c41dcd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/biginteger.h",
+      "sha256": "76fc3ac1eeb1308228abd834cb01c8b297318668bcffdb5df404c25e0e34497d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/clzll.h",
+      "sha256": "4ca3e63eaae4c67b049e8a6cbb532182e1d9c9023b7d992c556fcab0c2f4c045"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/diyfp.h",
+      "sha256": "b1c63c28dec8f82f7fdc2a39193d7a09a4c30343c3f008f060adc70e710e0a32"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/dtoa.h",
+      "sha256": "839551a35826b5cf2a5289cee282714882ed4ba97b30e9c9f1e2f73a51514038"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/ieee754.h",
+      "sha256": "3eab1c7d0b052c81bb66fbce3186b3a67851fbd2bc2bbf2b635dc6bee656fe34"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/itoa.h",
+      "sha256": "a0f965f33b11ce112b7bf2fbdeaf5338fca174e33f9f47608ccdd6d8559f3871"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/meta.h",
+      "sha256": "fbc1e3fa746a68a60bf236a922e19ecdf9572b814164f198e810334a1826aa05"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/pow10.h",
+      "sha256": "b8bf6bd27304d9d38f4cda49f249de0d3b97e4226e8dcdd04f75c473380b50e8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/regex.h",
+      "sha256": "e7f64e62a005f74661a1d63a09672d870d39914bc4a2f165b4165338020a10cc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/stack.h",
+      "sha256": "8b7efceeef0a0721ac98965ab6bef6c8507b0d0fcd205e35e0eec84e42cffb03"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/strfunc.h",
+      "sha256": "6ee8658c852b9c076e1893425d718cdca4089948b7c6b91e3653c1b407e431ad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/strtod.h",
+      "sha256": "0638724ffa4198da3678dba1457cb4abfe36b48d8be78132822af0946e6c111f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/internal/swap.h",
+      "sha256": "72acfabebd33f44869e7724603e57744da33337998b32443b66eaba58d2bbbfd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/istreamwrapper.h",
+      "sha256": "e11984b1ab67d74d87dfcd478bc1059e67720ab2d0de6e8fb57c55e2e053bdc6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/memorybuffer.h",
+      "sha256": "87d8c876554e50698a3e9f3cac49896d4b1f15eb814e279d01b2bb79f3aa3e1c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/memorystream.h",
+      "sha256": "9bf7c6bd1a657f48ba53c386f6dd116c1d5d8471d04c92216680bcd979fe6aad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/msinttypes/inttypes.h",
+      "sha256": "f95f632862138ad569a6e3adc431d867e6fb5ee5f8cf23e8cd1e942a1fd1fc55"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/msinttypes/stdint.h",
+      "sha256": "c3f7d184f187b82c617134170bf9a02c3233413cb3bfc0ee4aa363055464886d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/ostreamwrapper.h",
+      "sha256": "1f0c6cdebf9a4e31c53e59091c411e359e6e2c504790eafe55680a4ff98e0efa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/pointer.h",
+      "sha256": "113861bc59a7a273e22299305a16cb3600c0eaa5dd1d7554a30213c54b8f8bcc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/prettywriter.h",
+      "sha256": "27ae70723851da686c9a829f8404fa2e18e787eab9dfee16fe43303d8a2faa68"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/rapidjson.h",
+      "sha256": "13b192db391cd4e515bdfb0653cd8492ff9f42b823ec07f610c073b8ad928812"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/reader.h",
+      "sha256": "214ba7447b544217dd005020010fdcf5241ac7866607b94704bfe1642720a5ed"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/schema.h",
+      "sha256": "fb800528abcbe0fc44f343d111267b3383edf85fb0a328d3b671d3d72b4862a7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/stream.h",
+      "sha256": "a3708a941a130a5679d2302368169852e5c4ca5f54758ea0e94caf61615c8ae0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/stringbuffer.h",
+      "sha256": "5f01edff23eb9f98997a766e12873e23afa205fdd20a8cf2bebfcb8665737fec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/uri.h",
+      "sha256": "53d200ad6eae23399fab31687c50511b3a14cd32c0a36900151f34ea0bf4cde9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/rapidjson/writer.h",
+      "sha256": "8b27f983418c95d36c24d484c3271129980f0db91a50193fac206bf40d65ec33"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/thorvg.h",
+      "sha256": "bba3df898ea36f5cdd7ec6182246883b41a6252b51a6878d3bcbfe5823633eb8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/thorvg_capi.h",
+      "sha256": "f92ff0d463682149c6be6b9c8db11266471b6fa36d76e81b90058e5eee4fb443"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/thorvg_lottie.h",
+      "sha256": "9434ccde8e33016fc07e55a26553452533510586a2d73199628e543acb9eafad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgAccessor.cpp",
+      "sha256": "fa75f01c4c195d91524942854932d6c13aed14cbcf2f972c558f9d72d15950b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgAnimation.cpp",
+      "sha256": "10f29beb2325ab4c0bee5520f806c11d9c00a17115cf572d1fd14d5a2546bfaa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgAnimation.h",
+      "sha256": "d821663d63749dd59b05e0db38df5be2b2fc4ee09619b06c6f6bd8b6579f226a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgArray.h",
+      "sha256": "e08098a61fca39087464c9dfb5a37d485b7c213fbc3ba4e902b2feeeef990ef9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgBinaryDesc.h",
+      "sha256": "b0e78c13e420afd34bf98192cc510be2a0ce1057e99952faf1b2d18fdeb1931d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCanvas.cpp",
+      "sha256": "dcb0c08007fc51c70b2a5d599112ec890cfa9fc3b8d692c47a0ab6ada9ac4aa8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCanvas.h",
+      "sha256": "6bc22289f5b3e2ccad73a45527c188b34351d292343542a036f5eeb86ac7aea3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCapi.cpp",
+      "sha256": "84849c64ea65a123e4c720b25c75c00dcf4ed34441e9f45fc7017262c4c0a732"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCommon.h",
+      "sha256": "b1a2fd4e7389e0921566419b41179b6c93bad23a8807f50c67489f9acdfec004"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCompressor.cpp",
+      "sha256": "c1369541ff74b8b0da9cda038e7c268a71bb12da325fdd9db833d1b55e0adfb7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgCompressor.h",
+      "sha256": "914abe17a8d6bd77e962f7e0f26ac2e6f1343b13896762a0a742792595ef2fba"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgFill.cpp",
+      "sha256": "9269c5fb7ce79c116a7cdc6cc208c1b24a6eac0586b541cf0a6a936879500626"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgFill.h",
+      "sha256": "d4cf31b9691e1dcd2fcfc819ce760d6284ae1c321a87d65f248dbc7e6636607a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgFrameModule.h",
+      "sha256": "7a7472c9c8785db5b4c0fb35e12887cafd8d657b3127cf8efe051e4bbd07576f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgGlCanvas.cpp",
+      "sha256": "bdb44c3b603ad36244a9d3700aeeb1e96c7549375e5fb9f3de432c6371b370b5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgInitializer.cpp",
+      "sha256": "6ae50a6bd760423fa7e7422c8f629574e7acab36d391f6dd5847132a62ca32e2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgInlist.h",
+      "sha256": "b16e00b2cc4d2442977d4273b3cd90e68ace85a745b69a4341856e0897f7a092"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgIteratorAccessor.h",
+      "sha256": "db767a17cfdef2319d65ed0c0a59c51db7aef40b6f37ed81ff8147e66143e009"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLines.cpp",
+      "sha256": "02b353fe8443084a06d7a4d194001acd849cd4befd5f346c042d0621332d80ae"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLines.h",
+      "sha256": "f4fa48370fd48b5f2809f72ca846b424978ec563123c4c535f1d5b27be2c8e9e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLoader.cpp",
+      "sha256": "cbad2ed1eb9c950b6de7e29b53f3653c2adf45555ec00caf4d7515422ac2fbf6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLoader.h",
+      "sha256": "cd6ca58fabbfe1c866d8bb35c5cc011afa50b5b830f9f4c5da9141391215ab92"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLoadModule.h",
+      "sha256": "f08725474ae502fd5f8b4db3e6ca21129da84e9e9c7aefc127785cdb280796f6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLock.h",
+      "sha256": "9cb970a19da53526d517d05a4ae561c77333a5049749caba795b083a2a1ce0ae"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieAnimation.cpp",
+      "sha256": "1991c62abd39fd31d0da87ea2097e1cda4b6a85e4e59f2608b9630ecf1ed4e25"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieBuilder.cpp",
+      "sha256": "a85dd7c1332cbc721df6ba72c23a8bb6c22a0fb04acbb46ff020d5f122dd6fd6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieBuilder.h",
+      "sha256": "400dbcbe3b1a77b280b58e611b76a8e5736633520d5dddd1dd284ac2a88b9dbe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieExpressions.cpp",
+      "sha256": "6d3ad44247512810286d236eed7b833827cac8a446d813ec762e311b58ce4cc7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieExpressions.h",
+      "sha256": "57c1fb2d1b6c4ce66819def8c80129a9fd3cc5c77be4031578cb1949140553e9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieInterpolator.cpp",
+      "sha256": "6c3da5d62244ff6ab38410a4d83c14b881fd8820d9939647dccb13b9f8ed38c7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieInterpolator.h",
+      "sha256": "763f0fa122b01f321ec6a0b3fa3464ed648900b97ec3ba8abc24d0df645c55c6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieLoader.cpp",
+      "sha256": "327d872a5ce0fd83dcb10d8c552ff25921fa1e29ed638079b1026a0326f9979f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieLoader.h",
+      "sha256": "66fc1c29b655b87203d2de839c990c07e8ddb9d9af2346ef2f56c5fc65db3158"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieModel.cpp",
+      "sha256": "3c74fe73eb0e026fa56e381e4ecab6faae71520c0130e5ea661731fe182a57d2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieModel.h",
+      "sha256": "dd8abbc42e401cea0d493ff6e2bed8f401dc6752f70ee99e7a9e6476d8b8255b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieParser.cpp",
+      "sha256": "831d16404e7839794ab3503640895f42df3717a99485cf15207f67f8a0bd1685"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieParser.h",
+      "sha256": "4a8c318d3c79d5a0d7966bf47094babf093eea584e4688a58bc9460fd37dac33"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieParserHandler.cpp",
+      "sha256": "3c2200c1a960e49137495c673b093eca5143629ee51ccde0a7a6696fe00fdd2f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieParserHandler.h",
+      "sha256": "58b90961e2ab3c7ab86c8602b5b3597ac9dfe84e70c724fd2d8e80f126bdf59d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgLottieProperty.h",
+      "sha256": "ab1255aeb7bb08f5f6a267668c0003791c262cc25dfaf510c513df863a79fc22"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgMath.cpp",
+      "sha256": "c78ba2b6f19423468fb33dd3feee88781626ffb6d96438f2fc4ad9930a3ac14e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgMath.h",
+      "sha256": "7635b989d187e98739016ebbf79b672fe2f1b6a5d3fcbff6c3ef7e67e5988726"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgPaint.cpp",
+      "sha256": "7ba1f065fdce44056a6f7cd8b951a2bbf1af58c0a1f667b9235ad7f9c24b6ffd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgPaint.h",
+      "sha256": "4c80999d6522e46d6165acdde67090489150c7a5a90a658907ca21c17a549edc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgPicture.cpp",
+      "sha256": "1ee6c3bcf06d4181471398420c1bf82528219ee094e19af55ff045f85cbf8dcf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgPicture.h",
+      "sha256": "3f7f5a3d3ea10a20adf8dcf3e61b0d4ea21c3e6327b347a8cb4d5a615378ee6a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgRawLoader.cpp",
+      "sha256": "b10498c0e8ab7529a0b007e040a8a22232e9bf43268f80780e05b5a5866e9df1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgRawLoader.h",
+      "sha256": "41f9c37fdd3a41ec04e43f5452fc0a1fe3040795611276ea892010120093c172"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgRender.cpp",
+      "sha256": "d7885d962677d3655f809a0fa5d1e05bd341f3fd0e3a9baf9f3945525ba63295"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgRender.h",
+      "sha256": "43d8dcb90bc1f0635d6c40a65bcbd541ca0967e0bbb403fb490be7023c9346d3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSaveModule.h",
+      "sha256": "52928fe8c921eb4d17d59348c394c01b634e807adf16b33cc05ed1b158df6189"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSaver.cpp",
+      "sha256": "84763b5f5c33a7346fd11f9fce2d4443fcae194aa12c941c69be1c5201794e5c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgScene.cpp",
+      "sha256": "613e75e1287f08ff1d95ef485b7e7ebd4aa74e665169ede58f5df586e394972c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgScene.h",
+      "sha256": "f8abe5f0a0cb5c947a70e36985f408f23afd43fd6ee9faa008ab4b0516182a2e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgShape.cpp",
+      "sha256": "36bbbab56b624d242f3b7765c9bcad3f978751d0d8973b548fc2f21813d1504b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgShape.h",
+      "sha256": "0159ad8016b5b16a7152cb07ede84cfc82d00d4baeda9334ade560d2eea8b5f2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgStr.cpp",
+      "sha256": "88045617895a1634957996fda2ca3d97fc72eb746b7964bab1d3b93e33c084b2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgStr.h",
+      "sha256": "3be9bbd97b9d428b09e6c406f3c43d058d6fdf2d9dac6b88e500b701b5d4903c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgCssStyle.cpp",
+      "sha256": "b4421970561563b11da236fefb0ad35aac45430effaff622070ddc2a2fec0b65"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgCssStyle.h",
+      "sha256": "8b2f71217c9d5ab67ebadab065ffa269b2d1efc5fb106b803793f2702e040b19"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgLoader.cpp",
+      "sha256": "18a37d28a8de84446366d49f34f3edadfdfefa98a2348eaa4a7dfde3a3ed1c09"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgLoader.h",
+      "sha256": "9db732317dc5ed336d8c3bb92d4931b895392094bd7a8bf6cb53f72929ff7437"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgLoaderCommon.h",
+      "sha256": "bbe9da786c136cc64f683b1bd19a38cb0d50cd95f5564710078874e8970ceeab"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgPath.cpp",
+      "sha256": "704dcbe375a49fd8217b8e01c76e17e1322aec737e387228a8d057935f34d994"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgPath.h",
+      "sha256": "82d3d33c6a0cdc4a5f8a6ad7b38937608a147ebb171543c50f74e342c769745c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgSceneBuilder.cpp",
+      "sha256": "fee5416a725e3e0f3646ed6e6d71d82443168877f38276fdee25c30f68339ee6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgSceneBuilder.h",
+      "sha256": "3caed8c5dcf2b91204cfe52aa1b0be9ae4305a544e8e8df3b7307f05ffdaf0b8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgUtil.cpp",
+      "sha256": "c60970562441f9766e6f70be5653edc66fc37e9c9d4f573d0a7229764ccc95f1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSvgUtil.h",
+      "sha256": "77749b1016c3e3d6fa81c034fe7b60ce54fec5f15147ca2c5d4345d1badba612"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwCanvas.cpp",
+      "sha256": "748cd861a8fb2f4f21b4659e5d867a141c0c358e8db77fc92b7f8ce2056bee9c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwCommon.h",
+      "sha256": "49e3191845f9af8552984847d7de69c2a9ffed5ea91f247a26199cc19101cbba"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwFill.cpp",
+      "sha256": "19885764732547df9dd9e8c0544beab254e046295cfc9ae25f99f30abc4afb9f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwImage.cpp",
+      "sha256": "877b558a17560d80fdd8942c40e567271c94d1e256c3a0b704722d9c5ef28aa6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwMath.cpp",
+      "sha256": "a5a11b4b19df1164eba30967ca8eefedc39ceeed20b8bd9dfd9c1658b12aae9b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwMemPool.cpp",
+      "sha256": "25474460e4e105f8a34101df917c6c6f666770ac7aa9ca2d5c117a7ed2fd80ce"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRaster.cpp",
+      "sha256": "606a78308468bc1812f69cddfb239a78d974b96d436f0ed5982166a7f2aa7581"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRasterAvx.h",
+      "sha256": "2faea9146d5be9d375005e071016dc8027d34fcc97baddb637e2ad5ae5f28fca"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRasterC.h",
+      "sha256": "97e8d4e89fd1605291f5e1a23770efb9a33a07a7d01a89f4c31331918fee89c8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRasterNeon.h",
+      "sha256": "49cb7e5a4366168e49bfba1e3a97c7753d40638365a2b974b2d17cce18ee75de"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRasterTexmap.h",
+      "sha256": "8066cdde70d3d4c4147c57a0e77fe8e84d13158e68c05a8a4923c9b5c2005fbe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRenderer.cpp",
+      "sha256": "0771efc1d339c0d764c6f87f95607ec1c70dd729d2b09abb62a0e97e28018634"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRenderer.h",
+      "sha256": "82c9aa492f9efd9adcdbef374f113d72a1a4e73e124c50bd9c6d65d752a26752"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwRle.cpp",
+      "sha256": "c44f9e2cf3c3a8d11fbae83efbd2c7966f938a1008b645687b7dacbd08ee9582"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwShape.cpp",
+      "sha256": "f3ce4ac713be2526dc7cb3815107e2c58bf1e952d6873a7c6f7ed0edb85ad96a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgSwStroke.cpp",
+      "sha256": "6c495a754aef3d161ec79373e9dc8c06c9f2410cd954e1334e0ec2b78146d4b7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgTaskScheduler.cpp",
+      "sha256": "8ca1f330f1a2d88c3499bbb2a55d40cdc7c2344dc1abff7e3b0911f311a8cf09"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgTaskScheduler.h",
+      "sha256": "fdb1185f62ec6328b688216bc69018d1b819976dedd470bedfcf1f3ac375967b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgText.cpp",
+      "sha256": "694036000fb74342fe1d33c4b72cc1c02f88e382dbe31a0849f863deee9a594d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgText.h",
+      "sha256": "d2813bae123137f3dd630de4e784677546470af2c98afb65330f32fb7792eef8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgWgCanvas.cpp",
+      "sha256": "117c57da8ced49549090f97958b9508a7331f0bb093533db8eed36cb634cdfce"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgXmlParser.cpp",
+      "sha256": "7b07a39ea97438ce85ca45d6869017316acc873915554c88be9a11bbb039292a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/thorvg/tvgXmlParser.h",
+      "sha256": "741daffc46056927f4d63daeb131bd23a7a13e51b5e9e602b77b9058b68867ff"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tiny_ttf/lv_tiny_ttf.c",
+      "sha256": "ae5a126fd11fe9398d11f5c2d9ef5c073f63051b9ab956c1942df1fb165573ad"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tiny_ttf/lv_tiny_ttf.h",
+      "sha256": "4d58473dc474869cca8a07ac7e1bc965b7c155a7e712127489c741e4378c0728"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tiny_ttf/stb_rect_pack.h",
+      "sha256": "a77b5e58de68d892c0c880ff62f6de7a7a669503cf04fa6cd0af7492e149c413"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tiny_ttf/stb_truetype_htcw.h",
+      "sha256": "e567c26ee6b576ab1d94e439ff42979492a4e0b29bab4f0c2713c9e0b27b05d2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tjpgd/lv_tjpgd.c",
+      "sha256": "f727039b7f13bf087a5c63db36f9470ab5994a93ffa83acc02be90995304ed8e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tjpgd/lv_tjpgd.h",
+      "sha256": "602b5d249967fe2a489c04eed922f35d3389fc9188a2d2839d5c230c87078d6d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tjpgd/tjpgd.c",
+      "sha256": "869f12918ddd795c97ac36c281683fc3f18c81b9e0279c6219f8bbe70c03a26a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tjpgd/tjpgd.h",
+      "sha256": "7f768047e0b1947cd1eb55e29890137645042bfdb03fdcb56634ad7df8224d66"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/libs/tjpgd/tjpgdcnf.h",
+      "sha256": "ca1d5bc5fd41f3800238c56ea4322d5c0824df4e5fce5eb47ef9989cdf00728e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_api_map_v8.h",
+      "sha256": "8b6659fbe747dee915425404cdf2a4e1f9e883e6927f28752a8c228a4194a7a8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_api_map_v9_0.h",
+      "sha256": "d31e9ac2965968328225aba92614d349fca2c9fa0d378ea3ea766d55b31e290f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_api_map_v9_1.h",
+      "sha256": "a1730e8c1b1b6e8a5bb910b6ff46e1d4f642ddd289d256a609ca88a5bcae3b91"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_conf_internal.h",
+      "sha256": "be7303b19cbbe65d015a39dbd8224011a1ba1391aa30808edb725a1bf057f9ab"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_conf_kconfig.h",
+      "sha256": "cdd432597a596ba113c6380c4e1db4425dfa894c3d4e833d1dacdff3511e6f14"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_init.c",
+      "sha256": "4e6302ae1870feb82c4717db5c746bf255cb957e404f1b7787a8c56268207a3e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lv_init.h",
+      "sha256": "48acde7f63dc2aaed4bcd4e6156f64171e3432cebbf0b4fa0d6c9337176193b1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lvgl.h",
+      "sha256": "3c739c642fbe68e57e1efa52ca197a54250c5ece0c865950d21f8008c6789dee"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/lvgl_private.h",
+      "sha256": "54672d325c144c2fc529c3b82bd10d8e54ec32492aae51d73049a92aacffe414"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache.c",
+      "sha256": "504311cc4bc101e9db013cd837c00d552c9726bc78a7f03e1b4361dfd743ea7e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache.h",
+      "sha256": "37d1884117c259ec8256c4f32fcda2f3acb1c890e8fa53a9520b436363c63ecd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_entry.c",
+      "sha256": "9f78ca28c1b189e7936ea84863f42651eb755268db3bdc8ddf2d7237318322bf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_entry.h",
+      "sha256": "f5e1ddb4466218bd52a0638bcb4f685b80da49e994a386c53b8cb61573e3fdce"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_entry_private.h",
+      "sha256": "344d938e1177a6bb383194c6439c2c359a3f2ceff38bd39971cd24cdf44f0d36"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_lru_rb.c",
+      "sha256": "fa5f35eeb75c474219093953e708edadbfdfefbf3af006054e70658da0482058"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_lru_rb.h",
+      "sha256": "d35a58edebb4db124d95e06993c8cf3291400a5a91c38d0df9db07a23a9bb295"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_cache_private.h",
+      "sha256": "4a65a196de3bbff12f5444bcaace7d9607bed6ee13a4451afbf4c108bd5111fe"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_image_cache.c",
+      "sha256": "bfc790aa00b7d82fccee3397435ec3dd471f86795526de7d1ec97294168a285e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_image_cache.h",
+      "sha256": "d4bd3c4a4eee954bc56b63b9dbd9876a9d5831998c285725624b7ba0ec815f7b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_image_header_cache.c",
+      "sha256": "2e9e1f9bb97a0dffda44b98171e4c711e67e135a1aa2030eba76cde23de08d3b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/cache/lv_image_header_cache.h",
+      "sha256": "c3ceee619fc7ce0e02349938e1a9098248abf30d10b937f8ed617733909026db"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_anim.c",
+      "sha256": "5c4420396243f98d9deb4a74f0d777f3f4faea73defc6f9bb9fd919c4dcc48f4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_anim.h",
+      "sha256": "7a1674e1d40b41e0edf23d8757235c8801a46cba70b771da6d2880bacbfbc3b3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_anim_private.h",
+      "sha256": "f3ca6702abefbf9723d21012bca60c6226bd1d8b428cea6bc843cc88b9e0648d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_anim_timeline.c",
+      "sha256": "0ad91b13726b34f368cdd19facae8e464165bdcbd744ee298be105dc6b78f5b3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_anim_timeline.h",
+      "sha256": "c26838ccae26615d554b53f12d5ed8d2c83ba77c6e42fb5827b3f2bff1da0745"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_area.c",
+      "sha256": "5dc6cc3302b4586f45333ebeafdd3244c83bf62da368a8aa321fe2ef094dd904"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_area.h",
+      "sha256": "5f92c841954d11a1bb27311730a174ed02922d1601a6a4ba63cf87b57ee11755"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_area_private.h",
+      "sha256": "567579a0ed9b9ace5228d6517b493a3fe7d189ecc2c1c16b2294063e8caec2eb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_array.c",
+      "sha256": "88c8ee610bdb87942650efc77bfdc4d5b79852a92405703b90c141f8b4fa5c6d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_array.h",
+      "sha256": "b47b5ddcc265029e3af71d9727a71c7359ce5b798f582a3c64f5f23054a48aef"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_assert.h",
+      "sha256": "e2981f5118b8188088ab5b5344c8d39e37d554c5f59427d94976f96244cd8b11"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_async.c",
+      "sha256": "c2d0f5d28be478bb513d054879ff31f46da2d8e548832c82615e99d4eaac45fc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_async.h",
+      "sha256": "43d380375967f57c436ff68a81a10584343ffdd37886cc579ba968826fcb3372"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_bidi.c",
+      "sha256": "b1efa85dedca496a49b89ceab624dc1e4be743f1af0514b4f2376c0fa160f0f8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_bidi.h",
+      "sha256": "f947c2791343e2c86b70c961c7fc296b3bc02d6fc371a27d338bd82e9b739598"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_bidi_private.h",
+      "sha256": "8a2385f09dee20f8ff2731c32ffc810c7e0615e81db0aa38893584e06a393280"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_color.c",
+      "sha256": "73f453b8cd8339868273c38b5a03470df49865a6593f561019338ef23e9d421a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_color.h",
+      "sha256": "3a0cd90447be5b61e2c4203d0d2d8a6f9f464450905308133b7e4ff47745ce7d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_color_op.c",
+      "sha256": "c24ab8632d4f72a0d54550e217231b583b81556f150dfefb863dd0783d50b658"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_color_op.h",
+      "sha256": "adc8a0fabeb994fedc1d8e83fd7acd242262b6bf381d26a9715d116406cec013"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_color_op_private.h",
+      "sha256": "8368a2c9fb90d933881bbfeaacb99cbeb56342a1c5874dc6e61e66f8e8836ffa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_event.c",
+      "sha256": "de95de45c61352409e8ced92849002e7ba38d1e8ca75ed650ed9bfd3a4d69237"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_event.h",
+      "sha256": "2bf2302952ecefc61ed4ae8916994f36f5db829f6b7795a9e3337b3f5867068f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_event_private.h",
+      "sha256": "153a9633d20d44246fc48476d732967ddbca9b9d62b0e4478b5af6c49230f1bc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_fs.c",
+      "sha256": "7610535838bd0968f43193d6cb667e9623676d14dd9fb192b1c141a902d2aadd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_fs.h",
+      "sha256": "800f2d82ba35d56a5b3edc7087067e93c5c04f0fff57c8d8fb1e47b13dea19a8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_fs_private.h",
+      "sha256": "4d89269e47da144a523b345265178b940a43a95289e0a336923b86d1a7033482"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_ll.c",
+      "sha256": "d02cf56d77c5766d18b9d72751d7a022333685b95a09793a379c3854563d3e4d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_ll.h",
+      "sha256": "7a020a8d646c37f5760ec228c49955da3f731865e63bf6af4d83f6080d389d7c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_log.c",
+      "sha256": "ab22075290b80be115f74ce869f708b6304d46aac7fad489937b8488287e0be9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_log.h",
+      "sha256": "4b8d99d061bebe0e164af33e99ca3445e17183bb8a933936843dfd9e6fe4c20e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_lru.c",
+      "sha256": "9ec6d1deff2957c957a52b1c372e48224a374c66c46872b51c2d8dd6d0fc8f4b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_lru.h",
+      "sha256": "5eb598d54e11ce0e429d64eb73287f79ff3cb9f87ad20a7b6a77d62517e471b3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_math.c",
+      "sha256": "143c951b843c65c7aaab2a92f84e7395643eea62d86273f6504a2e3282078d1c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_math.h",
+      "sha256": "b04fd577a4146746c1b97af336bad412d45cc1f12edc0e6274727de10f658337"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_matrix.c",
+      "sha256": "edc598c45692aec5b6106c8dda47754b4708b06d848fff462f672f734eb099a8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_matrix.h",
+      "sha256": "fd74cd09eff19dd989d4474a361a5ebdbb84d567e49c83776ee01d308050cf1d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_palette.c",
+      "sha256": "87e038f4b160d274318663ab3214aade8eaadbba094095416fca7d9d8895f915"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_palette.h",
+      "sha256": "57f6853a9a1f9b014d4e75d96858c2fee09e31878b99d7fd8f2ad3cb1a4ac36f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_profiler.h",
+      "sha256": "7429513cb5402dd58124067046c983fb7885454d1a6e8d1e75523b50c7d98fe1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_profiler_builtin.c",
+      "sha256": "ae026984c9ce4fc5f5b6d970071dbc92993cd69a70c8f71f38f71be2637f43c2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_profiler_builtin.h",
+      "sha256": "83f5b32e9214fd2b42a4012e1953a4f54f7f87f2b0f3a162e2b9961bedb6305d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_profiler_builtin_private.h",
+      "sha256": "ec3e83e79d9a08dae4a48713249e8bde8d3dbf9c3c2f33c0adc8beaea0151724"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_rb.c",
+      "sha256": "376ed3247c31f42e7841fdc9a253f4a3c8eb895da5c11a8c553b9278cc44d4ef"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_rb.h",
+      "sha256": "b758d58da2016f02fd8503a747a362a0037e5adb11752caa86b9c2a0568970d1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_rb_private.h",
+      "sha256": "9cda08cf920520290057b752fd20add42f9464fa9c384f9ea3cb009f2126c846"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_style.c",
+      "sha256": "3957bd4f1025e8dbf76fc9a3927a38c1f94b09a645b88a0d3613afd04a012692"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_style.h",
+      "sha256": "653a2cf44a2392fe907ec478f362430d0dee41707e8abc5db3959d22ed9371e3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_style_gen.c",
+      "sha256": "439d6be84b9c157d11d0aae72f899300ce06ce1a040d48ba588f0f9c2115cf06"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_style_gen.h",
+      "sha256": "b9e5a549e67b3eeeab134b4b2ee06a0f83f984027a8c09bd654a93b9869ac063"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_style_private.h",
+      "sha256": "3cb6afad2988cbcc320f33fcf536cbac490772a2ca71295c75b08f5e3c7a0ba5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_templ.c",
+      "sha256": "40d1b3dab81753f66ebca0b6d0b3065bc92d317c3c54e1809628d666dbeff767"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_templ.h",
+      "sha256": "7cc6e2a787852952c13d4d42b1e9b3967bcac6c27341390a58cf470e868c30a4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_text.c",
+      "sha256": "fd84b6a4a080abc6af68ad0b49dad0cfac4be51aaacb46187a4915971a2dfd5e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_text.h",
+      "sha256": "c7073545474d3d541f673edfda9dc3d7172999e0d3cca309b41cd5000f365a9a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_text_ap.c",
+      "sha256": "e0eb229c485846762e43d1a2cc564e71b046ae26d0d3127d6b39fcd89cb7831e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_text_ap.h",
+      "sha256": "a355b36465a9e2dd21234c376886d262b1e56ca8663fdc4fbf283aea6529391c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_text_private.h",
+      "sha256": "8fdf261da2dcaedcec73dcb7eb75d55eac48983158d5f9bae6f0da77b00c5647"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_timer.c",
+      "sha256": "275ad69c8c971ddafa848f6c61a83d587862efe94092021a6cac4952750b8a8d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_timer.h",
+      "sha256": "383479c57140f4f96d3bc369071e2c83af3a3ab467ec688eb6bdbb9f44ef4382"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_timer_private.h",
+      "sha256": "80c047a1498afdc25e39dd154179b2fa0d409efc6dcfa971f9da0ec49ba47c1c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_types.h",
+      "sha256": "d544feac349a5fa19aa85644846e0e127a4d40ecc53aff6c84ee77f6735527f9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_utils.c",
+      "sha256": "b50fa9c2ca2ca06449ece85ba4800e12ecde44908800a4f93b136e0de63da18d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/misc/lv_utils.h",
+      "sha256": "d549cf13bea0d12ca4bca4b22df21608b68da6c6308504e7b24d216c7f1b065e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_cmsis_rtos2.c",
+      "sha256": "624166c54da863230bf73964a592e0f6a0b25a739d3fe06755fe2ba2c88b6c2a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_cmsis_rtos2.h",
+      "sha256": "8c25082fed88ac4badf303bc5d23bf6adc66546b7038fc96de16090d5c1f5c19"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_freertos.c",
+      "sha256": "0cb1c378ff48b2389d11885b8048c0e0fa595c7bb7269288d59404957633c894"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_freertos.h",
+      "sha256": "cdf2b0389ead7bb02fbe8650fdda8ab4e0be14d640fc01f61b3134c3de8531b3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_mqx.c",
+      "sha256": "07d9fe7a22ba64e14bdbdc27eec1f796735676325e24903ff879ad0a246fae40"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_mqx.h",
+      "sha256": "17b9fdf8e1e3e9a2088e810e78c7eb1c262d5c17509dca552cc6b9b99833f3c7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_os.c",
+      "sha256": "7c996a675a812a996cf6bcaeee00f2b51425c70cd72451f5a698d4691f784b48"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_os.h",
+      "sha256": "d3ef62a47a96c3f8a9e61155ac5b4ace66217635dd38224ad7d4cb2713d32bec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_os_none.c",
+      "sha256": "2fab2a8b6ba8bd2ca7b378a6715bd8ee81e7addca458c37358bc753fb579416f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_os_none.h",
+      "sha256": "74dddc25a66bfa264eb6076996c046f8c90f4cffaf793ddcbc744fa675259ca3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_os_private.h",
+      "sha256": "14c440281e7380f9ff967b4b92efc9a59d0d24985152d03c7d81f9c27480db08"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_pthread.c",
+      "sha256": "774bfa4b348dfdcb0659eb0f6082e7bb1317913707591436dc03c795e14c505b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_pthread.h",
+      "sha256": "728f9c17cd7f7390b385c0852b67b654aae37e377fb34de4d0278785dca8c62d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_rtthread.c",
+      "sha256": "536eb062e95c253ee321d6bd8a973719bb9eff9399b670a39d5291ca6377153a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_rtthread.h",
+      "sha256": "91a9691e84901b3806237dae07273d795fbedc7baf61a7c7bdad948dece54723"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_windows.c",
+      "sha256": "3f6b3a26b78550b33d3475bdf77a299312d08fc186e2d6e7b1b51e89d85a100c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/osal/lv_windows.h",
+      "sha256": "549c69d6545cd17955f8e447f0bf92c7ead943cffaf9f0b5db4608c40674018a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/file_explorer/lv_file_explorer.c",
+      "sha256": "ce0578189f9d6008261f2f4a0b0ed500b3f029a7667139a7932c89775e3350c3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/file_explorer/lv_file_explorer.h",
+      "sha256": "986ea34dde9e20faa5c4deeb976ba1c1c7c017a07ba9684099509570da046691"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/file_explorer/lv_file_explorer_private.h",
+      "sha256": "23e6f98f5d8fd803cdfb9d8dd84235f06920b1d27a81163b79a250368ffe2d01"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/fragment/lv_fragment.c",
+      "sha256": "ac125bd0061620bd0b65114a5912f746105e498c9bbd6b5388e3f27b57bbf5ec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/fragment/lv_fragment.h",
+      "sha256": "fb756f730a47ca0914875652d9817281df1c9eb36c16e7d89449abfb630f2cee"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/fragment/lv_fragment_manager.c",
+      "sha256": "1d3f924604c84003268ad8d144dee1dc445e3a153cc344b1ac51c2e180a0c179"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/fragment/lv_fragment_private.h",
+      "sha256": "d7753649b2c5352f4bff58487c0e2cea74ca8658c62301b93fe5ee04bc323d09"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/fragment/README.md",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/gridnav/lv_gridnav.c",
+      "sha256": "ef2bb0d61ec04dbcb609c274d66f1f24d7e964fcd40cf63177a145ed44d06405"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/gridnav/lv_gridnav.h",
+      "sha256": "65fb4ced703e4eb0359a6dc249fc5c61c27c708a522d0e3fc0fb6dbc7c363654"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/ime/lv_ime_pinyin.c",
+      "sha256": "36708f5f5dc8fda84f261a25a6e853f2c3106523ce623f5d68dd81f090ff65db"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/ime/lv_ime_pinyin.h",
+      "sha256": "b2334d907ef25ef69fa6e942bb8a1b209fc7661b827dce5b13036ce756fadbb0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/ime/lv_ime_pinyin_private.h",
+      "sha256": "aba3f9e6982d9f384b76bb7dc8ba552652f82a4289037bb42f8f82ffa4688fc4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/imgfont/lv_imgfont.c",
+      "sha256": "b78cbf7b92746f3e9fce1ab6bc5411c628e8a6702964e8afe32acc45e9078418"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/imgfont/lv_imgfont.h",
+      "sha256": "134619f5278016d7406191816d506f97e3c9a3eb76abd6c48ca69a33d8cbda94"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/monkey/lv_monkey.c",
+      "sha256": "3a9afa5697526f2cfbeecbcc85263d340fbf129a3844154842add35ac792cc12"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/monkey/lv_monkey.h",
+      "sha256": "c9149c46d9c9d03e566d44ec903d2304471f56c0cb0b1c0271266bee90c68f21"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/monkey/lv_monkey_private.h",
+      "sha256": "f2b18e5230d65ee0e4c1c9edf9936e1dcc24326ad83263778e7f9ccb34d5c57f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/observer/lv_observer.c",
+      "sha256": "4030fd4bc0fd8decd3d27cb3f7f94fd28d30acd4b26813810b77cbeb7fcf113d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/observer/lv_observer.h",
+      "sha256": "e150a11e0f45f888642112dbe4112f8880b888918f639eb9f9f0dfe345266ee4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/observer/lv_observer_private.h",
+      "sha256": "6cb93dd756ca8451885e4eadd69ae1f19ee94f93c5faee7c0cd3219afeca0adf"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/snapshot/lv_snapshot.c",
+      "sha256": "b2244d2fab2cd495c7b67c577268d5fda31d844d26785cd59c466996b7362c28"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/snapshot/lv_snapshot.h",
+      "sha256": "267d83666b874e795f46928f87980e2a354ca21b54d2978644e9a8319d54f8d2"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/sysmon/lv_sysmon.c",
+      "sha256": "04492466ec159abee665acfb94274455def6199a629eee00fc44fde822017bff"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/sysmon/lv_sysmon.h",
+      "sha256": "f7ba78fb7919ebfcc82721babf10fa815493c559dda0e6873ade7263356eb5ca"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/sysmon/lv_sysmon_private.h",
+      "sha256": "8e1556fa56bdaff559ac0128b990d92c09375be3169e047540db765ecd79af71"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/vg_lite_tvg/vg_lite.h",
+      "sha256": "bdb5b9eb89238bb1c393f880fe63e14b40b17ed46b310a7102759dac9c9c7fee"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/vg_lite_tvg/vg_lite_matrix.c",
+      "sha256": "58d313b99765f1f460323610fc7a12c0104f473bd42d723bd240308355090930"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/others/vg_lite_tvg/vg_lite_tvg.cpp",
+      "sha256": "61d52bcf1586866a35cf9642e1e3de4dd126f58693887c49cecedd5a54694552"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_mem_core_builtin.c",
+      "sha256": "8867f810663fba96261d09bece69e503cc812479952f9581ccbefcc68acf46e7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_sprintf_builtin.c",
+      "sha256": "139f258876a1b3b92acaf3802026e6791316d943958e7c1ffc9e359ee6ef346f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_string_builtin.c",
+      "sha256": "f5d14f8256d681a54ec9630167fd201cfa38b4abab57ba6de60e458042ea5e05"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_tlsf.c",
+      "sha256": "fb67f7034a5fb9f4176fa2d0c7c31937a60c955e0dd5351dee24134833e9716e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_tlsf.h",
+      "sha256": "d22309e04d7905a7b8cf3ce9ef754e166d7171585d278a76de9854d92ec37d38"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/builtin/lv_tlsf_private.h",
+      "sha256": "4a14d3fad08d4e2395215bd6d33cf95735d0add231ad27d1d368d00f99baa8f8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/clib/lv_mem_core_clib.c",
+      "sha256": "f8b8bb0413c4b3623cfe0538a8d857fe413a3aef51eceae60f524904c12c6367"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/clib/lv_sprintf_clib.c",
+      "sha256": "aff86273b405c8feb36340eb25943d5ccecc47d6132a1ef4d49a6b63f27463fa"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/clib/lv_string_clib.c",
+      "sha256": "a4b1624b4f4b1128625ada00516b1c93589515047cd4af08f66abe659cf8994c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/lv_mem.c",
+      "sha256": "7328bd68a5d0b81ff50438c77a0a99fc3575325fcfb7717c3c7f5599a2b2a816"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/lv_mem.h",
+      "sha256": "c440bd0fe3d88e6a2c970289a0d0d6d58a9d4e4fbe8c0602c743c8b830ea5921"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/lv_mem_private.h",
+      "sha256": "9201a978bed0a0409a8c08f31080a4a56f6189ea2e8336b134517426822998d1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/lv_sprintf.h",
+      "sha256": "1449cdd7991018c7602beea72713a31c550e06d5c96fb5fd5dfb3e66bb77e186"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/lv_string.h",
+      "sha256": "a50193735a6370fccdc0da6a1f8a04cb0a35b4dfd6f5660a348ebff061ef1deb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/micropython/lv_mem_core_micropython.c",
+      "sha256": "c89723668eabbcf290b3006b01b67a7cd35852eb95656d181670c4718770079e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/rtthread/lv_mem_core_rtthread.c",
+      "sha256": "9ea34cfed40cc3622c80f669c89e859894a8ff6ef0fbad93739eb90541a35d36"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/rtthread/lv_sprintf_rtthread.c",
+      "sha256": "d7599be3b9416ef5ae2bfcfa1db51560bca20c8d9ea1b8b9f34db9774255fc9e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/stdlib/rtthread/lv_string_rtthread.c",
+      "sha256": "128debae4027fad3679827f1c22736453b08dc5551840f365019524e610cc000"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/default/lv_theme_default.c",
+      "sha256": "f2de5a2b11a58aa7383a648c8397b87122ba1e17ffb7410ea996903e97b48859"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/default/lv_theme_default.h",
+      "sha256": "3022e5ef81de8613402a324a161c310464274ab7655f42b733009310462271dc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/lv_theme.c",
+      "sha256": "4b8f12f433517cb02e211621b7cae73146f94cc05004572b865770ad5eaedd01"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/lv_theme.h",
+      "sha256": "0897d702dddfcbe00a84b216474ba4cd7d99f531e9dae7560c3d7bde313cddf5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/lv_theme_private.h",
+      "sha256": "1024d971beef51e68943341b4693a9f69862246e5756e4e0c36a85809ecb49b0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/mono/lv_theme_mono.c",
+      "sha256": "bde05c26741e1a8461f308d48630bba5acc48091d4386db5a907e37f4139a8b5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/mono/lv_theme_mono.h",
+      "sha256": "79eff910c6fb25bdc8b118fcbeb026aceeaa4e1ee01f0cd2a9acb5787eddee76"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/simple/lv_theme_simple.c",
+      "sha256": "40837a7df377bf1616db5e314fc282c66af669f7ff4b732ed59d1750091fba12"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/themes/simple/lv_theme_simple.h",
+      "sha256": "a049148f4c31c3e093f39f0284df096e09cd715afad6fcc12dbfc6437be718b5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/tick/lv_tick.c",
+      "sha256": "6eb227829cc6f3b6280200633f6cfa938cea2107c7454fcfd56940b0bd5a7a4f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/tick/lv_tick.h",
+      "sha256": "61127e179ea47654eedf1cf4410398ff44462341167511b794b0a7502222b8d4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/tick/lv_tick_private.h",
+      "sha256": "2b5c6cb5b59e3f11b333d441955230d38bc23b8ad86262b6f628480bc087916f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/animimage/lv_animimage.c",
+      "sha256": "23a2a25a315b3cb5605c747c2ff287aca4b4e374efce572b775de4935685c77c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/animimage/lv_animimage.h",
+      "sha256": "ec16a1efdd49b1f5735377bae7968649fad84116ab8567fe28652b898fef237b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/animimage/lv_animimage_private.h",
+      "sha256": "ea429dba413158ddf83885aa755162643356257a9c5dd45698dee9796a1fdbc7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/arc/lv_arc.c",
+      "sha256": "2cd49e3e2ea5975b49d3297363ecc45e62675576d14272f070c2c6edb8487417"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/arc/lv_arc.h",
+      "sha256": "06df8a00cc7723c67189934cc1328e0183ef1154790a1c98b1d390251d7d0b32"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/arc/lv_arc_private.h",
+      "sha256": "b5cd6deb652f2fdec05b6b53143f8679aac8d4e42525f250d414fae4edf4f8bd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/bar/lv_bar.c",
+      "sha256": "dc888583a897b54b666b8002a48ea5c8fc786d4b43a7837dd97dcd6b68ae7508"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/bar/lv_bar.h",
+      "sha256": "1995af0c97924f447809d066c618af897f817e2ac1c49d082fefb62f95a578d6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/bar/lv_bar_private.h",
+      "sha256": "45357176976d40ad070b53428bb9e480df6cc9671511234f6ecfeeb05731267a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/button/lv_button.c",
+      "sha256": "c046173c3010c3de831416ae746b88f04c49163df6aaf34573dfd9f009cc0bd6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/button/lv_button.h",
+      "sha256": "a5373650a63c4818004036d109c72886d1067acd77901cc5be675ee3b671e2c5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/button/lv_button_private.h",
+      "sha256": "25101ac64b07dc56dfd1268da3ee34c625deaa55d58c9afbd76835385c95d9c1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/buttonmatrix/lv_buttonmatrix.c",
+      "sha256": "caba6a0fbb8dc88d9efb0177b89063c336a6c433a1a7e868dc5250f324347a29"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/buttonmatrix/lv_buttonmatrix.h",
+      "sha256": "1346ffd522af17bcbbc9e658502eba1ad10c0803d8c4bc277440cd5b60750709"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/buttonmatrix/lv_buttonmatrix_private.h",
+      "sha256": "5cd08ff84e63351916cd3a7f3376c6d7cf7333c898e6264e83605555d410bcf1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar.c",
+      "sha256": "4dc2c6f9ab099f69ee36404b189ce917a9c22a8b6eb0df7407a16baa51cace02"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar.h",
+      "sha256": "a081c1b3764978e25af2672f8a6b44c6b3693d1d9cf22e7444885470dd8de5f6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_chinese.c",
+      "sha256": "54c141fe45c4db792317d2cad8a7f346484153771e1351abf0a4ee631699a49e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_chinese.h",
+      "sha256": "d6819a00581c5b5c72d15024a42b0a5109949045d127de3aa2210904b3fbd8d1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_chinese_private.h",
+      "sha256": "afb981ca4bef11d6827a65cf0708bf551cc429437b9fbda5fe5f214014b1333b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_header_arrow.c",
+      "sha256": "348e190c6d69b5b438b7e8af899b5b544c75a95f7e8cf52690b20ffd27adb306"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_header_arrow.h",
+      "sha256": "6c9ac1a2eecaf5096fd52fc8dfa950f7348499aad7ab33d7ffc450ccead868d7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_header_dropdown.c",
+      "sha256": "0061e5e9619f0e49f49fca2d862dcf19e89810d8fe5999b47cefb96ac9f635f7"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_header_dropdown.h",
+      "sha256": "9dce5812f2c11c44a1501c95032a2dc9d923b02c10e31b0c416c309e9cb7ae16"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/calendar/lv_calendar_private.h",
+      "sha256": "3a72505ea7b29040cabbdc289aaa9413d0803623c4f5ff8a8ec1958a687b9502"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/canvas/lv_canvas.c",
+      "sha256": "a3eff889a616b963e5be9525b44d8b14bbacd3adbd62d6690f42a8697aeea64e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/canvas/lv_canvas.h",
+      "sha256": "2b547c53a7d3ea96963b225ebb10bda3779477d90a5a44cd8819fe40ceb8aeb1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/canvas/lv_canvas_private.h",
+      "sha256": "c3287c4d2c1fccfe70aac5a978fa317ca13be1473f3393ea915ffe4a60102b59"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/chart/lv_chart.c",
+      "sha256": "090e7adbe66cf70c8594a459980a3dd049a959cac70085d3d04d20cdc02a4913"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/chart/lv_chart.h",
+      "sha256": "cfc6139387535c2dd7990e54bac798da5d16e03ed42341e33bfa9a14c2b825d8"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/chart/lv_chart_private.h",
+      "sha256": "1ba2b4732e1ba1b1dbbf9c29cbb8d3d381e3ab1a80917313f82c5f1649aba046"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/checkbox/lv_checkbox.c",
+      "sha256": "e32b2ce4dfc4db48658e6ab7fc2fb832a8b3658dec1e419e028d7af8173963c3"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/checkbox/lv_checkbox.h",
+      "sha256": "5448695c34a149458f04d10cb55a1f00a529c602da9cf3e2c8b13ca7d7e50143"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/checkbox/lv_checkbox_private.h",
+      "sha256": "ca425045f1fd72eba5a54f51f7964a588b403941856da8aee7ce2c800c5a218e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/dropdown/lv_dropdown.c",
+      "sha256": "e9aa3fe0ba346c5a6510b75ea12e37fe5ff1826bca70b9647f1377aabdccada0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/dropdown/lv_dropdown.h",
+      "sha256": "c73234a4e78228717bce3607fc8eea5967857768b3d69fa2ce7130796fe8ecb9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/dropdown/lv_dropdown_private.h",
+      "sha256": "cb352c34751c617819f0debbfdb30efe98820426c1655fc1c434a55f5e1abb22"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/image/lv_image.c",
+      "sha256": "ef3048b2013b6a26ba7cc28734afe504c045de008f0c17851aa890fb8750ce8b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/image/lv_image.h",
+      "sha256": "40c2d65a5296b34c3ec347027231ea4f6b270ab2406f23252fc17492300992ed"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/image/lv_image_private.h",
+      "sha256": "180436b5f4add9ef3241d163a737765f22933ff2fc944e20640cb8cab308bed9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/imagebutton/lv_imagebutton.c",
+      "sha256": "40cd841888ed73cd9b3faec9b31470f2aa204edf25e08940f1eabfa9995d8418"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/imagebutton/lv_imagebutton.h",
+      "sha256": "64d1bbebd3a490a8e9c57bc825059c8379a21b88fbac2efaa89c142f0b7053a1"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/imagebutton/lv_imagebutton_private.h",
+      "sha256": "00b1bd14103c2927b785bf1ce07968d76f2c433d1c0c1d91c751b83aab69f8f0"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/keyboard/lv_keyboard.c",
+      "sha256": "82f3e70c2072318440a6df5f326721540c9a25a1240b36da9278f2013d66de21"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/keyboard/lv_keyboard.h",
+      "sha256": "7259dddd504400284ee3d785f81bd5358958cd27a421554235e711e4e07976be"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/keyboard/lv_keyboard_private.h",
+      "sha256": "a51b89f69f9eb3f327b8e33d467bb23fce1d506b67ea9fd2d54e31a88c596da5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/label/lv_label.c",
+      "sha256": "890a82d51d59d59675983f56062f98f755b7302df4fdda9a68cf32e810c9c43d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/label/lv_label.h",
+      "sha256": "29d875df2bd33abdca39fd1a5419a865eddee00dbfbfa2467d9efb294e509933"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/label/lv_label_private.h",
+      "sha256": "d8771cc99c6e64fd65d76a44bef84fbe69e8c9dca8343b59f78e279ce042e75e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/led/lv_led.c",
+      "sha256": "adcd22af9b30e5e4d2b06b4e22392567ac035549e81f606df662e2c08b22723f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/led/lv_led.h",
+      "sha256": "bd8f1531b0df411eeb04c146189879a75835e185c41df38ffda07774b03b9635"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/led/lv_led_private.h",
+      "sha256": "9594846d4c14a3a4f7e3e64ac65d883d580984da9d12effa2f0c4ed2b8ee6da9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/line/lv_line.c",
+      "sha256": "e1715818a739962320da54ea63a3fa16e40c00b26cc82ee29a0b36969432ac33"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/line/lv_line.h",
+      "sha256": "fbd0140da04c4c90c0f9dcf2671820bb4708897571ab8b4460d5e2c83e3a6d29"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/line/lv_line_private.h",
+      "sha256": "f54edc76509edfe97b6824248a7c96e704d2d5ed32587a03115315146b69d17e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/list/lv_list.c",
+      "sha256": "5262e2344fea02389eaeed380c61a8d652bbf1e88609283c3700a00200a1db5a"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/list/lv_list.h",
+      "sha256": "8bfe0314114a648d7b6c4825a37c4954db0aa39ec310dc3de99bac97664b0dc9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/lottie/lv_lottie.c",
+      "sha256": "41d8d283818fb4bb207a2e675784032a8d9568ca17fa90944954c149f83ebd34"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/lottie/lv_lottie.h",
+      "sha256": "8eeb596ffcf969b25954db0fe7aa68b72d84cfe8b4e4e01552b30217be78e4d5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/lottie/lv_lottie_private.h",
+      "sha256": "5e18bb1ee0349716d4ab02c420ccd6ee1ab03666662f8b5c4272624c090a1611"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/menu/lv_menu.c",
+      "sha256": "e744300b575855d97db86fb04d2e4999bcf7a76ac8503e7fa4d8d2a2f63e6da5"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/menu/lv_menu.h",
+      "sha256": "e1879e04bba199e37c54ba434de382af1b4ad33fec5d447356cd1d24b1218461"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/menu/lv_menu_private.h",
+      "sha256": "61f5b6e7e0db737a594f6127474eb8f53273f8cd3c21773571e374a9224ba0f9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/msgbox/lv_msgbox.c",
+      "sha256": "5da4a45a84564f8eb1e48c51a9cf463cd0720ab5e2f7c34c246fd441c1fcbb7d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/msgbox/lv_msgbox.h",
+      "sha256": "9a2b05e7625b9e1beac60372836d96d7d51619987212e64b6206c045843f2492"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/msgbox/lv_msgbox_private.h",
+      "sha256": "a9d86cc02f5132175070fc96584725780ad8ff6b2f0df22959c0e2ae40ba9e76"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/objx_templ/lv_objx_templ.c",
+      "sha256": "aaa477f49d4e87f1b3e69bd46683a3f023f2e3bd70619327c6fc0afc61ea8592"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/objx_templ/lv_objx_templ.h",
+      "sha256": "1204cc52a6a5d378afb75cb6cc1b13e094c367430534706d2abb889188bef731"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_dropdown_properties.c",
+      "sha256": "c46c467ae40faba6e7e6daaf7af2b1988613f4f0c1c43435acaf09130dcd905f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_image_properties.c",
+      "sha256": "b7ce94f64743a8b26d74a31fca92f2c9d9ca54ef1c6ae2b785438d394e099d50"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_keyboard_properties.c",
+      "sha256": "42db2b3f7e82d0b02aec7b11a55b089d9caf14b63b4db0746e383b465fa0e066"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_label_properties.c",
+      "sha256": "41a77ebb1f97559d8ebd37c627751ca52eba4cbdca083e1b69ff3921119a3774"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_obj_properties.c",
+      "sha256": "987462b21651ddd90c4a019a00dfc5fc0c82ff33485b7b53825b7543d125adf9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_obj_property_names.h",
+      "sha256": "081331b531b6c2175a80656792bcde83c7a4abf5991d201ea870b50a4f50dc3c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_roller_properties.c",
+      "sha256": "bf76dc63a7ddd0ad401c6e327d4f6d672569cc2ef29887aad74b77d4663d44b6"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_style_properties.c",
+      "sha256": "bd8e86e86d7e3a4dd6ef6ff578ec556644a1319f18cb555887858865763d4858"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_style_properties.h",
+      "sha256": "011f422d6550892d63bd1cad92316c0eab0bf68ec32beac2a1af4b193bd01a23"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/property/lv_textarea_properties.c",
+      "sha256": "45c88147f26cbb85a28a7a87dfc2ac70345ba55e908a2c112f4441ab1c81f767"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/roller/lv_roller.c",
+      "sha256": "229fb15912a18a0ba82b630bed32df65e00f05f683e027c7c5af188681110401"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/roller/lv_roller.h",
+      "sha256": "a5edf182fefd9fb87deea7c56c2058c615465f8d0ac9eee3550e156c500cea2d"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/roller/lv_roller_private.h",
+      "sha256": "a37099f4df7862ed7dc2b66a1585ad94ba4e2d576440baf6f1d3e554b3fb9000"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/scale/lv_scale.c",
+      "sha256": "eb79ff5025ec7db9c228c2de022d313979ddd6a9d7e104abcb922156dd569079"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/scale/lv_scale.h",
+      "sha256": "006450252caf5e389b51fa5aa85df4c6b7f8685b3849c38e7371db588c6814fc"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/scale/lv_scale_private.h",
+      "sha256": "b8807236f41b0209f0e9d3e04ddb23d64e101b7c4c58a3c9ed68cba12687a177"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/slider/lv_slider.c",
+      "sha256": "35112a3c259120cdcabb1e0b7948ec24efc65f2bece510a7d9b4b550aba9f068"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/slider/lv_slider.h",
+      "sha256": "865013783ad89d817665492a8135d4f03fe44a75bb755df895d03dd9967ff171"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/slider/lv_slider_private.h",
+      "sha256": "8c0fa3e8f36fc0a29db1d4cd27e9e00744e379b6a1a438e964fb547c7eef0976"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/span/lv_span.c",
+      "sha256": "5da304f49411218448031af1806d1ca4bc4e74b953d82a7d2c021dd36526d0af"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/span/lv_span.h",
+      "sha256": "20d8580cede5c0ea4e07290bd04c5d3447c444c3be95775e75fffb5dc6905800"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/span/lv_span_private.h",
+      "sha256": "d5175aee26aecae23e552521e49ca08e00d3fb8e6d36a6df93b5ac26264b39ae"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/spinbox/lv_spinbox.c",
+      "sha256": "e31fee60bc203276c90a471af94c8cb99df1a0b66e6ea3aaeae44f25fe389bf9"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/spinbox/lv_spinbox.h",
+      "sha256": "9ef2e4ac68fb6d069f751157035f4c86e1bf08aa68de17559d9143a7730fe926"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/spinbox/lv_spinbox_private.h",
+      "sha256": "7ccfe83230b43f1261415f5ec8a07525bf3ca9fbf7a18ce6d56ed31e7a506493"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/spinner/lv_spinner.c",
+      "sha256": "a52c2996a2f968690ea318ab56c632c71f7e62be5122daf20e4bc8ee8c2dcccb"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/spinner/lv_spinner.h",
+      "sha256": "d921ef516b71dcaa4c6b22e9b4cee0ef97656061026ae4de462a1d37c4b3dd28"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/switch/lv_switch.c",
+      "sha256": "cad41d00fe90c1f29c730fb837b725a8cb7cfc99154f0619cff7a237245f545f"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/switch/lv_switch.h",
+      "sha256": "829baefaac66b794cd096005d3c746482da5fe509f497b10c7cf344ed3ac14ec"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/switch/lv_switch_private.h",
+      "sha256": "1d494559f7918744f7f38ae0ff9be0b529dc3d559e1aa1168ec77dfb19fe4820"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/table/lv_table.c",
+      "sha256": "dbcf88aa5d1af7dd54bcae06aa03168a4fb08f51ea3d6c867b1a6ed4f7258581"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/table/lv_table.h",
+      "sha256": "da51ce12677f521b3a5198bf235b0598e66ac6bb5c5898c14b9863c4827ece17"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/table/lv_table_private.h",
+      "sha256": "e28c127a3a336bdddadb5eb69dd43f60551537db5598a211f4e77f82f63f6069"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tabview/lv_tabview.c",
+      "sha256": "c39b3c5785e9dfa471cf9318d2c791cedf1cc77f8236bf7dcb7df29de2f45dbd"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tabview/lv_tabview.h",
+      "sha256": "7fa9c7fc480aac506b75d9c0cbd548af3b0eea1f06c4f30d2e55d84030ef5d2e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tabview/lv_tabview_private.h",
+      "sha256": "df820f8c477222be9b65efadd101983040a78647eb51ec98bc122dc6175b5da4"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/textarea/lv_textarea.c",
+      "sha256": "306cee267a30d8dc1d59c6b44bc0200bae9ceb5b3dcab2a290585e4a8a5749ff"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/textarea/lv_textarea.h",
+      "sha256": "a84542d7d9578b4087c1b882a44b4026df755f7393909b358375c54f8110a50e"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/textarea/lv_textarea_private.h",
+      "sha256": "7cca15efddbc2e4c10a9bcd5dad04225677c403e06ba9e72cd8937c107b5ecae"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tileview/lv_tileview.c",
+      "sha256": "2ea487c1bae0dc82f68a70e0f03f1f375416e815c62a36181cd86ee25edde19b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tileview/lv_tileview.h",
+      "sha256": "857e5cb9d7af05ef89d6dd92e573600d63792a569976d348d984f13620c14e8c"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/tileview/lv_tileview_private.h",
+      "sha256": "591bf58db5b6ac3a188f61972948b761f3f13824e302c770de7bc62cf6bbcd87"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/win/lv_win.c",
+      "sha256": "439b9ab815b11b5eb4d99d0e7211c66a6b3e8275aafe928e8a7fd4e16cbca752"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/win/lv_win.h",
+      "sha256": "4e98011f99190b5e51324ea1a2e82615590a833a38ee603d3cd49c194ded671b"
+    },
+    {
+      "path": ".tools/sdk/lvgl-9.2.2/src/widgets/win/lv_win_private.h",
+      "sha256": "344c7a50683cb706b11536bfdb97876a745630c6584200e59147e56dfa2ddac0"
+    },
+    {
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/esp_lcd_ili9341.c",
+      "sha256": "0155a9421945bb68ad66308e7d060cfeb15f569eacb1d2bb6b0d6d5196970382"
+    },
+    {
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/idf_component.yml",
+      "sha256": "015cf82cd5127b9cdcb9a7c6e422479b0d995b1b68125d7f5a620b9a1538ac61"
+    },
+    {
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/include/esp_lcd_ili9341.h",
+      "sha256": "ebb60162c4708cfbd675b6c09a0e09e251f555156b90822fd764eff01cdd6c92"
+    },
+    {
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/license.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": ".tools/sdk/esp_lcd_ili9341-2.1.0/README.md",
+      "sha256": "f628e081511c01f85400ef26a6175e8392a4dff1cc353f5bd18f2cfb3c0186c4"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+advance 200
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+reset stm32
+expect safety STARTUP
+expect channel 3 -1000
+advance 400
+expect safety STARTUP
+expect ui_valid 1
+expect ui_safety 0
+switch arm 0
+advance 20
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+reset esp32
+expect ui_valid 0
+expect safety BENCH_ARMED
+advance 500
+expect ui_valid 1
+expect safety BENCH_ARMED
+expect rf 0
+page 6

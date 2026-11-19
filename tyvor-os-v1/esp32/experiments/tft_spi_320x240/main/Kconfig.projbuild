@@ -1,0 +1,60 @@
+# Reuse existing UART defaults without modifying the original project.
+rsource "../../../main/Kconfig.projbuild"
+menu "TYVOR TFT experiment"
+    config TYVOR_TFT_HARDWARE_GATE
+        bool "Enable verified TFT hardware (never enable for an unidentified board/module)"
+        default n
+    config TYVOR_TFT_BOARD_VERIFIED
+        bool "Actual ESP board routing/power has been verified"
+        default n
+    config TYVOR_TFT_MODULE_VERIFIED
+        bool "Actual TFT controller/pinout/power has been verified"
+        default n
+    config TYVOR_TFT_ROTATION
+        int "Orientation: 0=portrait,1=landscape,2=portrait inverted,3=landscape inverted"
+        range 0 3
+        default 0
+    config TYVOR_TFT_BGR
+        bool "BGR element order (verify separately from RGB565 byte order)"
+        default n
+    config TYVOR_TFT_BACKLIGHT_ACTIVE_LOW
+        bool "Backlight control is active-low on the verified module"
+        default n
+    config TYVOR_TFT_SIMULATOR
+        bool "Use explicitly labelled UI simulator fixtures"
+        default y
+    config TYVOR_TFT_BOOT_DIAGNOSTICS
+        bool "Run colour/geometry/rotation diagnostics before UI"
+        default y
+    config TYVOR_TFT_TOUCH_RUNTIME
+        bool "SPI touch runtime (unsupported until actual IC verification)"
+        default n
+    config TYVOR_TFT_SCLK
+        int "Verified TFT SCLK (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_MOSI
+        int "Verified TFT MOSI (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_MISO
+        int "Verified TFT MISO, optional (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_CS
+        int "Verified TFT CS (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_DC
+        int "Verified TFT DC (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_RESET
+        int "Verified TFT RESET (-1=unassigned)"
+        range -1 48
+        default -1
+    config TYVOR_TFT_BACKLIGHT
+        int "Verified backlight control, optional (-1=unassigned)"
+        range -1 48
+        default -1
+endmenu

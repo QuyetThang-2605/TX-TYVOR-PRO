@@ -1,0 +1,105 @@
+"""Export actual LVGL screens and geometry comparisons, never substitute mock UI.
+Reference artwork appears only in labelled review comparisons, never firmware.
+"""
+import argparse,hashlib,importlib.util,json,shutil,subprocess,sys,time
+from pathlib import Path
+ROOT=Path(__file__).resolve().parent.parent
+spec=importlib.util.spec_from_file_location('png_tools',ROOT/'scripts/export-tft-preview.py');png_tools=importlib.util.module_from_spec(spec);spec.loader.exec_module(png_tools)
+png,ppm=png_tools.png,png_tools.ppm
+BUILD=ROOT/'build/ui-v3-2-1';EVIDENCE=BUILD/'evidence';PPM=BUILD/'rendered';OUT=ROOT/'artifacts/tyvor-ui-v3-2-1'
+# Hand-measured estimates from official 400x315 poster, not user screen captures.
+REFERENCE={"hero":[17,47,365,154],"find":[30,90,65,62],"bind":[308,90,65,62],"timer":[110,88,181,68],"safety":[133,47,135,29],"stick_left":[17,211,90,92],"battery":[111,211,88,92],"mode":[205,211,78,92],"stick_right":[287,211,95,92]}
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def resize(image,w,h):
+    iw,ih,rgb=image;out=bytearray(w*h*3)
+    if (iw,ih)==(w,h):return image
+    positions=[]
+    for x in range(w):
+        sx=max(0,min(iw-1,(x+0.5)*iw/w-0.5));x0=int(sx);positions.append((x0,min(x0+1,iw-1),sx-x0))
+    for y in range(h):
+        sy=max(0,min(ih-1,(y+0.5)*ih/h-0.5));y0=int(sy);y1=min(y0+1,ih-1);fy=sy-y0
+        for x,(x0,x1,fx) in enumerate(positions):
+            for c in range(3):out[(y*w+x)*3+c]=round((rgb[(y0*iw+x0)*3+c]*(1-fx)+rgb[(y0*iw+x1)*3+c]*fx)*(1-fy)+(rgb[(y1*iw+x0)*3+c]*(1-fx)+rgb[(y1*iw+x1)*3+c]*fx)*fy)
+    return w,h,bytes(out)
+def sheet(images,path,columns=4,pad=14):
+    rows=[images[i:i+columns] for i in range(0,len(images),columns)];w=max(sum(im[0] for im in row)+(len(row)+1)*pad for row in rows);h=sum(max(im[1] for im in row)+pad for row in rows)+pad
+    canvas=bytearray(bytes([23,43,59])*(w*h));y=pad
+    for row in rows:
+        x=pad
+        for iw,ih,pixels in row:
+            for yy in range(ih):start=((y+yy)*w+x)*3;canvas[start:start+iw*3]=pixels[yy*iw*3:(yy+1)*iw*3]
+            x+=iw+pad
+        y+=max(im[1] for im in row)+pad
+    png(path,w,h,canvas)
+def outline(buf,w,h,r,color):
+    x,y,rw,rh=[int(round(v)) for v in r]
+    for xx in range(max(0,x),min(w,x+rw)):
+        for yy in [y,y+rh-1]:
+            if 0<=yy<h:buf[(yy*w+xx)*3:(yy*w+xx)*3+3]=bytes(color)
+    for yy in range(max(0,y),min(h,y+rh)):
+        for xx in [x,x+rw-1]:
+            if 0<=xx<w:buf[(yy*w+xx)*3:(yy*w+xx)*3+3]=bytes(color)
+def fit(image,w,h):
+    iw,ih,_=image;factor=min(w/iw,h/ih);nw,nh=round(iw*factor),round(ih*factor)
+    resized=resize(image,nw,nh);buf=bytearray(bytes([3,15,40])*(w*h));x=(w-nw)//2;y=(h-nh)//2
+    for yy in range(nh):buf[((y+yy)*w+x)*3:((y+yy)*w+x+nw)*3]=resized[2][yy*nw*3:(yy+1)*nw*3]
+    return w,h,bytes(buf)
+
+def compare(out):
+    images=[];rows=[]
+    for w,h,panel in [(320,240,'approved-middle'),(448,368,'approved-right')]:
+        ref=ppm(EVIDENCE/('reference/'+panel+'.ppm'));actual=ppm(PPM/f'ui-{w}x{h}-state3-page0.ppm')
+        images.extend([fit(ref,400,328),fit(actual,400,328)])
+        rows.append(dict(profile=[w,h],approved_panel=panel,actual_geometry=json.loads((PPM/f'home-geometry-{w}x{h}.json').read_text())))
+    sheet(images,out/'approved-vs-v3-2-1.png',2)
+    sheet([ppm(PPM/'ui-320x240-state3-page0.ppm'),ppm(PPM/'ui-448x368-state3-page0.ppm')],out/'home-both-resolutions.png',2)
+    source=json.loads((EVIDENCE/'reference-source.json').read_text(encoding='utf-8-sig'))
+    (EVIDENCE/'reference-comparison.json').write_text(json.dumps(dict(source=source,panels='Left approved TYVOR; right actual LVGL; upper row320, lower row448',normalization='Uniform bilinear contain into400x328, letterboxed; native HOME PNGs unfiltered',measurement='Actual object allocations only; no perceptual PASS score',comparisons=rows),indent=2)+'\n')
+    return rows
+
+def crop(image,rect):
+    iw,ih,pixels=image;x,y,w,h=rect
+    return w,h,b''.join(pixels[((y+yy)*iw+x)*3:((y+yy)*iw+x+w)*3] for yy in range(h))
+def text_bounds(image):
+    w,h,pixels=image;points=[(x,y) for y in range(h) for x in range(w) if min(pixels[(y*w+x)*3:(y*w+x)*3+3])>175]
+    if not points:raise ValueError('Missing timer pixels')
+    x0=min(p[0] for p in points);y0=min(p[1] for p in points);x1=max(p[0] for p in points);y1=max(p[1] for p in points)
+    return crop(image,(x0,y0,x1-x0+1,y1-y0+1))
+def font_comparison(out):
+    images=[]
+    reference=text_bounds(crop(ppm(EVIDENCE/'reference/approved-middle.ppm'),(205,176,310,102)))
+    for w,h in [(320,240),(448,368)]:
+        old_geometry=json.loads((ROOT/f'build/ui-v3-2/rendered/home-geometry-{w}x{h}.json').read_text())['timer']
+        new_geometry=json.loads((PPM/f'home-geometry-{w}x{h}.json').read_text())['timer']
+        old=text_bounds(crop(ppm(ROOT/f'build/ui-v3-2/rendered/ui-{w}x{h}-state3-page0.ppm'),old_geometry))
+        new=text_bounds(crop(ppm(PPM/f'ui-{w}x{h}-state3-page0.ppm'),new_geometry))
+        images.extend([fit(reference,300,100),fit(old,300,100),fit(new,300,100)])
+    sheet(images,out/'timer-font-comparison.png',3)
+    sheet([fit(ppm(PPM/f'home-rgb888-{w}x{h}.ppm'),400,328) if rgb888 else fit(ppm(PPM/f'ui-{w}x{h}-state3-page0.ppm'),400,328) for w,h in [(320,240),(448,368)] for rgb888 in [True,False]],out/'rgb888-vs-rgb565.png',2)
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--draft',action='store_true');a=p.parse_args();config='debug' if a.draft else 'release';out=BUILD/'draft' if a.draft else OUT;out.mkdir(parents=True,exist_ok=True);PPM.mkdir(parents=True,exist_ok=True)
+    if not a.draft:
+        from ui321_artifacts import verify_native
+        verify_native('Release')
+    exe=BUILD/f'native-{config}/experiments/tyvor_ui_v3_2_1/tyvor_ui321_render.exe';started=time.perf_counter();run=subprocess.run([str(exe),str(PPM)],capture_output=True,text=True);render_wall_seconds=time.perf_counter()-started;(EVIDENCE/'render-console.txt').write_text(run.stdout+run.stderr)
+    rows=[]
+    for file in sorted(PPM.glob('*.ppm')):
+        w,h,pixels=ppm(file);png(out/(file.stem+'.png'),w,h,pixels);rows.append(dict(path=file.stem+'.png',width=w,height=h,sha256=sha(out/(file.stem+'.png'))))
+    if len(rows)!=154:raise ValueError('Expected152 RGB565 corpus images +2 raw RGB888 HOME images')
+    for w,h in [(320,240),(448,368)]:
+        shutil.copy2(out/f'ui-{w}x{h}-state3-page0.png',out/f'home-{w}x{h}.png')
+        shutil.copy2(out/f'home-{w}x{h}.png',out/f'home-rgb565-{w}x{h}.png')
+        sheet([ppm(PPM/f'ui-{w}x{h}-state3-page{page}.ppm') for page in range(9)],out/f'pages-{w}x{h}.png',3)
+        sheet([ppm(PPM/f'ui-{w}x{h}-state{s}-page0.ppm') for s in range(5)],out/f'states-{w}x{h}.png',5)
+    sheet([ppm(PPM/f'ui-{w}x{h}-state3-page{page}.ppm') for w,h in [(320,240),(448,368)] for page in range(9)],out/'all-pages-contact-sheet.png',3)
+    sheet([ppm(ROOT/f'build/ui-v3-2/rendered/ui-{w}x{h}-state3-page0.ppm') if old else ppm(PPM/f'ui-{w}x{h}-state3-page0.ppm') for w,h in [(320,240),(448,368)] for old in [True,False]],out/'v3-2-vs-v3-2-1.png',2)
+    compare(out)
+    font_comparison(out)
+    if run.returncode:print(run.stdout+run.stderr,file=sys.stderr);sys.exit(run.returncode)
+    host=exe.parent/'tyvor_ui321_simulator.exe';capture=BUILD/'host-capture.ppm';result=subprocess.run([str(host),'--smoke','--capture',str(capture)],capture_output=True,text=True,check=True);png(out/'simulator-preview.png',*ppm(capture))
+    html='''<!doctype html><meta charset="utf-8"><title>TYVOR V3.2.1 - LVGL visual review</title><style>body{background:#23394c;color:#e2ecf1;font:15px system-ui;margin:24px}section{display:flex;flex-wrap:wrap;gap:14px}figure{margin:0;padding:12px;background:#385b6b;border-radius:14px}img{max-width:448px}figcaption{font-size:12px}a{color:#78cdea}</style><h1>TYVOR V3.2.1 / HOME REFINEMENT</h1><p>Actual LVGL9.2.2 RGB888 compositing, packed to RGB565 with ordered dither. Authentic TYVOR logo assets. HOME reference: approved TYVOR middle/right panels; exact user blue-wave background, transparent TYVOR artwork and flat Lucide icons. Other pages inherit the HOME component system. SIM data only; hardware UNVERIFIED. Rendering success is not visual approval.</p><p><a href="approved-vs-v3-2-1.png">Approved / LVGL</a> | <a href="v3-2-vs-v3-2-1.png">V3.2 / V3.2.1</a> | <a href="visual-review.md">Visual findings</a> | <a href="all-pages-contact-sheet.png">All pages</a> | <a href="RUN_SIMULATOR.md">PC simulator</a></p><section>'''
+    html+=''.join(f'<figure><img src="{r["path"]}" alt="{r["path"]}"><figcaption>{r["path"]}</figcaption></figure>' for r in rows)+'</section>';(out/'index.html').write_text(html,encoding='utf-8')
+    (EVIDENCE/'render-validation.json').write_text(json.dumps(dict(engine='LVGL9.2.2 actual RGB888 compositor -> in-place dithered RGB565 framebuffer',count=152,raw_rgb888=2,total_images=154,draft=a.draft,layout_errors=0,renderer_sha256=sha(exe),images=rows,renderer_stdout=run.stdout,win32_stdout=result.stdout,native_renderer_wall_seconds=round(render_wall_seconds,6),timing_caveat='PC process incl navigation/layout/PPM IO, not FPS or SPI timing; mock frame_us uses synthetic n/8+17 clock',hardware_tested=False),indent=2)+'\n')
+    print(run.stdout.strip());print(result.stdout.strip());print(out)
+if __name__=='__main__':main()

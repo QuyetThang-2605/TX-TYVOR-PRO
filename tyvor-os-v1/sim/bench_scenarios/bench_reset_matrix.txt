@@ -1,0 +1,22 @@
+advance 300
+switch arm 1
+advance 100
+expect safety BENCH_ARMED
+reset esp32
+expect safety BENCH_ARMED
+expect ui_valid 0
+advance 600
+expect ui_valid 1
+reset stm32
+expect safety STARTUP
+advance 600
+expect safety STARTUP
+reset both
+expect ui_valid 0
+expect safety STARTUP
+switch arm 0
+advance 600
+expect safety DISARMED
+expect ui_valid 1
+expect rf 0
+diag

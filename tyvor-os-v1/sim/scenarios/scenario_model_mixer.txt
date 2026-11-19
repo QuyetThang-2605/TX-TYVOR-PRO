@@ -1,0 +1,20 @@
+advance 200
+model 1
+expect safety STARTUP
+expect model_id 2
+advance 20
+switch arm 1
+advance 20
+gimbal roll 1000
+advance 150
+expect channel 1 500
+expect ui_model 2
+reject_model 0
+switch arm 0
+gimbal throttle -1000
+advance 20
+model 0
+expect model_id 1
+advance 20
+save 0
+page 1

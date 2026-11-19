@@ -1,0 +1,33 @@
+set(LVGL_SOURCE "${PROJECT_SOURCE_DIR}/.tools/sdk/lvgl-9.2.2")
+if(NOT EXISTS "${LVGL_SOURCE}/lvgl.h")
+  message(FATAL_ERROR "Pinned LVGL9.2.2 missing. Run scripts/fetch-tft-dependencies.py")
+endif()
+file(GLOB_RECURSE LVGL_SOURCES CONFIGURE_DEPENDS "${LVGL_SOURCE}/src/*.c")
+add_library(tyvor_tft_lvgl_vendor STATIC ${LVGL_SOURCES})
+target_include_directories(tyvor_tft_lvgl_vendor SYSTEM PUBLIC "${LVGL_SOURCE}")
+target_include_directories(tyvor_tft_lvgl_vendor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(tyvor_tft_lvgl_vendor PUBLIC LV_CONF_INCLUDE_SIMPLE=1 LV_KCONFIG_IGNORE=1)
+target_compile_options(tyvor_tft_lvgl_vendor PRIVATE -w)
+add_library(tyvor_tft_portable display_contract.c tft_presenter.c touch_adapter.c tft_lvgl.c)
+target_include_directories(tyvor_tft_portable PUBLIC .)
+target_link_libraries(tyvor_tft_portable PUBLIC tyvor_ui_endpoint tyvor_tft_lvgl_vendor)
+add_executable(test_tft native/test_tft.c native/mock_display.c)
+target_link_libraries(test_tft PRIVATE tyvor_tft_portable tyvor_sim_runtime)
+set(TYVOR_TFT_CASES tft_config tft_pins_disabled tft_pins_evidence tft_pins_reserved tft_pins_duplicates tft_region_bounds
+    tft_rgb565 tft_dma_complete tft_dma_busy tft_dma_timeout tft_dma_start_error tft_dma_clock tft_rotate
+    tft_valid_safe tft_stale tft_disconnected tft_telemetry_expiry tft_live_timer_unknown tft_clock_regression tft_invalid_safety
+    tft_touch_disabled tft_touch_validation tft_render_home tft_render_partial tft_render_rotation tft_navigation_readonly
+    tft_session_control_reset tft_session_ui_reset tft_session_both_reset tft_session_loss_recovery)
+foreach(case IN LISTS TYVOR_TFT_CASES)
+  add_test(NAME ${case} COMMAND test_tft ${case})
+endforeach()
+add_executable(tyvor_tft_render native/render_tft.c native/mock_display.c)
+target_link_libraries(tyvor_tft_render PRIVATE tyvor_tft_portable)
+add_executable(test_tft_spi native/test_tft_spi.c
+    "${PROJECT_SOURCE_DIR}/esp32/experiments/tft_spi_320x240/main/tft_spi_backend.c")
+target_include_directories(test_tft_spi PRIVATE native/stubs "${PROJECT_SOURCE_DIR}/esp32/experiments/tft_spi_320x240/main")
+target_link_libraries(test_tft_spi PRIVATE tyvor_tft_portable)
+set(TYVOR_TFT_SPI_CASES tft_spi_gate_off tft_spi_unverified tft_spi_bad_config tft_spi_dma_config tft_spi_timeout tft_spi_rotation)
+foreach(case IN LISTS TYVOR_TFT_SPI_CASES)
+  add_test(NAME ${case} COMMAND test_tft_spi ${case})
+endforeach()

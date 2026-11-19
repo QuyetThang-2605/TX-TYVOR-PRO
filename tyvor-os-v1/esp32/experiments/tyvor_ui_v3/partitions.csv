@@ -1,0 +1,6 @@
+# Identical memory partition plan to the existing UI processor; separate project/config.
+nvs,      data, nvs,     0x9000,   0x6000,
+phy_init, data, phy,     0xf000,   0x1000,
+factory,  app,  factory, 0x10000,  0x300000,
+ui_assets,data, spiffs,  0x310000, 0xC00000,
+logs,     data, spiffs,  0xF10000, 0xF0000,

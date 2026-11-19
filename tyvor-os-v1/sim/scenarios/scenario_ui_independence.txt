@@ -1,0 +1,18 @@
+advance 200
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+link off
+advance 700
+expect ui_valid 0
+expect safety BENCH_ARMED
+advance 4000
+expect safety BENCH_ARMED
+link on
+advance 2500
+expect ui_valid 1
+expect safety BENCH_ARMED
+switch arm 0
+advance 20
+expect safety DISARMED
+expect rf 0

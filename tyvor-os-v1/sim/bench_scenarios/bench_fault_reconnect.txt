@@ -1,0 +1,20 @@
+advance 300
+expect ui_valid 1
+fault c2u delay 20
+fault u2c delay 15
+fault both duplicate 3
+fault c2u corrupt 11
+fault u2c loss 7
+advance 2000
+fault both clear 0
+advance 2500
+expect ui_valid 1
+link off
+advance 2200
+expect ui_valid 0
+page 6
+link on
+advance 2500
+expect ui_valid 1
+expect rf 0
+diag

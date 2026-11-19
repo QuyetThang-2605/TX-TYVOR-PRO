@@ -1,0 +1,23 @@
+switch arm 1
+gimbal throttle 1000
+advance 100
+expect safety STARTUP
+gimbal throttle -1000
+advance 100
+expect safety STARTUP
+switch arm 0
+advance 20
+expect safety DISARMED
+gimbal throttle 1000
+switch arm 1
+advance 20
+expect safety DISARMED
+gimbal throttle -1000
+advance 20
+expect safety DISARMED
+switch arm 0
+advance 20
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+expect rf 0

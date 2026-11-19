@@ -1,0 +1,5 @@
+get_filename_component(TYVOR_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
+set(LVGL_ROOT "${TYVOR_ROOT}/.tools/sdk/lvgl-9.2.2")
+file(GLOB_RECURSE LVGL_SOURCES "${LVGL_ROOT}/src/*.c")
+idf_component_register(SRCS ${LVGL_SOURCES} INCLUDE_DIRS "${TYVOR_ROOT}/experiments/tyvor_ui_v3_2" "${LVGL_ROOT}")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_CONF_INCLUDE_SIMPLE=1 LV_KCONFIG_IGNORE=1)

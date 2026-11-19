@@ -1,0 +1,10 @@
+advance 300
+fault c2u delay 1400
+advance 1800
+expect ui_valid 0
+page 5
+fault both clear 0
+advance 2500
+expect ui_valid 1
+page 5
+expect rf 0

@@ -1,0 +1,21 @@
+telemetry battery 7900
+telemetry lq 72
+telemetry rssi -85
+telemetry gps 107600000 1066600000 12
+advance 200
+expect telemetry_valid 15
+expect ui_telemetry_valid 15
+telemetry off
+advance 1200
+expect telemetry_valid 8
+expect ui_telemetry_valid 8
+advance 1100
+expect telemetry_valid 0
+expect ui_telemetry_valid 0
+telemetry on
+# Source updates each 100 ms, snapshot freezes each 120 ms, last part +100 ms.
+# Allow that bounded monitor latency; core recovery itself is immediate on feed.
+advance 400
+expect telemetry_valid 15
+expect ui_telemetry_valid 15
+page 5

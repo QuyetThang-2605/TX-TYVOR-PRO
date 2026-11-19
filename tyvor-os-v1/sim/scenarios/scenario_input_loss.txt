@@ -1,0 +1,23 @@
+advance 100
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+gimbal roll 1000
+advance 20
+expect channel 1 1000
+input loss
+advance 150
+expect safety FAILSAFE
+expect input_valid 0
+expect channel 1 0
+expect channel 3 -1000
+input recover
+advance 20
+expect safety FAILSAFE
+switch arm 0
+advance 20
+expect safety DISARMED
+switch arm 1
+advance 20
+expect safety BENCH_ARMED
+expect rf 0

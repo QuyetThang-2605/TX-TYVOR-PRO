@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.20)
+project(tyvor_phase3a1_offline C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+enable_testing()
+option(TYVOR_OFFLINE_FULL_REGRESSION "Include immutable UI/Core regression targets" ON)
+option(TYVOR_OFFLINE_HSE12_PLAN "Enable proposed HSE12 mathematical profile only; no HAL" OFF)
+if(TYVOR_OFFLINE_FULL_REGRESSION)
+  foreach(feature DISCOVERY_TESTS TFT_EXPERIMENT UI_V2 UI_V3 UI_V31 UI_V32 UI_V321)
+    set(TYVOR_BUILD_${feature} ON CACHE BOOL "Existing regression" FORCE)
+  endforeach()
+endif()
+# Import the existing project without editing its files or changing firmware targets.
+add_subdirectory(../.. baseline)
+add_library(tyvor_offline board_plan.c mock_io.c mock_media.c mock_audio.c)
+target_include_directories(tyvor_offline PUBLIC .)
+target_link_libraries(tyvor_offline PUBLIC tyvor_core)
+target_compile_definitions(tyvor_offline PRIVATE TYVOR_OFFLINE_HSE12_PLAN=$<BOOL:${TYVOR_OFFLINE_HSE12_PLAN}>)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(tyvor_offline PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_executable(test_offline test_offline.c)
+target_link_libraries(test_offline PRIVATE tyvor_offline)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(test_offline PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+set(OFFLINE_CASES board_defaults board_reject_gpio board_reject_gate clock_current clock_hse_gate
+  clock_hse_math clock_bad_divisors clock_bad_vco clock_bad_usb clock_bus_limits clock_overflow
+  input_default input_read input_timeout input_stale input_future input_invalid input_loss input_clock input_deadline
+  media_roundtrip media_bounds media_removed media_readonly media_timeout media_io media_partial media_sync
+  store_roundtrip store_failure store_corrupt store_removed store_bounds
+  audio_boot audio_event audio_queue audio_expiry audio_mute audio_failure audio_clock audio_timeout audio_validation
+  core_input_loss core_storage_failure randomized_io)
+foreach(case IN LISTS OFFLINE_CASES)
+  add_test(NAME offline_${case} COMMAND test_offline ${case})
+endforeach()
+# Opt-in profile tested in a distinct pure-math executable; production/default library stays gated.
+add_executable(test_offline_hse12 board_plan.c test_clock_enabled.c)
+target_include_directories(test_offline_hse12 PRIVATE .)
+target_compile_definitions(test_offline_hse12 PRIVATE TYVOR_OFFLINE_HSE12_PLAN=1)
+add_test(NAME offline_hse12_opt_in COMMAND test_offline_hse12)
+add_executable(tyvor_offline_sim host_sim.c)
+target_link_libraries(tyvor_offline_sim PRIVATE tyvor_offline)
+add_test(NAME offline_host_scenario COMMAND tyvor_offline_sim)
