@@ -18,7 +18,7 @@ int tyvor_telemetry_feed(tyvor_telemetry_t *s,const tyvor_telemetry_sample_t *p,
         ((v->valid&4) && (v->rssi_dbm<-150 || v->rssi_dbm>0)) ||
         ((v->valid&8) && (v->latitude_e7<-900000000 || v->latitude_e7>900000000 ||
          v->longitude_e7<-1800000000 || v->longitude_e7>1800000000 || v->satellites>64))) return -1;
-    for (unsigned i=0;i<4;++i) if ((p->present&(1u<<i)) && (s->seen&(1u<<i)) && p->sampled_ms<=s->sampled_ms[i]) return -1;
+    for (unsigned i=0;i<4;++i) if ((p->present&(1u<<i)) && (s->seen&(1u<<i)) && p->sampled_ms<s->sampled_ms[i]) return -1;
     for (unsigned i=0;i<4;++i) {
         uint8_t bit=(uint8_t)(1u<<i);if(!(p->present&bit))continue;
         s->sampled_ms[i]=p->sampled_ms;s->seen|=bit;

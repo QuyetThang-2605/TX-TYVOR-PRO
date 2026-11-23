@@ -1,4 +1,4 @@
-﻿#include "tyvor_core_bridge.h"
+#include "tyvor_core_bridge.h"
 #include <string.h>
 static uint8_t read_request(void *ctx,uint8_t opcode,uint8_t page) {
     tyvor_core_bridge_t *b=ctx;(void)opcode;(void)page;
@@ -10,8 +10,8 @@ static void read_packet(void *ctx,const tyvor_frame_t *f,uint64_t now) {
     if(b->session_count!=b->transport.link.stats.sessions) {
         b->session_count=b->transport.link.stats.sessions;b->read_token=0;b->response_active=0;
     }
-    /* Bounded read-only snapshots, no repeated freeze from replay/flood. */
-    if(token<=b->read_token || (b->read_token && (now<b->last_read_ms || now-b->last_read_ms<100))) {++b->read_rejected;return;}
+    /* Bounded read-only snapshots, high-rate 100Hz live streaming over 460800 bps UART. */
+    if(token<=b->read_token || (b->read_token && (now<b->last_read_ms || now-b->last_read_ms<8))) {++b->read_rejected;return;}
     b->read_token=token;b->last_read_ms=now;b->response_active=1;b->part=0;b->mix_page=0;b->next_tx_ms=now;
     tyvor_core_snapshot(b->core,now,&b->frozen);b->frozen.generation=token;b->generation=token;
 }
@@ -50,7 +50,7 @@ void tyvor_core_bridge_poll(tyvor_core_bridge_t *b,uint64_t now) {
         if(now>=b->last_status_ms && now-b->last_status_ms>=100)status(b,now);
         return;
     }
-    b->next_tx_ms=now+10;
+    b->next_tx_ms=now+1;
     if(!b->part) {status(b,now);b->part=1;return;}
     uint8_t payload[32];unsigned kind=b->part<=5?b->part:TYVOR_CORE_MIXES;
     b->frozen.mix_page=b->mix_page;

@@ -28,7 +28,7 @@ int tyvor_payload_valid(uint8_t type,const uint8_t *b,size_t n) {
     case TYVOR_UI_REQUEST:return (b[0]==TYVOR_REQ_MODEL_INFO && !b[1]) ||
                                 (b[0]==TYVOR_REQ_PAGE && b[1]<7) ||
                                 (b[0]==TYVOR_REQ_QUICKSET);
-    case TYVOR_ACK:return b[0]>=1 && b[0]<=2 && b[1]<=3;
+    case TYVOR_ACK:return b[0]>=1 && b[0]<=3 && b[1]<=3;
     case TYVOR_HELLO:case TYVOR_SESSION_ACK:
         return (b[0]==TYVOR_ROLE_CONTROL || b[0]==TYVOR_ROLE_UI) && b[1]==0;
     case TYVOR_DIAGNOSTIC:return 1;

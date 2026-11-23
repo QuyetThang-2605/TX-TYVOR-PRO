@@ -347,7 +347,7 @@ static int os_viewed_model = 0; /* Currently browsed tab on MODELS screen */
 static int os_pending_model = 0;/* Target model in Switch Model confirmation modal */
 static int os_model_modal_open = 0;
 static int os_power_idx = 2;    /* 0=100mW, 1=250mW, 2=400mW, 3=500mW, 4=1000mW */
-static const uint16_t k_power_mw_table[5] = {100, 250, 400, 500, 1000};
+static const uint16_t k_power_mw_table[5] = {50, 100, 200, 400, 500};
 static int os_elrs_rate_idx = 2;/* 0=50Hz, 1=150Hz, 2=250Hz, 3=500Hz */
 static const uint16_t k_elrs_rate_table[4] = {50, 150, 250, 500};
 static int os_finder_active = 0;
@@ -622,6 +622,9 @@ static unsigned tyvor_nav_resolve_target(unsigned cur_page, tyvor_swipe_dir_t di
 /* ----------------------------------------------------------------------------
  * MODULE 2: SCREEN SWITCH CONTROLLER (Instant Page Switch — No Transition Anim)
  * -------------------------------------------------------------------------- */
+static void f_page_anim_x_cb(void *var, int32_t v);
+static void f_page_anim_y_cb(void *var, int32_t v);
+
 static void tyvor_trans_hide_inactive_pages(unsigned keep_a, unsigned keep_b) {
     for (unsigned i = 0; i < FIGMA_PAGE_COUNT; ++i) {
         if (!page_containers[i]) continue;
@@ -629,6 +632,8 @@ static void tyvor_trans_hide_inactive_pages(unsigned keep_a, unsigned keep_b) {
             lv_obj_remove_flag(page_containers[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_set_pos(page_containers[i], 0, 0);
         } else {
+            lv_anim_delete(page_containers[i], f_page_anim_x_cb);
+            lv_anim_delete(page_containers[i], f_page_anim_y_cb);
             lv_obj_add_flag(page_containers[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_set_pos(page_containers[i], 0, 0);
         }
@@ -681,12 +686,19 @@ static void tyvor_trans_drag_update(tyvor_gesture_axis_t axis, int delta_px) {
         new_dir = (delta_px >= 0) ? TYVOR_SWIPE_DOWN : TYVOR_SWIPE_UP;
     }
 
+    unsigned prev_to  = (g_trans.state == TYVOR_TRANS_DRAGGING) ? g_trans.to_page : TYVOR_PAGE_NONE;
     g_trans.state     = TYVOR_TRANS_DRAGGING;
     g_trans.axis      = axis;
     g_trans.dir       = new_dir;
     g_trans.from_page = figma_page;
     g_trans.to_page   = tyvor_nav_resolve_target(figma_page, new_dir);
     g_trans.offset_px = delta_px;
+
+    if (prev_to != g_trans.to_page && prev_to < FIGMA_PAGE_COUNT &&
+        prev_to != figma_page && page_containers[prev_to]) {
+        lv_obj_add_flag(page_containers[prev_to], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_pos(page_containers[prev_to], 0, 0);
+    }
 
 #define MOD_TRACK_BASE_X (-240)
 #define MOD_CARD_STRIDE  220
@@ -707,7 +719,8 @@ static void tyvor_trans_drag_update(tyvor_gesture_axis_t axis, int delta_px) {
     /* Live interactive slide-in of target page container following finger */
     unsigned to = g_trans.to_page;
     if (to < FIGMA_PAGE_COUNT && to != figma_page) {
-        if (to == FIGMA_PAGE_MODELS && figma_page != FIGMA_PAGE_MODELS) {
+        if (to == FIGMA_PAGE_MODELS && figma_page != FIGMA_PAGE_MODELS &&
+            os_viewed_model != os_active_model) {
             os_viewed_model = os_active_model;
             f_invalidate_page(FIGMA_PAGE_MODELS);
         }
@@ -777,7 +790,8 @@ static void tyvor_trans_release(void) {
             f_refresh_models_page_dir(enter_x);
             return;
         }
-        if (target == FIGMA_PAGE_MODELS && figma_page != FIGMA_PAGE_MODELS) {
+        if (target == FIGMA_PAGE_MODELS && figma_page != FIGMA_PAGE_MODELS &&
+            os_viewed_model != os_active_model) {
             os_viewed_model = os_active_model;
             f_invalidate_page(FIGMA_PAGE_MODELS);
         }
@@ -787,6 +801,7 @@ static void tyvor_trans_release(void) {
         g_gesture.cooldown_until_ms = millis() + TYVOR_SWIPE_COOLDOWN_MS;
         ESP_LOGI("NAV", "SLIDE SWITCH dir=%d from=%u -> to=%u",
                  (int)g_trans.dir, figma_page, target);
+        f_ensure_page_built(target);
         if (page_containers[target]) {
             int is_x = (g_trans.axis == TYVOR_AXIS_HORIZ);
             int cur_v = is_x ? (int)lv_obj_get_x(page_containers[target])
@@ -1183,9 +1198,9 @@ static void lvgl_touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
                             active_non_sleep_page = FIGMA_PAGE_SETTINGS_MENU;
                             f_open_page(FIGMA_PAGE_SETTINGS_MENU);
                         }
-                    } else if (figma_page == FIGMA_PAGE_TX_POWER && ty >= 42 && ty <= 232) {
-                        int row = (ty - 42) / 46;
-                        if (row >= 0 && row < 4) {
+                    } else if (figma_page == FIGMA_PAGE_TX_POWER && ty >= 36 && ty <= 232) {
+                        int row = (ty - 36) / 39;
+                        if (row >= 0 && row < 5) {
                             touch_suppress_click_until_ms = now + 260;
                             f_tx_power_select(row);
                         }
@@ -1214,7 +1229,9 @@ static void lvgl_touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
                             active_non_sleep_page = FIGMA_PAGE_CH_VIEW;
                             f_open_page(FIGMA_PAGE_CH_VIEW);
                         }
-                    } else if (figma_page == FIGMA_PAGE_BIND && tx >= 186 && ty >= 168 && ty <= 226) {
+                    } else if (figma_page == FIGMA_PAGE_BIND &&
+                               ((tx >= 180 && ty >= 156 && ty <= 228) ||
+                                (tx >= 36 && tx <= 156 && ty >= 56 && ty <= 168))) {
                         touch_suppress_click_until_ms = now + 260;
                         f_bind_toggle();
                     }
@@ -1594,6 +1611,16 @@ static int os_stick_cal_active = 0;
 static int32_t os_cal_live_min[4] = {2048, 2048, 2048, 2048};
 static int32_t os_cal_live_max[4] = {2048, 2048, 2048, 2048};
 
+/* Bind page live widgets */
+static lv_obj_t *w_bind_ring = NULL;
+static lv_obj_t *w_bind_ring_lbl = NULL;
+static lv_obj_t *w_bind_status_lbl = NULL;
+static lv_obj_t *w_bind_sub_lbl = NULL;
+static lv_obj_t *w_bind_btn = NULL;
+static lv_obj_t *w_bind_btn_lbl = NULL;
+static uint64_t os_bind_until_ms = 0;
+static int os_bind_sent_once = 0;
+
 /* Sleep / Screen Saver live widgets (Official TYVOR Logo + Owl Face) */
 static lv_obj_t *w_thr_warn_overlay = NULL;
 static lv_obj_t *w_thr_warn_bar = NULL;
@@ -1690,9 +1717,11 @@ static void init_gimbal_adc(void) {
     }
 }
 
+static int any_local_gimbal_connected(void);
+
 static void service_gimbal_adc(uint64_t now) {
     if (!adc1_handle || now < next_gimbal_ms) return;
-    next_gimbal_ms = now + 12; /* ~83 Hz real-time gimbal sampling */
+    next_gimbal_ms = now + (any_local_gimbal_connected() ? 12 : 250);
 
     for (int i = 0; i < 4; ++i) {
         int gpio = gimbal_gpio_map[i];
@@ -1804,14 +1833,39 @@ static int16_t clamp_ch(int32_t v) {
     return (int16_t)v;
 }
 
+/* Integer Cubic Expo: y = (k * x^3 / 1000^2 + (100 - k) * x) / 100 */
+static int16_t apply_expo(int16_t x, int expo_pct) {
+    int32_t v = x;
+    int32_t x3 = ((v * v) / 1000) * v / 1000;
+    int32_t res = (x3 * expo_pct + v * (100 - expo_pct)) / 100;
+    return clamp_ch(res);
+}
+
+/* Get Flight Mode name received from Drone Flight Controller over CRSF 0x21 (or Model default if offline) */
+static const char *get_drone_flight_mode_name(const tyvor_core_snapshot_t *snap, int link_ok, int model_idx) {
+    if (link_ok && snap && strncmp(snap->model_name, "FM:", 3) == 0 && snap->model_name[3] != '\0') {
+        return &snap->model_name[3];
+    }
+    return k_os_models[model_idx & 3].mode_name;
+}
+
 static int16_t get_live_ch_raw(int ch, const tyvor_core_snapshot_t *snap, int link_ok) {
-    (void)snap;
-    (void)link_ok;
-    /* Raw physical gimbal axes (Mode 2 default: 0=Roll, 1=Pitch, 2=Thr, 3=Yaw) */
-    int16_t rol = gimbal_connected[0] ? gimbal_raw_val[0] : 0;
-    int16_t pit = gimbal_connected[1] ? gimbal_raw_val[1] : 0;
-    int16_t thr = gimbal_connected[2] ? gimbal_raw_val[2] : -1000;
-    int16_t yaw = gimbal_connected[3] ? gimbal_raw_val[3] : 0;
+    int stm32_ok = (link_ok && snap && snap->input_valid);
+    /* Raw physical gimbal axes (Mode 2 default: 0=Roll, 1=Pitch, 2=Thr, 3=Yaw)
+     * Priority: local ESP32 ADC if wired, else STM32F407 ADC1 (PC1, PC2, PC4, PC5) over UART! */
+    int16_t rol = gimbal_connected[0] ? gimbal_raw_val[0] : (stm32_ok ? snap->inputs[0] : 0);
+    int16_t pit = gimbal_connected[1] ? gimbal_raw_val[1] : (stm32_ok ? snap->inputs[1] : 0);
+    int16_t thr = gimbal_connected[2] ? gimbal_raw_val[2] : (stm32_ok ? snap->inputs[2] : -1000);
+    int16_t yaw = gimbal_connected[3] ? gimbal_raw_val[3] : (stm32_ok ? snap->inputs[3] : 0);
+    int16_t sa  = stm32_ok ? snap->channels[4] : ((gimbal_raw_val[4] > 0) ? 1000 : -1000);
+    int16_t sb  = stm32_ok ? snap->channels[5] : ((gimbal_raw_val[5] > 0) ? 1000 : -1000);
+    int16_t sc  = stm32_ok ? snap->channels[6] : 0;
+    int16_t sd  = stm32_ok ? snap->channels[7] : 0;
+    int16_t ch9 = 0, ch10 = 0;
+    if (stm32_ok && (snap->model_id & (1u << 30))) {
+        ch9  = clamp_ch((int32_t)(snap->model_id & 0xFFFu) - 1000);
+        ch10 = clamp_ch((int32_t)((snap->model_id >> 12) & 0xFFFu) - 1000);
+    }
 
     /* Stick Mode 1 swaps Pitch (CH2) and Throttle (CH3) physical inputs */
     if (os_stick_mode == 1) {
@@ -1820,26 +1874,46 @@ static int16_t get_live_ch_raw(int ch, const tyvor_core_snapshot_t *snap, int li
         thr = tmp;
     }
 
-    int16_t out[6];
+    int16_t out[10];
     out[0] = rol;
     out[1] = pit;
     out[2] = thr;
     out[3] = yaw;
-    out[4] = gimbal_raw_val[4];
-    out[5] = gimbal_raw_val[5];
+    out[4] = sa;   /* CH5: Switch SA (-100% / 0% / +100%) */
+    out[5] = sb;   /* CH6: Pot S1 (-100% .. +100%) */
+    out[6] = sc;   /* CH7: Switch SB (-100% / 0% / +100%) */
+    out[7] = sd;   /* CH8: Switch SC (-100% / 0% / +100%) */
+    out[8] = ch9;  /* CH9: Pot S2 (-100% .. +100%) */
+    out[9] = ch10; /* CH10: Switch SD (-100% / 0% / +100%) */
 
-    /* Apply active Model Mixer (CRU / QUAD / FIXED Elevon / VTAIL) */
-    if (os_active_model == 2) {
-        /* FIXED Wing: Elevon Mixer (CH1 = AIL+ELE, CH2 = AIL-ELE) */
-        out[0] = clamp_ch(((int32_t)rol + (int32_t)pit) / 2);
-        out[1] = clamp_ch(((int32_t)rol - (int32_t)pit) / 2);
+    /* Apply active Model Primary Surface Mixer & Expo (functions of AUX channels are configured on Drone FC) */
+    if (os_active_model == 0) {
+        /* 0: CRU Cruiser — 25% Smooth Expo */
+        out[0] = apply_expo(rol, 25);
+        out[1] = apply_expo(pit, 25);
+        out[3] = apply_expo(yaw, 20);
+    } else if (os_active_model == 1) {
+        /* 1: QUAD Freestyle — 35% Acro Expo */
+        out[0] = apply_expo(rol, 35);
+        out[1] = apply_expo(pit, 35);
+        out[3] = apply_expo(yaw, 25);
+    } else if (os_active_model == 2) {
+        /* 2: FIXED Wing — 20% Expo + Elevon Mix (CH1 = AIL+ELE, CH2 = AIL-ELE) */
+        int32_t r_e = apply_expo(rol, 20);
+        int32_t p_e = apply_expo(pit, 20);
+        out[0] = clamp_ch((r_e * 75 + p_e * 75) / 100);
+        out[1] = clamp_ch((r_e * 75 - p_e * 75) / 100);
     } else if (os_active_model == 3) {
-        /* VTAIL Glider: V-Tail Mixer (CH2 = ELE+RUD, CH4 = ELE-RUD) */
-        out[1] = clamp_ch(((int32_t)pit + (int32_t)yaw) / 2);
-        out[3] = clamp_ch(((int32_t)pit - (int32_t)yaw) / 2);
+        /* 3: VTAIL Glider — 20% Expo + V-Tail Mix (CH2 = ELE+RUD, CH4 = ELE-RUD) */
+        int32_t r_e = apply_expo(rol, 20);
+        int32_t p_e = apply_expo(pit, 20);
+        int32_t y_e = apply_expo(yaw, 20);
+        out[0] = clamp_ch(r_e);
+        out[1] = clamp_ch((p_e * 75 + y_e * 75) / 100);
+        out[3] = clamp_ch((p_e * 75 - y_e * 75) / 100);
     }
 
-    if (ch >= 0 && ch < 6) {
+    if (ch >= 0 && ch < 10) {
         return out[ch];
     }
     return 0;
@@ -1890,6 +1964,13 @@ static void reset_page_widgets(unsigned p) {
     } else if (p == FIGMA_PAGE_CHANNELS) {
         memset(w_chc_pct, 0, sizeof(w_chc_pct));
         memset(w_chc_fill, 0, sizeof(w_chc_fill));
+    } else if (p == FIGMA_PAGE_BIND) {
+        w_bind_ring = NULL;
+        w_bind_ring_lbl = NULL;
+        w_bind_status_lbl = NULL;
+        w_bind_sub_lbl = NULL;
+        w_bind_btn = NULL;
+        w_bind_btn_lbl = NULL;
     } else if (p == FIGMA_PAGE_TELEMETRY) {
         w_tel_vp = NULL;
         memset(w_tel_val, 0, sizeof(w_tel_val));
@@ -1911,6 +1992,10 @@ static void reset_page_widgets(unsigned p) {
     }
 }
 
+static int in_lvgl_handler = 0;
+static int deferred_clean_invalidated = 0;
+static void f_clean_invalidated_pages(void);
+
 static void f_invalidate_page(unsigned page) {
     if (page < FIGMA_PAGE_COUNT) {
         page_built[page] = 0;
@@ -1919,6 +2004,11 @@ static void f_invalidate_page(unsigned page) {
 
 static void f_invalidate_all_pages(void) {
     memset(page_built, 0, sizeof(page_built));
+    if (in_lvgl_handler) {
+        deferred_clean_invalidated = 1;
+    } else {
+        f_clean_invalidated_pages();
+    }
 }
 
 static lv_obj_t *f_rect(lv_obj_t *parent, int x, int y, int w, int h,
@@ -2099,8 +2189,20 @@ static void on_nav_btn_cb(lv_event_t *e) {
     tyvor_trans_start_animated(target, dir);
 }
 
+static int deferred_open_page = -1;
+static int deferred_enter_x = 0;
+static int deferred_enter_y = 0;
+static int deferred_mod_track_x = 0;
+
 static void f_refresh_models_page_dir(int enter_x) {
     f_invalidate_page(FIGMA_PAGE_MODELS);
+    if (in_lvgl_handler) {
+        deferred_open_page = (int)FIGMA_PAGE_MODELS;
+        deferred_enter_x = 0;
+        deferred_enter_y = 0;
+        deferred_mod_track_x = enter_x;
+        return;
+    }
     f_ensure_page_built(FIGMA_PAGE_MODELS);
     if (enter_x != 0 && w_mod_track) {
         lv_obj_set_x(w_mod_track, MOD_TRACK_BASE_X + enter_x);
@@ -2115,6 +2217,8 @@ static void f_refresh_models_page(void) {
     f_invalidate_all_pages();
     f_open_page(FIGMA_PAGE_MODELS);
 }
+
+static void os_sync_all_to_stm32(void);
 
 static void apply_model_profile(int idx) {
     if (idx < 0 || idx > 3) return;
@@ -2131,7 +2235,7 @@ static void apply_model_profile(int idx) {
     }
     f_invalidate_all_pages();
     if (ui_endpoint.link.ready) {
-        (void)tyvor_ui_endpoint_request(&ui_endpoint, TYVOR_REQ_PAGE, 1);
+        os_sync_all_to_stm32();
         ui_endpoint.read_active = 0;
         ui_endpoint.next_read_ms = millis();
     }
@@ -2306,7 +2410,11 @@ static void f_build_menu_row_header(lv_obj_t *parent, unsigned current_page) {
     lv_obj_set_ext_click_area(back, 16);
     lv_obj_add_event_cb(back, on_back_btn_cb, LV_EVENT_CLICKED, NULL);
 
-    static const char *tab_titles[3] = {"QuickSet", "Settings", "About"};
+    const char *tab_titles[3] = {
+        os_lang_vi ? "Nhanh" : "QuickSet",
+        os_lang_vi ? "Cai dat" : "Settings",
+        os_lang_vi ? "Thong tin" : "About"
+    };
     static const unsigned tab_pages[3] = {
         FIGMA_PAGE_QUICKSET_MENU,
         FIGMA_PAGE_SETTINGS_MENU,
@@ -2356,7 +2464,7 @@ static void f_build_home_page(lv_obj_t *p) {
     /* Top Status Pill ("DISARMED" / "ARMED") */
     lv_obj_t *top_notch = f_rect(p, 102, 22, 116, 20, 0x071C3D, LV_OPA_COVER, 10, 1, 0x355C8C);
     w_home_arm_dot = f_rect(top_notch, 10, 5, 8, 8, 0xEF4444, LV_OPA_COVER, 4, 0, 0);
-    w_home_arm_lbl = f_label(top_notch, 22, 2, 86, "DISARMED",
+    w_home_arm_lbl = f_label(top_notch, 22, 2, 86, os_lang_vi ? "CHUA ARM" : "DISARMED",
                              &lv_font_montserrat_12, 0xEF4444, LV_TEXT_ALIGN_CENTER);
 
     /* Left "Find" Button + Centered Radar Target Icon */
@@ -2373,7 +2481,7 @@ static void f_build_home_page(lv_obj_t *p) {
     lv_obj_add_flag(find_btn, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_ext_click_area(find_btn, 6);
     lv_obj_add_event_cb(find_btn, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_FIND);
-    f_label(p, 26, 95, 52, "Find", &lv_font_montserrat_12, 0xCBD5E1, LV_TEXT_ALIGN_CENTER);
+    f_label(p, 26, 95, 52, os_lang_vi ? "Tim" : "Find", &lv_font_montserrat_12, 0xCBD5E1, LV_TEXT_ALIGN_CENTER);
 
     /* Center Digital Session Timer & Active Model Box (Tap to open CH View) */
     lv_obj_t *timer_box = f_rect(p, 84, 46, 152, 62, 0x0A1C36, LV_OPA_COVER, 12, 1, 0x355C8C);
@@ -2381,7 +2489,7 @@ static void f_build_home_page(lv_obj_t *p) {
             &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     w_home_timer_lbl = f_label(timer_box, 4, 21, 144, "00:00",
                                &lv_font_montserrat_20, 0x38BDF8, LV_TEXT_ALIGN_CENTER);
-    f_label(timer_box, 4, 44, 144, "TAP FOR CHANNELS",
+    f_label(timer_box, 4, 44, 144, os_lang_vi ? "CHAM XEM KENH" : "TAP FOR CHANNELS",
             &lv_font_montserrat_12, 0x475569, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(timer_box, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(timer_box, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_CH_VIEW);
@@ -2395,11 +2503,11 @@ static void f_build_home_page(lv_obj_t *p) {
     lv_obj_add_flag(bind_btn, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_ext_click_area(bind_btn, 6);
     lv_obj_add_event_cb(bind_btn, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_BIND);
-    f_label(p, 242, 95, 52, "Bind", &lv_font_montserrat_12, 0xCBD5E1, LV_TEXT_ALIGN_CENTER);
+    f_label(p, 242, 95, 52, os_lang_vi ? "Ket noi" : "Bind", &lv_font_montserrat_12, 0xCBD5E1, LV_TEXT_ALIGN_CENTER);
 
     /* Bottom Signal / Live Gimbal Pill (flush on Hero Card bottom edge) */
     lv_obj_t *bot_notch = f_rect(p, 76, 127, 168, 20, 0x071C3D, LV_OPA_COVER, 10, 1, 0x355C8C);
-    w_home_sig_lbl = f_label(bot_notch, 4, 2, 160, "No Signal",
+    w_home_sig_lbl = f_label(bot_notch, 4, 2, 160, os_lang_vi ? "Mat tin hieu" : "No Signal",
                              &lv_font_montserrat_12, 0xE67E22, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(bot_notch, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(bot_notch, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_CH_VIEW);
@@ -2420,10 +2528,10 @@ static void f_build_home_page(lv_obj_t *p) {
     lv_obj_t *mode_card = f_rect(p, 116, 153, 88, 66, 0x1E3F66, LV_OPA_COVER, 12, 1, 0x4A7AB0);
     lv_obj_set_style_bg_grad_color(mode_card, lv_color_hex(0x132E52), 0);
     lv_obj_set_style_bg_grad_dir(mode_card, LV_GRAD_DIR_VER, 0);
-    f_label(mode_card, 4, 6, 80, "MODE", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+    f_label(mode_card, 4, 6, 80, os_lang_vi ? "CHE DO" : "MODE", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     w_home_mode_lbl = f_label(mode_card, 4, 24, 80, k_os_models[os_active_model].mode_name,
                               &lv_font_montserrat_14, k_os_models[os_active_model].badge_hex, LV_TEXT_ALIGN_CENTER);
-    f_label(mode_card, 4, 44, 80, LV_SYMBOL_SHUFFLE " MODELS", &lv_font_montserrat_12, 0x64748B, LV_TEXT_ALIGN_CENTER);
+    f_label(mode_card, 4, 44, 80, os_lang_vi ? (LV_SYMBOL_SHUFFLE " MAU") : (LV_SYMBOL_SHUFFLE " MODELS"), &lv_font_montserrat_12, 0x64748B, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(mode_card, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(mode_card, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_MODELS);
 
@@ -2454,7 +2562,7 @@ static void f_build_home_page(lv_obj_t *p) {
     (void)f_rect(p, 22, 230, 84, 4, 0x334155, LV_OPA_COVER, 2, 0, 0);
     w_home_trim_ticks[2] = f_rect(p, 62, 228, 4, 8, 0xE2E8F0, LV_OPA_COVER, 2, 0, 0);
 
-    f_label(p, 112, 223, 96, LV_SYMBOL_UP " QuickSet", &lv_font_montserrat_12, 0x64748B, LV_TEXT_ALIGN_CENTER);
+    f_label(p, 112, 223, 96, os_lang_vi ? (LV_SYMBOL_UP " Cai nhanh") : (LV_SYMBOL_UP " QuickSet"), &lv_font_montserrat_12, 0x64748B, LV_TEXT_ALIGN_CENTER);
 
     (void)f_rect(p, 214, 230, 84, 4, 0x334155, LV_OPA_COVER, 2, 0, 0);
     w_home_trim_ticks[3] = f_rect(p, 254, 228, 4, 8, 0xE2E8F0, LV_OPA_COVER, 2, 0, 0);
@@ -2477,7 +2585,7 @@ static lv_obj_t *f_build_model_card(lv_obj_t *parent, int model_idx, int x, int 
 
     lv_obj_t *mini_main = f_rect(card, 12, 24, 182, 66, 0x1E3F66, LV_OPA_COVER, 9, 1, m->theme_hex);
     f_label(mini_main, 0, 3, 182,
-            is_act ? "ACTIVE MODEL" : "TAP TO SWITCH",
+            is_act ? (os_lang_vi ? "DANG DUNG" : "ACTIVE MODEL") : (os_lang_vi ? "CHAM DE CHON" : "TAP TO SWITCH"),
             &lv_font_montserrat_12,
             is_act ? 0x5ECA62 : 0xEAB308, LV_TEXT_ALIGN_CENTER);
     (void)f_rect(mini_main, 10, 20, 22, 22, 0x2D5078, LV_OPA_COVER, 5, 0, 0);
@@ -2493,7 +2601,7 @@ static lv_obj_t *f_build_model_card(lv_obj_t *parent, int model_idx, int x, int 
     (void)f_rect(mc1, 13, 20, 30, 6, 0x5ECA62, LV_OPA_COVER, 3, 0, 0);
 
     lv_obj_t *mc2 = f_rect(card, 75, 94, 56, 34, 0x1E3F66, LV_OPA_COVER, 7, 1, 0x4A7AB0);
-    f_label(mc2, 0, 2, 56, "MODE", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+    f_label(mc2, 0, 2, 56, os_lang_vi ? "CHE DO" : "MODE", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     lv_obj_t *mode_lbl = f_label(mc2, 0, 16, 56, m->mode_name, &lv_font_montserrat_12, m->badge_hex, LV_TEXT_ALIGN_CENTER);
     if (is_center) w_mod_prev_mode = mode_lbl;
 
@@ -2521,7 +2629,7 @@ static void f_build_models_page(lv_obj_t *p) {
     lv_obj_add_event_cb(back, on_back_btn_cb, LV_EVENT_CLICKED, NULL);
 
     char title_buf[48];
-    snprintf(title_buf, sizeof(title_buf), "%s Model%s", m->tab_name, is_active ? " *" : "");
+    snprintf(title_buf, sizeof(title_buf), os_lang_vi ? "Mau %s%s" : "%s Model%s", m->tab_name, is_active ? " *" : "");
     w_mod_title_lbl = f_label(p, 58, 7, 200, title_buf,
                               &lv_font_montserrat_14,
                               is_active ? 0x5ECA62 : 0xF7FAFF, LV_TEXT_ALIGN_CENTER);
@@ -2569,13 +2677,13 @@ static void f_build_models_page(lv_obj_t *p) {
     lv_obj_t *b_mod = f_rect(p, 18, 196, 136, 34,
                              is_active ? 0x15803D : 0x23476E, LV_OPA_COVER, 10,
                              1, is_active ? 0x5ECA62 : 0x4A7AB0);
-    f_label(b_mod, 0, 9, 136, is_active ? "Active" : "Select",
+    f_label(b_mod, 0, 9, 136, is_active ? (os_lang_vi ? "Dang dung" : "Active") : (os_lang_vi ? "Chon mau" : "Select"),
             &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(b_mod, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(b_mod, on_model_activate_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t *b_lay = f_rect(p, 166, 196, 136, 34, 0x23476E, LV_OPA_COVER, 10, 2, 0x38BDF8);
-    f_label(b_lay, 0, 9, 136, "Layout", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
+    f_label(b_lay, 0, 9, 136, os_lang_vi ? "So do" : "Layout", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(b_lay, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(b_lay, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_MODEL_LAYOUT);
 
@@ -2588,7 +2696,7 @@ static void f_build_models_page(lv_obj_t *p) {
 
     lv_obj_t *dlg = f_rect(w_mod_confirm_overlay, 36, 14, 248, 212, 0x132E52, LV_OPA_COVER, 14, 1, 0x4A7AB0);
     lv_obj_remove_flag(dlg, LV_OBJ_FLAG_CLICKABLE);
-    f_label(dlg, 0, 6, 248, "Switch to", &lv_font_montserrat_14, 0xF7FAFF, LV_TEXT_ALIGN_CENTER);
+    f_label(dlg, 0, 6, 248, os_lang_vi ? "Chuyen sang" : "Switch to", &lv_font_montserrat_14, 0xF7FAFF, LV_TEXT_ALIGN_CENTER);
 
     /* Mini Preview inside Confirmation Modal */
     w_mod_modal_card = f_rect(dlg, 46, 26, 156, 94, 0x0A1936, LV_OPA_COVER, 10, 2, m->theme_hex);
@@ -2596,7 +2704,7 @@ static void f_build_models_page(lv_obj_t *p) {
     w_mod_modal_pwr = f_label(w_mod_modal_card, 100, 4, 48, "400mW", &lv_font_montserrat_12, 0xD8E0E8, LV_TEXT_ALIGN_RIGHT);
 
     lv_obj_t *m_inner = f_rect(w_mod_modal_card, 8, 22, 140, 38, 0x1E3F66, LV_OPA_COVER, 7, 0, 0);
-    f_label(m_inner, 0, 2, 140, "No Arm", &lv_font_montserrat_12, 0xE53935, LV_TEXT_ALIGN_CENTER);
+    f_label(m_inner, 0, 2, 140, os_lang_vi ? "Chua Arm" : "No Arm", &lv_font_montserrat_12, 0xE53935, LV_TEXT_ALIGN_CENTER);
     f_label(m_inner, 0, 15, 140, "00:00", &lv_font_montserrat_14, 0xD8E0E8, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t *m_bat = f_rect(w_mod_modal_card, 8, 63, 44, 24, 0x1E3F66, LV_OPA_COVER, 5, 0, 0);
@@ -2625,13 +2733,13 @@ static void f_build_models_page(lv_obj_t *p) {
 
     /* Cancel & Switch Buttons (tall, easy to tap) */
     lv_obj_t *btn_cancel = f_rect(dlg, 14, 162, 104, 38, 0x23476E, LV_OPA_COVER, 9, 1, 0x4A7AB0);
-    f_label(btn_cancel, 0, 11, 104, "Cancel", &lv_font_montserrat_14, 0xF2F7FF, LV_TEXT_ALIGN_CENTER);
+    f_label(btn_cancel, 0, 11, 104, os_lang_vi ? "Huy" : "Cancel", &lv_font_montserrat_14, 0xF2F7FF, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(btn_cancel, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_ext_click_area(btn_cancel, 12);
     lv_obj_add_event_cb(btn_cancel, on_model_confirm_cancel_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t *btn_switch = f_rect(dlg, 130, 162, 104, 38, 0x2D5078, LV_OPA_COVER, 9, 2, 0xEAB308);
-    f_label(btn_switch, 0, 11, 104, "Switch", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
+    f_label(btn_switch, 0, 11, 104, os_lang_vi ? "Chuyen" : "Switch", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(btn_switch, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_ext_click_area(btn_switch, 12);
     lv_obj_add_event_cb(btn_switch, on_model_confirm_switch_cb, LV_EVENT_CLICKED, NULL);
@@ -2643,7 +2751,7 @@ static void f_build_models_page(lv_obj_t *p) {
 static void f_build_model_layout_page(lv_obj_t *p) {
     const tyvor_os_model_profile_t *m = &k_os_models[os_viewed_model];
     char hdr[32];
-    snprintf(hdr, sizeof(hdr), "%s Layout", m->tab_name);
+    snprintf(hdr, sizeof(hdr), os_lang_vi ? "So do %s" : "%s Layout", m->tab_name);
     f_build_top_header(p, 1, hdr);
 
     /* Left Card: Airframe / Output Visual Diagram */
@@ -2664,7 +2772,7 @@ static void f_build_model_layout_page(lv_obj_t *p) {
             lv_obj_t *mc = f_rect(diag, mx[i], my[i], 26, 26, 0x123254, LV_OPA_COVER, 13, 1, 0x22C55E);
             f_label(mc, 0, 6, 26, ml[i], &lv_font_montserrat_12, 0x5ECA62, LV_TEXT_ALIGN_CENTER);
         }
-        f_label(diag, 0, 126, 136, "4-Motor X Quad", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+        f_label(diag, 0, 126, 136, os_lang_vi ? "Quad X 4 Motor" : "4-Motor X Quad", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     } else if (os_viewed_model == 0) {
         /* CRUISER (Car/Boat): Steering Front + Throttle Rear */
         lv_obj_t *body = f_rect(diag, 44, 34, 48, 76, 0x1E3F66, LV_OPA_COVER, 10, 1, 0x38BDF8);
@@ -2673,14 +2781,14 @@ static void f_build_model_layout_page(lv_obj_t *p) {
         f_rect(diag, 94, 42, 12, 20, 0x22C55E, LV_OPA_COVER, 3, 0, 0);
         f_rect(diag, 30, 80, 12, 22, 0xF97316, LV_OPA_COVER, 3, 0, 0);
         f_rect(diag, 94, 80, 12, 22, 0xF97316, LV_OPA_COVER, 3, 0, 0);
-        f_label(diag, 0, 126, 136, "Steer + Drive", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+        f_label(diag, 0, 126, 136, os_lang_vi ? "Lai + Ga" : "Steer + Drive", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     } else if (os_viewed_model == 2) {
         /* FIXED WING: Wing + Fuselage + Tail */
         f_rect(diag, 16, 56, 104, 18, 0x1E3F66, LV_OPA_COVER, 6, 1, 0x38BDF8);
         f_rect(diag, 60, 32, 16, 76, 0x23476E, LV_OPA_COVER, 6, 1, 0x60A5FA);
         f_rect(diag, 40, 96, 56, 12, 0x1E3F66, LV_OPA_COVER, 4, 1, 0xF97316);
         f_label(diag, 16, 59, 104, "AIL   THR   AIL", &lv_font_montserrat_12, 0xE2E8F0, LV_TEXT_ALIGN_CENTER);
-        f_label(diag, 0, 126, 136, "4CH Fixed-Wing", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+        f_label(diag, 0, 126, 136, os_lang_vi ? "Canh bang 4CH" : "4CH Fixed-Wing", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     } else {
         /* V-TAIL: Swept Wing + V-Mix Tail */
         f_rect(diag, 18, 52, 100, 18, 0x1E3F66, LV_OPA_COVER, 6, 1, 0xA855F7);
@@ -2689,19 +2797,19 @@ static void f_build_model_layout_page(lv_obj_t *p) {
         f_rect(diag, 74, 88, 28, 12, 0x3B1D60, LV_OPA_COVER, 4, 1, 0xE879F9);
         f_label(diag, 34, 88, 28, "VL", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
         f_label(diag, 74, 88, 28, "VR", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
-        f_label(diag, 0, 126, 136, "V-Tail Mix", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+        f_label(diag, 0, 126, 136, os_lang_vi ? "Tron duoi V" : "V-Tail Mix", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
     }
 
     /* Right Card: 6-Channel & Switch Assignment Table */
     lv_obj_t *tbl = f_rect(p, 154, 36, 154, 152, 0x0E1E38, LV_OPA_COVER, 10, 1, 0x263B59);
     static const char *ch_lbls[6] = {"CH1", "CH2", "CH3", "CH4", "CH5", "CH6"};
     const char *ch_fn[6] = {
-        (os_viewed_model == 0) ? "Steering" : "Roll / AIL",
+        (os_viewed_model == 0) ? (os_lang_vi ? "Lai" : "Steering") : "Roll / AIL",
         (os_viewed_model == 0) ? "Aux 1" : (os_viewed_model == 3 ? "V-Mix L" : "Pitch / ELE"),
-        "Throttle",
+        os_lang_vi ? "Ga (THR)" : "Throttle",
         (os_viewed_model == 3) ? "V-Mix R" : "Yaw / RUD",
         "SA • ARM",
-        "SB • Mode"
+        os_lang_vi ? "SB • Che do" : "SB • Mode"
     };
     static const uint32_t fn_col[6] = {
         0x38BDF8, 0x38BDF8, 0xF97316, 0x38BDF8, 0x22C55E, 0xA855F7
@@ -2715,12 +2823,12 @@ static void f_build_model_layout_page(lv_obj_t *p) {
 
     /* Bottom Action Buttons: Stick Mode | CH Monitor */
     lv_obj_t *b_mode = f_rect(p, 12, 196, 144, 34, 0x1E3F66, LV_OPA_COVER, 10, 1, 0x38BDF8);
-    f_label(b_mode, 0, 9, 144, "Stick Mode", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
+    f_label(b_mode, 0, 9, 144, os_lang_vi ? "Che do can" : "Stick Mode", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(b_mode, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(b_mode, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_STICK_MODE);
 
     lv_obj_t *b_chv = f_rect(p, 164, 196, 144, 34, 0x1E3F66, LV_OPA_COVER, 10, 1, 0x4A7AB0);
-    f_label(b_chv, 0, 9, 144, "CH Monitor", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
+    f_label(b_chv, 0, 9, 144, os_lang_vi ? "Xem kenh" : "CH Monitor", &lv_font_montserrat_14, 0xF5F7FC, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(b_chv, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(b_chv, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_CH_VIEW);
 }
@@ -2729,11 +2837,11 @@ static void f_build_model_layout_page(lv_obj_t *p) {
  * PAGE 2: TYVOR CH VIEW (Figma Node 2053:80 — Live 10CH Gimbal Monitor)
  * ========================================================================== */
 static void f_build_ch_view_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "CH View");
+    f_build_top_header(p, 1, os_lang_vi ? "Xem 10 Kenh" : "CH View");
 
     static const char *ch_names[10] = {
-        "CH1(Roll)", "CH2(Pitch)", "CH3(Thr)", "CH4(Yaw)", "CH5(SA)",
-        "CH6(SB)",   "CH7(SC)",    "CH8(SD)",  "CH9(SE)",  "CH10(SF)"
+        "CH1(Roll)", "CH2(Pitch)", "CH3(Thr)",  "CH4(Yaw)", "CH5(SA)",
+        "CH6(S1)",   "CH7(SB)",    "CH8(SC)",   "CH9(S2)",  "CH10(SD)"
     };
     static const uint32_t ch_colors[10] = {
         0xF97316, 0xF97316, 0xEF4444, 0xF97316, 0x6366F1,
@@ -2760,10 +2868,12 @@ static void f_build_ch_view_page(lv_obj_t *p) {
  * PAGE 3: TYVOR CHANNELS (Figma Node 2070:70 — 6CH Setup & Live Monitor)
  * ========================================================================== */
 static void f_build_channels_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "Channels");
+    f_build_top_header(p, 1, os_lang_vi ? "Kenh TX" : "Channels");
 
     static const char *badge_txt[6] = {"CH1", "CH2", "CH3", "CH4", "CH5", "CH6"};
-    static const char *title_txt[6] = {"Roll", "Pitch", "Throttle", "Yaw", "SA", "SB"};
+    const char *title_txt[6] = {
+        "Roll", "Pitch", os_lang_vi ? "Ga (Thr)" : "Throttle", "Yaw", "SA", "SB"
+    };
     static const char *sub_txt[6] = {
         "GPIO 1 (ADC)", "GPIO 2 (ADC)", "GPIO 3 (ADC)",
         "GPIO 4 (ADC)", "GPIO 38 (SW)", "GPIO 39 (SW)"
@@ -2796,7 +2906,7 @@ static void f_build_channels_page(lv_obj_t *p) {
  * PAGE 4: TYVOR TELEMETRY (Left of HOME — Swipe Right from HOME)
  * ========================================================================== */
 static void f_build_telemetry_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "Telemetry");
+    f_build_top_header(p, 1, os_lang_vi ? "Thong so bay" : "Telemetry");
 
     /* Vertical scrollable viewport (opaque solid bg + flat borderless cards for smooth SPI scroll) */
     lv_obj_t *vp = lv_obj_create(p);
@@ -2837,8 +2947,11 @@ static void f_build_telemetry_page(lv_obj_t *p) {
         {"GSpd", 3, 0}, {"Hdg",  3, 0},
         {"Alt",  3, 0}, {"Sats", 3, 0},
     };
-    static const char *k_group_titles[4] = {
-        "RF LINK", "TX & POWER", "BATTERY & ATTITUDE", "GPS & NAVIGATION"
+    const char *k_group_titles[4] = {
+        os_lang_vi ? "TIN HIEU RF" : "RF LINK",
+        os_lang_vi ? "TX & CONG SUAT" : "TX & POWER",
+        os_lang_vi ? "PIN & TRANG THAI" : "BATTERY & ATTITUDE",
+        os_lang_vi ? "GPS & DINH VI" : "GPS & NAVIGATION"
     };
 
     int y = 2;
@@ -2916,7 +3029,7 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
     f_build_top_header(p, 1, NULL);
 
     lv_obj_t *panel = f_rect(p, 12, 26, 296, 206, 0x182940, 240, 14, 1, 0x4A6B8C);
-    f_label(panel, 12, 8, 130, "Quick settings", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+    f_label(panel, 12, 8, 130, os_lang_vi ? "Cai dat nhanh" : "Quick settings", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
 
     lv_obj_t *demo = f_rect(panel, 130, 8, 56, 18, 0x10324A, LV_OPA_COVER, 9, 1, 0x38BDF8);
     f_label(demo, 0, 2, 56, k_os_models[os_active_model].tab_name,
@@ -2932,7 +3045,7 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
     char br_buf[16];
     snprintf(br_buf, sizeof(br_buf), "%d%%", os_brightness_pct);
     lv_obj_t *br_card = f_rect(panel, 10, 32, 276, 38, 0x142238, LV_OPA_COVER, 8, 1, 0x2A4365);
-    f_label(br_card, 10, 4, 120, "Brightness", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+    f_label(br_card, 10, 4, 120, os_lang_vi ? "Do sang" : "Brightness", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
     w_qs_br_lbl = f_label(br_card, 210, 4, 56, br_buf, &lv_font_montserrat_12, 0x38BDF8, LV_TEXT_ALIGN_RIGHT);
     lv_obj_t *br_tr = f_rect(br_card, 10, 22, 256, 8, 0x0A1526, LV_OPA_COVER, 4, 0, 0);
     int bw = (256 * os_brightness_pct) / 100;
@@ -2944,7 +3057,7 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
     char vol_buf[16];
     snprintf(vol_buf, sizeof(vol_buf), "%d%%", os_volume_pct);
     lv_obj_t *vol_card = f_rect(panel, 10, 76, 276, 38, 0x142238, LV_OPA_COVER, 8, 1, 0x2A4365);
-    f_label(vol_card, 10, 4, 120, "Volume", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+    f_label(vol_card, 10, 4, 120, os_lang_vi ? "Am luong" : "Volume", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
     w_qs_vol_lbl = f_label(vol_card, 210, 4, 56, vol_buf, &lv_font_montserrat_12, 0x38BDF8, LV_TEXT_ALIGN_RIGHT);
     lv_obj_t *vol_tr = f_rect(vol_card, 10, 22, 256, 8, 0x0A1526, LV_OPA_COVER, 4, 0, 0);
     int vw = (256 * os_volume_pct) / 100;
@@ -2958,7 +3071,8 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
                                LV_OPA_COVER, 8, 1,
                                os_bt_enabled ? 0x38BDF8 : 0x2A4365);
     f_label(bt_card, 10, 7, 114, "Bluetooth", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
-    f_label(bt_card, 10, 25, 114, os_bt_enabled ? "Connected" : "Disabled",
+    f_label(bt_card, 10, 25, 114,
+            os_lang_vi ? (os_bt_enabled ? "Da bat" : "Dang tat") : (os_bt_enabled ? "Connected" : "Disabled"),
             &lv_font_montserrat_12, os_bt_enabled ? 0x38BDF8 : 0x64748B, LV_TEXT_ALIGN_LEFT);
     lv_obj_add_flag(bt_card, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(bt_card, on_qshade_action_cb, LV_EVENT_CLICKED, (void *)(intptr_t)2);
@@ -2967,15 +3081,16 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
                                os_touch_locked ? 0x3B1A1A : 0x142238,
                                LV_OPA_COVER, 8, 1,
                                os_touch_locked ? 0xEF4444 : 0x2A4365);
-    f_label(tl_card, 10, 7, 114, "Touch lock", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
-    f_label(tl_card, 10, 25, 114, os_touch_locked ? "Locked" : "Unlocked",
+    f_label(tl_card, 10, 7, 114, os_lang_vi ? "Khoa cam ung" : "Touch lock", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+    f_label(tl_card, 10, 25, 114,
+            os_lang_vi ? (os_touch_locked ? "Dang khoa" : "Da mo") : (os_touch_locked ? "Locked" : "Unlocked"),
             &lv_font_montserrat_12, os_touch_locked ? 0xEF4444 : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
     lv_obj_add_flag(tl_card, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(tl_card, on_qshade_action_cb, LV_EVENT_CLICKED, (void *)(intptr_t)3);
 
     /* All Settings Button */
     lv_obj_t *all_btn = f_rect(panel, 10, 172, 276, 26, 0x1E3350, LV_OPA_COVER, 8, 1, 0x3B5980);
-    f_label(all_btn, 0, 5, 276, "All settings", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
+    f_label(all_btn, 0, 5, 276, os_lang_vi ? "Tat ca cai dat" : "All settings", &lv_font_montserrat_12, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(all_btn, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(all_btn, on_nav_btn_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)FIGMA_PAGE_SETTINGS_MENU);
 }
@@ -2985,11 +3100,13 @@ static void f_build_quick_settings_page(lv_obj_t *p) {
  * ========================================================================== */
 static void esp_send_quickset_cmd(uint8_t cmd) {
     os_qs_local_grace_ms = millis() + 450;
+    int ret = -1;
     if (ui_endpoint.link.ready) {
-        (void)tyvor_ui_endpoint_request(&ui_endpoint, TYVOR_REQ_QUICKSET, cmd);
+        ret = tyvor_ui_endpoint_request(&ui_endpoint, TYVOR_REQ_QUICKSET, cmd);
         ui_endpoint.read_active = 0;
         ui_endpoint.next_read_ms = millis();
     }
+    ESP_LOGI(TAG, "QS cmd=0x%02X ready=%u ret=%d", cmd, ui_endpoint.link.ready, ret);
 }
 
 typedef struct {
@@ -3058,8 +3175,8 @@ static void os_config_load(void) {
         if (cfg.power_idx < 5) os_power_idx = cfg.power_idx;
         if (cfg.elrs_rate_idx < 4) os_elrs_rate_idx = cfg.elrs_rate_idx;
         if (cfg.telem_ratio_idx < 4) os_telem_ratio_idx = cfg.telem_ratio_idx;
-        os_model_match = cfg.model_match ? 1 : 0;
-        os_rf_output_on = 0; /* Safety: never auto-enable RF output on boot from NVS */
+        os_model_match = 0; /* Default Model Match OFF so any ELRS RX can bind & link without ID mismatch */
+        os_rf_output_on = 1; /* Internal RadioMaster ELRS TX module active by default */
         os_rf_external = cfg.rf_external ? 1 : 0;
         os_lang_vi = cfg.lang_vi ? 1 : 0;
         os_stick_mode = (cfg.stick_mode == 1) ? 1 : 2;
@@ -3084,27 +3201,49 @@ static void os_config_load(void) {
     nvs_close(h);
 }
 
+static int os_boot_sync_step = -1;
+static uint64_t os_boot_sync_next_ms = 0;
+
 static void os_sync_all_to_stm32(void) {
     if (!ui_endpoint.link.ready) return;
-    /* Safety: never send RF ON on boot; only sync Stick Mode, THR Lock, Power & ELRS Rate */
-    esp_send_quickset_cmd((uint8_t)(0x00u + (uint8_t)os_power_idx));
-    esp_send_quickset_cmd((uint8_t)(0x10u + (uint8_t)os_elrs_rate_idx));
-    esp_send_quickset_cmd((uint8_t)(0x50u + (uint8_t)os_telem_ratio_idx));
-    esp_send_quickset_cmd((uint8_t)(os_model_match ? 0x61u : 0x60u));
-    esp_send_quickset_cmd((uint8_t)(os_rf_external ? 0x71u : 0x70u));
-    esp_send_quickset_cmd((uint8_t)(os_thr_lock_on ? 0x81u : 0x80u));
-    esp_send_quickset_cmd((uint8_t)((os_stick_mode == 2) ? 0x91u : 0x90u));
+    os_boot_sync_step = 0;
+    os_boot_sync_next_ms = millis();
+}
+
+static void os_sync_poll(uint64_t now) {
+    if (os_boot_sync_step < 0 || !ui_endpoint.link.ready || now < os_boot_sync_next_ms) return;
+    const uint8_t cmds[9] = {
+        (uint8_t)(os_rf_output_on ? 0x31u : 0x30u),
+        (uint8_t)(0x00u + (uint8_t)os_power_idx),
+        (uint8_t)(0x10u + (uint8_t)os_elrs_rate_idx),
+        (uint8_t)(0x50u + (uint8_t)os_telem_ratio_idx),
+        (uint8_t)(os_model_match ? 0x61u : 0x60u),
+        (uint8_t)(os_rf_external ? 0x71u : 0x70u),
+        (uint8_t)(os_thr_lock_on ? 0x81u : 0x80u),
+        (uint8_t)((os_stick_mode == 2) ? 0x91u : 0x90u),
+        (uint8_t)(0xA0u + ((uint8_t)os_active_model & 0x03u))
+    };
+    esp_send_quickset_cmd(cmds[os_boot_sync_step]);
+    os_boot_sync_step++;
+    os_boot_sync_next_ms = now + 35u;
+    if (os_boot_sync_step >= 9) {
+        os_boot_sync_step = -1;
+    }
 }
 
 static void f_quickset_handle_card(int idx) {
     nav_return_page = FIGMA_PAGE_QUICKSET_MENU;
     unsigned target = FIGMA_PAGE_QUICKSET_MENU;
-    if (idx == 0) target = FIGMA_PAGE_CH_VIEW;
-    else if (idx == 1) target = FIGMA_PAGE_TX_POWER;
+    /* Clean 2x3 Logical Layout:
+     * Row 1 (RF Link & Output):  [0] Bind RX    | [1] RF Output
+     * Row 2 (ELRS Config):       [2] ELRS Set   | [3] TX Power
+     * Row 3 (Monitor & Tools):   [4] CH View    | [5] Finder */
+    if (idx == 0) target = FIGMA_PAGE_BIND;
+    else if (idx == 1) target = FIGMA_PAGE_RF_OUTPUT;
     else if (idx == 2) target = FIGMA_PAGE_ELRS_SET;
-    else if (idx == 3) target = FIGMA_PAGE_FIND;
-    else if (idx == 4) target = FIGMA_PAGE_RF_OUTPUT;
-    else if (idx == 5) target = FIGMA_PAGE_BIND;
+    else if (idx == 3) target = FIGMA_PAGE_TX_POWER;
+    else if (idx == 4) target = FIGMA_PAGE_CH_VIEW;
+    else if (idx == 5) target = FIGMA_PAGE_FIND;
 
     active_non_sleep_page = target;
     f_invalidate_page(target);
@@ -3120,61 +3259,81 @@ static void on_quickset_card_cb(lv_event_t *e) {
 static void f_build_quickset_menu_page(lv_obj_t *p) {
     f_build_menu_row_header(p, FIGMA_PAGE_QUICKSET_MENU);
 
-    static const char *qs_titles[6] = {
-        "CH View", "Power", "ELRS Set", "Finder", "RF Output", "Bind"
+    const char *qs_titles[6] = {
+        os_lang_vi ? "Ket noi RX" : "Bind RX",
+        os_lang_vi ? "Phat song" : "RF Output",
+        os_lang_vi ? "Cai ELRS" : "ELRS Set",
+        os_lang_vi ? "Cong suat" : "TX Power",
+        os_lang_vi ? "Xem kenh" : "CH View",
+        os_lang_vi ? "Tim may" : "Finder"
     };
     char pwr_sub[20], rate_sub[20];
     snprintf(pwr_sub, sizeof(pwr_sub), "%u mW", (unsigned)k_power_mw_table[os_power_idx]);
     snprintf(rate_sub, sizeof(rate_sub), "%u Hz", (unsigned)k_elrs_rate_table[os_elrs_rate_idx]);
 
+    const tyvor_core_snapshot_t *snap = &ui_endpoint.state.snapshot;
+    int link_ok = ui_endpoint.link.ready && ui_endpoint.state.valid;
+    int rx_bound = link_ok && ((strcmp(snap->model_name, "FM:RX BOUND") == 0) ||
+                               ((snap->telemetry.valid & (TYVOR_T_LQ | TYVOR_T_RSSI)) && snap->telemetry.lq > 0));
+    int elrs_ok  = link_ok && (strncmp(snap->model_name, "FM:", 3) == 0);
+    const char *bind_sub = os_bind_active ? (os_lang_vi ? "DANG BIND..." : "BINDING...") :
+                           rx_bound       ? (os_lang_vi ? "DA KET NOI" : "RX BOUND") :
+                           elrs_ok        ? (os_lang_vi ? "ELRS San sang" : "ELRS Ready") : "CRSFv2";
+
     const char *qs_subs[6] = {
-        "10 CH Live",
-        pwr_sub,
+        bind_sub,
+        os_rf_output_on ? (os_rf_external ? (os_lang_vi ? "TX NGOAI BAT" : "EXT TX ON")
+                                          : (os_lang_vi ? "2.4G TRONG" : "INT 2.4G ON"))
+                        : (os_lang_vi ? "TAT SONG" : "RF OFF"),
         rate_sub,
-        os_finder_active ? "BEEPING!" : "Ready",
-        os_rf_output_on ? (os_rf_external ? "EXT ON" : "INT ON") : "OFF",
-        os_bind_active ? "BINDING..." : "CRSFv2"
+        pwr_sub,
+        os_lang_vi ? "10 Kenh" : "10 CH Live",
+        os_finder_active ? (os_lang_vi ? "DANG KEU!" : "BEEPING!") : (os_lang_vi ? "San sang" : "Ready")
     };
     static const uint32_t qs_badge_bg[6] = {
-        0x1E3A5F, 0x0D3B2E, 0x2E1A47, 0x3E2723, 0x3B2A14, 0x3E2723
+        0x3E2723, 0x103828, 0x2E1A47, 0x0D3B2E, 0x1E3A5F, 0x3B2A14
     };
     static const uint32_t qs_badge_fg[6] = {
-        0x38BDF8, 0x22C55E, 0xC084FC, 0xF59E0B, 0xFBBF24, 0xF97316
+        0xF97316, 0x38BDF8, 0xC084FC, 0x22C55E, 0x38BDF8, 0xF59E0B
     };
     static const char *qs_glyph[6] = {
-        NULL,
-        LV_SYMBOL_CHARGE,
-        LV_SYMBOL_SETTINGS,
-        LV_SYMBOL_VOLUME_MAX,
+        LV_SYMBOL_LOOP,
         LV_SYMBOL_WIFI,
-        LV_SYMBOL_LOOP
+        LV_SYMBOL_SETTINGS,
+        LV_SYMBOL_CHARGE,
+        NULL,
+        LV_SYMBOL_VOLUME_MAX
     };
 
     for (int i = 0; i < 6; ++i) {
         int col = i % 2;
         int row = i / 2;
-        int x = 14 + col * 150;
-        int y = 36 + row * 64;
+        int x = 12 + col * 152;
+        int y = 36 + row * 65;
 
-        int highlight = (i == 3 && os_finder_active) ||
-                        (i == 4 && os_rf_output_on) ||
-                        (i == 5 && os_bind_active);
-        lv_obj_t *card = f_rect(p, x, y, 142, 54, 0x193B65, 235, 18,
-                                1, highlight ? 0x38BDF8 : 0x355C8C);
-        lv_obj_t *circle = f_rect(card, 10, 11, 32, 32, qs_badge_bg[i], LV_OPA_COVER, 16,
+        int highlight = (i == 0 && (os_bind_active || rx_bound || elrs_ok)) ||
+                        (i == 1 && os_rf_output_on) ||
+                        (i == 5 && os_finder_active);
+        uint32_t bdr_col = (i == 0 && os_bind_active) ? 0xF97316 :
+                           (i == 1 && !os_rf_output_on) ? 0xEF4444 :
+                           (highlight ? 0x38BDF8 : 0x355C8C);
+        lv_obj_t *card = f_rect(p, x, y, 144, 56, 0x193B65, 240, 16, 1, bdr_col);
+        lv_obj_t *circle = f_rect(card, 10, 12, 32, 32, qs_badge_bg[i], LV_OPA_COVER, 16,
                                   1, qs_badge_fg[i]);
-        if (i == 0) {
+        if (i == 4) {
             /* Symmetric 3-bar channel meter icon inside 30x30 inner box */
-            (void)f_rect(circle, 6, 13, 4, 10, qs_badge_fg[0], LV_OPA_COVER, 1, 0, 0);
-            (void)f_rect(circle, 13, 7, 4, 16, qs_badge_fg[0], LV_OPA_COVER, 1, 0, 0);
-            (void)f_rect(circle, 20, 10, 4, 13, qs_badge_fg[0], LV_OPA_COVER, 1, 0, 0);
+            (void)f_rect(circle, 6, 13, 4, 10, qs_badge_fg[4], LV_OPA_COVER, 1, 0, 0);
+            (void)f_rect(circle, 13, 7, 4, 16, qs_badge_fg[4], LV_OPA_COVER, 1, 0, 0);
+            (void)f_rect(circle, 20, 10, 4, 13, qs_badge_fg[4], LV_OPA_COVER, 1, 0, 0);
         } else {
             f_icon_centered(circle, qs_glyph[i], &lv_font_montserrat_14, qs_badge_fg[i]);
         }
 
-        f_label(card, 48, 10, 88, qs_titles[i], &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
-        f_label(card, 48, 29, 88, qs_subs[i], &lv_font_montserrat_12,
-                highlight ? 0x5ECA62 : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+        f_label(card, 48, 10, 90, qs_titles[i], &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+        uint32_t sub_col = (i == 0 && os_bind_active) ? 0xF97316 :
+                           (i == 1 && !os_rf_output_on) ? 0xEF4444 :
+                           (highlight ? 0x5ECA62 : 0x94A3B8);
+        f_label(card, 48, 30, 90, qs_subs[i], &lv_font_montserrat_12, sub_col, LV_TEXT_ALIGN_LEFT);
 
         lv_obj_add_flag(card, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event_cb(card, on_quickset_card_cb, LV_EVENT_CLICKED, (void *)(intptr_t)i);
@@ -3183,8 +3342,8 @@ static void f_build_quickset_menu_page(lv_obj_t *p) {
 
 /* --- Sub-Page 6A: TX Power (Figma 2053:137) --- */
 static void f_tx_power_select(int row) {
-    if (row < 0 || row > 3) return;
-    os_power_idx = row; /* 0=100mW, 1=250mW, 2=400mW, 3=500mW */
+    if (row < 0 || row > 4) return;
+    os_power_idx = row; /* 0=50mW, 1=100mW, 2=200mW, 3=400mW, 4=500mW */
     esp_send_quickset_cmd((uint8_t)(0x00u + (uint8_t)row));
     os_config_save();
     f_invalidate_all_pages();
@@ -3197,27 +3356,29 @@ static void on_tx_power_row_cb(lv_event_t *e) {
 }
 
 static void f_build_tx_power_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "TX Power");
-    for (int i = 0; i < 4; ++i) {
+    f_build_top_header(p, 1, os_lang_vi ? "Cong suat TX" : "TX Power");
+    for (int i = 0; i < 5; ++i) {
         int sel = (os_power_idx == i);
-        int y = 44 + i * 46;
-        lv_obj_t *row = f_rect(p, 24, y, 272, 38,
-                               sel ? 0x1E4673 : 0x193B65, 235, 19,
+        int y = 38 + i * 39;
+        lv_obj_t *row = f_rect(p, 24, y, 272, 32,
+                               sel ? 0x1E4673 : 0x193B65, 235, 16,
                                1, sel ? 0x38BDF8 : 0x355C8C);
-        lv_obj_t *chk = f_rect(row, 14, 10, 18, 18,
+        lv_obj_t *chk = f_rect(row, 14, 7, 18, 18,
                                sel ? 0x3AE52A : 0x465160, LV_OPA_COVER, 9, 0, 0);
         if (sel) {
             f_icon_centered(chk, LV_SYMBOL_OK, &lv_font_montserrat_12, 0x0A1936);
         }
         char buf[20];
         snprintf(buf, sizeof(buf), "%umW", (unsigned)k_power_mw_table[i]);
-        f_label(row, 44, 9, 184, buf, &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_CENTER);
+        f_label(row, 44, 6, 184, buf, &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_CENTER);
         lv_obj_add_flag(row, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event_cb(row, on_tx_power_row_cb, LV_EVENT_CLICKED, (void *)(intptr_t)i);
     }
 }
 
 /* --- Sub-Page 6B: ELRS Settings (Figma 2053:164) --- */
+static int os_tx_wifi_on = 0;
+
 static void f_elrs_handle_row(int row) {
     if (row == 0) {
         os_elrs_rate_idx = (os_elrs_rate_idx + 1) % 4;
@@ -3241,12 +3402,12 @@ static void on_elrs_row_cb(lv_event_t *e) {
 }
 
 static void f_build_elrs_set_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "ELRS Settings");
+    f_build_top_header(p, 1, os_lang_vi ? "Cai dat ELRS" : "ELRS Settings");
 
     char rate_buf[28];
     snprintf(rate_buf, sizeof(rate_buf), "%uHz  >", (unsigned)k_elrs_rate_table[os_elrs_rate_idx]);
     lv_obj_t *r0 = f_rect(p, 18, 48, 284, 48, 0x193B65, 235, 24, 1, 0x355C8C);
-    f_label(r0, 18, 14, 120, "Packet Rate", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
+    f_label(r0, 18, 14, 120, os_lang_vi ? "Toc do goi" : "Packet Rate", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
     f_label(r0, 146, 14, 120, rate_buf, &lv_font_montserrat_14, 0x38BDF8, LV_TEXT_ALIGN_RIGHT);
     lv_obj_add_flag(r0, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(r0, on_elrs_row_cb, LV_EVENT_CLICKED, (void *)(intptr_t)0);
@@ -3254,13 +3415,13 @@ static void f_build_elrs_set_page(lv_obj_t *p) {
     char tel_buf[20];
     snprintf(tel_buf, sizeof(tel_buf), "%s  >", k_telem_ratio_table[os_telem_ratio_idx]);
     lv_obj_t *r1 = f_rect(p, 18, 106, 284, 48, 0x193B65, 235, 24, 1, 0x355C8C);
-    f_label(r1, 18, 14, 120, "Telem Ratio", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
+    f_label(r1, 18, 14, 120, os_lang_vi ? "Ty le Tele" : "Telem Ratio", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
     f_label(r1, 146, 14, 120, tel_buf, &lv_font_montserrat_14, 0x38BDF8, LV_TEXT_ALIGN_RIGHT);
     lv_obj_add_flag(r1, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(r1, on_elrs_row_cb, LV_EVENT_CLICKED, (void *)(intptr_t)1);
 
     lv_obj_t *r2 = f_rect(p, 18, 164, 284, 48, 0x193B65, 235, 24, 1, 0x355C8C);
-    f_label(r2, 18, 14, 140, "Model Match", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
+    f_label(r2, 18, 14, 140, os_lang_vi ? "Khop mau" : "Model Match", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
     lv_obj_t *sw_bg = f_rect(r2, 224, 12, 42, 24, os_model_match ? 0x0EA5E9 : 0x465160, LV_OPA_COVER, 12, 0, 0);
     (void)f_rect(sw_bg, os_model_match ? 20 : 2, 2, 20, 20, 0xFFFFFF, LV_OPA_COVER, 10, 0, 0);
     lv_obj_add_flag(r2, LV_OBJ_FLAG_CLICKABLE);
@@ -3290,14 +3451,14 @@ static void on_rf_output_row_cb(lv_event_t *e) {
 }
 
 static void f_build_rf_output_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "RF Output");
+    f_build_top_header(p, 1, os_lang_vi ? "Cong ra RF" : "RF Output");
 
     int sel_int = !os_rf_external;
     lv_obj_t *r0 = f_rect(p, 22, 48, 276, 48, sel_int ? 0x1E4673 : 0x152B4A, 235, 24,
                           1, sel_int ? 0x38BDF8 : 0x2A4365);
     lv_obj_t *c0 = f_rect(r0, 14, 14, 20, 20, sel_int ? 0x3AE52A : 0x7C6C8A, LV_OPA_COVER, 10, 0, 0);
     if (sel_int) f_icon_centered(c0, LV_SYMBOL_OK, &lv_font_montserrat_12, 0x0A1936);
-    f_label(r0, 44, 14, 200, "Internal TX", &lv_font_montserrat_14, sel_int ? 0xF0ECEF : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    f_label(r0, 44, 14, 200, os_lang_vi ? "Mach TX trong" : "Internal TX", &lv_font_montserrat_14, sel_int ? 0xF0ECEF : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
     lv_obj_add_flag(r0, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(r0, on_rf_output_row_cb, LV_EVENT_CLICKED, (void *)(intptr_t)0);
 
@@ -3306,15 +3467,16 @@ static void f_build_rf_output_page(lv_obj_t *p) {
                           1, sel_ext ? 0x38BDF8 : 0x2A4365);
     lv_obj_t *c1 = f_rect(r1, 14, 14, 20, 20, sel_ext ? 0x3AE52A : 0x7C6C8A, LV_OPA_COVER, 10, 0, 0);
     if (sel_ext) f_icon_centered(c1, LV_SYMBOL_OK, &lv_font_montserrat_12, 0x0A1936);
-    f_label(r1, 44, 14, 200, "External TX", &lv_font_montserrat_14, sel_ext ? 0xF0ECEF : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    f_label(r1, 44, 14, 200, os_lang_vi ? "Mach TX ngoai" : "External TX", &lv_font_montserrat_14, sel_ext ? 0xF0ECEF : 0x94A3B8, LV_TEXT_ALIGN_LEFT);
     lv_obj_add_flag(r1, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(r1, on_rf_output_row_cb, LV_EVENT_CLICKED, (void *)(intptr_t)1);
 
     lv_obj_t *r2 = f_rect(p, 22, 162, 276, 48, 0x193B65, 235, 24,
                           1, os_rf_output_on ? 0x3AE52A : 0xEF4444);
-    f_label(r2, 20, 14, 140, "RF Power Out", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
-    f_label(r2, 166, 14, 48, os_rf_output_on ? "ON" : "OFF", &lv_font_montserrat_14,
-            os_rf_output_on ? 0x5ECA62 : 0xEF4444, LV_TEXT_ALIGN_RIGHT);
+    f_label(r2, 20, 14, 140, os_lang_vi ? "Phat song RF" : "RF Power Out", &lv_font_montserrat_14, 0xF0ECEF, LV_TEXT_ALIGN_LEFT);
+    f_label(r2, 166, 14, 48,
+            os_lang_vi ? (os_rf_output_on ? "BAT" : "TAT") : (os_rf_output_on ? "ON" : "OFF"),
+            &lv_font_montserrat_14, os_rf_output_on ? 0x5ECA62 : 0xEF4444, LV_TEXT_ALIGN_RIGHT);
     lv_obj_t *sw = f_rect(r2, 222, 12, 42, 24, os_rf_output_on ? 0x0EA5E9 : 0x465160, LV_OPA_COVER, 12, 0, 0);
     (void)f_rect(sw, os_rf_output_on ? 20 : 2, 2, 20, 20, 0xFFFFFF, LV_OPA_COVER, 10, 0, 0);
     lv_obj_add_flag(r2, LV_OBJ_FLAG_CLICKABLE);
@@ -3338,42 +3500,72 @@ static void on_find_toggle_cb(lv_event_t *e) {
 }
 
 static void f_build_find_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "Find device");
+    f_build_top_header(p, 1, os_lang_vi ? "Tim thiet bi" : "Find device");
     int link_ok = ui_endpoint.link.ready && ui_endpoint.state.valid;
 
     lv_obj_t *left = f_rect(p, 12, 36, 166, 192, 0x152E50, 235, 12, 1, 0x355C8C);
-    f_label(left, 10, 8, 146, "DEVICE LOCATION", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    f_label(left, 10, 8, 146, os_lang_vi ? "VI TRI THIET BI" : "DEVICE LOCATION", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
     lv_obj_t *box = f_rect(left, 38, 38, 90, 80, 0x0F223D, LV_OPA_COVER, 12, 2,
                            os_finder_active ? 0x22C55E : 0x4A7AB0);
-    f_label(box, 0, 28, 90, os_finder_active ? "BEEP!" : "SCAN",
+    f_label(box, 0, 28, 90, os_lang_vi ? (os_finder_active ? "KEU!" : "QUET") : (os_finder_active ? "BEEP!" : "SCAN"),
             &lv_font_montserrat_14, os_finder_active ? 0x22C55E : 0x38BDF8, LV_TEXT_ALIGN_CENTER);
-    f_label(left, 8, 132, 150, os_finder_active ? "Beacon Active" : "Ready to Find",
+    f_label(left, 8, 132, 150,
+            os_lang_vi ? (os_finder_active ? "Dang phat coi" : "San sang tim")
+                       : (os_finder_active ? "Beacon Active" : "Ready to Find"),
             &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
-    f_label(left, 8, 156, 150, link_ok ? "STM32 Synced" : "Standalone",
+    f_label(left, 8, 156, 150,
+            os_lang_vi ? (link_ok ? "Da dong bo STM32" : "Doc lap")
+                       : (link_ok ? "STM32 Synced" : "Standalone"),
             &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t *right = f_rect(p, 186, 36, 122, 192, 0x152E50, 235, 12, 1, 0x355C8C);
-    f_label(right, 8, 12, 106, link_ok ? "RX Linked" : "No receiver",
+    f_label(right, 8, 12, 106,
+            os_lang_vi ? (link_ok ? "RX Da ket noi" : "Chua co RX")
+                       : (link_ok ? "RX Linked" : "No receiver"),
             &lv_font_montserrat_14, link_ok ? 0x5ECA62 : 0xF59E0B, LV_TEXT_ALIGN_CENTER);
-    f_label(right, 8, 44, 106, "Finder Beep:", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
-    f_label(right, 8, 62, 106, os_finder_active ? "ACTIVE" : "OFF",
+    f_label(right, 8, 44, 106, os_lang_vi ? "Coi bao tim:" : "Finder Beep:", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+    f_label(right, 8, 62, 106,
+            os_lang_vi ? (os_finder_active ? "DANG BAT" : "TAT")
+                       : (os_finder_active ? "ACTIVE" : "OFF"),
             &lv_font_montserrat_14, os_finder_active ? 0x5ECA62 : 0xD8E0E8, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t *btn = f_rect(right, 8, 140, 106, 40,
                            os_finder_active ? 0xC83233 : 0x23476E, LV_OPA_COVER, 10, 1,
                            os_finder_active ? 0xEF4444 : 0x38BDF8);
-    f_label(btn, 0, 11, 106, os_finder_active ? "Stop Beep" : "Start Beep",
+    f_label(btn, 0, 11, 106,
+            os_lang_vi ? (os_finder_active ? "Tat coi" : "Bat coi")
+                       : (os_finder_active ? "Stop Beep" : "Start Beep"),
             &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(btn, on_find_toggle_cb, LV_EVENT_CLICKED, NULL);
 }
 
 /* --- Sub-Page 6E: Bind Receiver (Figma 2041:764) --- */
+static uint64_t os_bind_started_ms = 0;
+static int os_bind_saw_wifi_on = 0;
+
 static void f_bind_toggle(void) {
     os_bind_active = !os_bind_active;
-    esp_send_quickset_cmd((uint8_t)(os_bind_active ? 0x41u : 0x40u));
+    if (os_bind_active) {
+        os_rf_output_on = 1;
+        os_model_match = 0;
+        os_tx_wifi_on = 1;
+        os_bind_started_ms = millis();
+        os_bind_saw_wifi_on = 0;
+        os_bind_until_ms = 0u;
+        os_bind_sent_once = 1;
+        esp_send_quickset_cmd(0xB1u); /* Auto-enable ExpressLRS TX WiFi AP ("ExpressLRS TX") */
+    } else {
+        os_tx_wifi_on = 0;
+        os_bind_started_ms = 0u;
+        os_bind_saw_wifi_on = 0;
+        os_bind_until_ms = 0u;
+        esp_send_quickset_cmd(0xB0u); /* Exit WiFi AP back to RF */
+    }
     f_invalidate_page(FIGMA_PAGE_HOME);
     f_invalidate_page(FIGMA_PAGE_QUICKSET_MENU);
+    f_invalidate_page(FIGMA_PAGE_RF_OUTPUT);
+    f_invalidate_page(FIGMA_PAGE_ELRS_SET);
     f_invalidate_page(FIGMA_PAGE_BIND);
     f_open_page(FIGMA_PAGE_BIND);
 }
@@ -3385,32 +3577,54 @@ static void on_bind_toggle_cb(lv_event_t *e) {
 }
 
 static void f_build_bind_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "Bind receiver");
+    f_build_top_header(p, 1, os_lang_vi ? "Ket noi RX" : "Bind receiver");
+
+    const tyvor_core_snapshot_t *snap = &ui_endpoint.state.snapshot;
+    int link_ok = ui_endpoint.link.ready && ui_endpoint.state.valid;
+    int rx_bound = link_ok && ((strcmp(snap->model_name, "FM:RX BOUND") == 0) ||
+                               ((snap->telemetry.valid & (TYVOR_T_LQ | TYVOR_T_RSSI)) && snap->telemetry.lq > 0));
+    int elrs_ok  = link_ok && (strncmp(snap->model_name, "FM:", 3) == 0);
+    int wifi_on  = os_bind_active || os_tx_wifi_on || (link_ok && strcmp(snap->model_name, "FM:WIFI ON") == 0);
+    int tx_binding = wifi_on;
+
+    uint32_t ring_col = tx_binding ? 0x22C55E : (rx_bound ? 0x22C55E : 0x38BDF8);
+    const char *ring_txt = tx_binding ? "WIFI" : (rx_bound ? "OK" : (elrs_ok ? "ELRS" : "CRSF"));
+    const char *st_txt   = tx_binding ? (os_lang_vi ? "Da bat WiFi ELRS!" : "ELRS WiFi ON!") :
+                           rx_bound   ? (os_lang_vi ? "Da ket noi RX!" : "RX Bound OK!") :
+                           os_bind_sent_once ? (os_lang_vi ? "Da tat WiFi" : "WiFi Stopped") :
+                           elrs_ok    ? (os_lang_vi ? "ELRS TX San sang" : "ELRS TX Ready") :
+                                        (os_lang_vi ? "Dang cho TX..." : "Waiting for TX");
+    const char *sub_txt  = tx_binding ? "ExpressLRS TX" :
+                           rx_bound   ? (os_lang_vi ? "Da nhan song RX!" : "Receiver Linked!") :
+                           elrs_ok    ? (os_lang_vi ? "Bam Bat dau Bind" : "Tap Start Bind") :
+                                        (os_lang_vi ? "Kiem tra day ELRS" : "Check ELRS Wire");
 
     lv_obj_t *left = f_rect(p, 12, 36, 166, 192, 0x152E50, 235, 12, 1, 0x355C8C);
-    f_label(left, 10, 8, 146, "RECEIVER PAIRING", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
-    lv_obj_t *ring = f_rect(left, 45, 38, 76, 76, 0x0F223D, LV_OPA_COVER, 38, 4,
-                            os_bind_active ? 0xF97316 : 0x38BDF8);
-    f_label(ring, 0, 26, 76, os_bind_active ? "BIND" : "CRSF",
-            &lv_font_montserrat_14, os_bind_active ? 0xF97316 : 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
-    f_label(left, 8, 128, 150, os_bind_active ? "Binding RX..." : "Waiting for RX",
-            &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
-    f_label(left, 8, 154, 150, os_bind_active ? "ELRS Pulse Sent" : "Tap Start Bind",
-            &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_CENTER);
+    f_label(left, 10, 8, 146, os_lang_vi ? "GHEP NOI ELRS TX" : "ELRS TX PAIRING", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    w_bind_ring = f_rect(left, 45, 38, 76, 76, 0x0F223D, LV_OPA_COVER, 38, 4, ring_col);
+    lv_obj_add_flag(w_bind_ring, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(w_bind_ring, on_bind_toggle_cb, LV_EVENT_CLICKED, NULL);
+    w_bind_ring_lbl = f_label(w_bind_ring, 0, 26, 76, ring_txt,
+                              &lv_font_montserrat_14, tx_binding ? 0x5ECA62 : (rx_bound ? 0x5ECA62 : 0xFFFFFF), LV_TEXT_ALIGN_CENTER);
+    w_bind_status_lbl = f_label(left, 8, 128, 150, st_txt,
+                                &lv_font_montserrat_14, (tx_binding || rx_bound) ? 0x5ECA62 : 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
+    w_bind_sub_lbl = f_label(left, 8, 154, 150, sub_txt,
+                             &lv_font_montserrat_12, tx_binding ? 0x38BDF8 : 0x94A3B8, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t *right = f_rect(p, 186, 36, 122, 192, 0x152E50, 235, 12, 1, 0x355C8C);
-    f_label(right, 8, 10, 106, "Before pair", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
-    f_label(right, 8, 36, 106, "1. Power RX", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
-    f_label(right, 8, 56, 106, "2. Pair mode", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
-    f_label(right, 8, 76, 106, "3. Keep near", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    f_label(right, 8, 10, 106, os_lang_vi ? "Thong tin WiFi:" : "TX WiFi Info:", &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_LEFT);
+    f_label(right, 8, 36, 106, "ExpressLRS TX", &lv_font_montserrat_12, 0x38BDF8, LV_TEXT_ALIGN_LEFT);
+    f_label(right, 8, 56, 106, "Pass: expresslrs", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
+    f_label(right, 8, 76, 106, "IP: 10.0.0.1", &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
 
-    lv_obj_t *btn = f_rect(right, 8, 140, 106, 40,
-                           os_bind_active ? 0xC83233 : 0x23476E, LV_OPA_COVER, 10, 1,
-                           os_bind_active ? 0xEF4444 : 0xF97316);
-    f_label(btn, 0, 11, 106, os_bind_active ? "Cancel" : "Start Bind",
-            &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
-    lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_event_cb(btn, on_bind_toggle_cb, LV_EVENT_CLICKED, NULL);
+    w_bind_btn = f_rect(right, 8, 140, 106, 40,
+                        os_bind_active ? 0xC83233 : 0x23476E, LV_OPA_COVER, 10, 1,
+                        os_bind_active ? 0xEF4444 : 0xF97316);
+    w_bind_btn_lbl = f_label(w_bind_btn, 0, 11, 106,
+                             os_lang_vi ? (os_bind_active ? "Huy" : "Bat dau") : (os_bind_active ? "Cancel" : "Start Bind"),
+                             &lv_font_montserrat_14, 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
+    lv_obj_add_flag(w_bind_btn, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(w_bind_btn, on_bind_toggle_cb, LV_EVENT_CLICKED, NULL);
 }
 
 /* ============================================================================
@@ -3424,6 +3638,7 @@ static void f_stick_cal_toggle(void) {
             os_cal_live_min[i] = v;
             os_cal_live_max[i] = v;
         }
+        esp_send_quickset_cmd(0xC1u); /* Start Stick Cal on STM32 ADC1 */
     } else {
         os_stick_cal_active = 0;
         for (int i = 0; i < 4; ++i) {
@@ -3432,6 +3647,7 @@ static void f_stick_cal_toggle(void) {
                 gimbal_max_cal[i] = os_cal_live_max[i];
             }
         }
+        esp_send_quickset_cmd(0xC2u); /* Save Stick Cal on STM32 ADC1 */
         os_cal_done_flash = 1;
         os_config_save();
     }
@@ -3448,6 +3664,7 @@ static void f_stick_cal_reset(void) {
         os_cal_live_min[i] = 350;
         os_cal_live_max[i] = 3745;
     }
+    esp_send_quickset_cmd(0xC0u); /* Reset Stick Cal on STM32 ADC1 */
     os_cal_done_flash = 1;
     os_config_save();
     f_invalidate_page(FIGMA_PAGE_STICK_CAL);
@@ -3580,7 +3797,7 @@ static void on_stick_mode_cb(lv_event_t *e) {
 }
 
 static void f_build_stick_mode_page(lv_obj_t *p) {
-    f_build_top_header(p, 1, "Stick Mode");
+    f_build_top_header(p, 1, os_lang_vi ? "Che do can" : "Stick Mode");
 
     for (int m = 1; m <= 2; ++m) {
         int active = (os_stick_mode == m);
@@ -3589,8 +3806,8 @@ static void f_build_stick_mode_page(lv_obj_t *p) {
                                 active ? 0x163A63 : 0x152E50, 235, 14,
                                 active ? 2 : 1,
                                 active ? 0x38BDF8 : 0x355C8C);
-        char title[16];
-        snprintf(title, sizeof(title), "MODE %d", m);
+        char title[20];
+        snprintf(title, sizeof(title), os_lang_vi ? "CHE DO %d" : "MODE %d", m);
         f_label(card, 8, 8, 124, title, &lv_font_montserrat_14,
                 active ? 0x38BDF8 : 0xFFFFFF, LV_TEXT_ALIGN_CENTER);
 
@@ -3611,7 +3828,8 @@ static void f_build_stick_mode_page(lv_obj_t *p) {
 
         lv_obj_t *badge = f_rect(card, 24, 126, 92, 20,
                                  active ? 0x0284C7 : 0x1E293B, LV_OPA_COVER, 8, 0, 0);
-        f_label(badge, 0, 2, 92, active ? "ACTIVE" : "SELECT",
+        f_label(badge, 0, 2, 92,
+                os_lang_vi ? (active ? "DANG DUNG" : "CHON") : (active ? "ACTIVE" : "SELECT"),
                 &lv_font_montserrat_12, active ? 0xFFFFFF : 0x94A3B8, LV_TEXT_ALIGN_CENTER);
 
         lv_obj_add_flag(card, LV_OBJ_FLAG_CLICKABLE);
@@ -3631,9 +3849,8 @@ static void f_settings_handle_card(int idx) {
         return;
     } else if (idx == 1) {
         os_lang_vi = !os_lang_vi;
-        f_invalidate_page(FIGMA_PAGE_STICK_CAL);
-        f_invalidate_page(FIGMA_PAGE_STICK_MODE);
-        f_invalidate_page(FIGMA_PAGE_SCR_SAVER);
+        ESP_LOGI("LANG", "Language toggled -> %s", os_lang_vi ? "VI" : "EN");
+        f_invalidate_all_pages();
     } else if (idx == 2) {
         active_non_sleep_page = FIGMA_PAGE_STICK_CAL;
         f_invalidate_page(FIGMA_PAGE_STICK_CAL);
@@ -3677,15 +3894,16 @@ static void f_build_settings_menu_page(lv_obj_t *p) {
         os_lang_vi ? "Khoa ga" : "THR Lock"
     };
     char scr_sub[24];
-    if (os_sleep_timeout_sec == 0) snprintf(scr_sub, sizeof(scr_sub), "OFF");
-    else snprintf(scr_sub, sizeof(scr_sub), "%us Sleep", (unsigned)os_sleep_timeout_sec);
+    if (os_sleep_timeout_sec == 0) snprintf(scr_sub, sizeof(scr_sub), os_lang_vi ? "TAT" : "OFF");
+    else snprintf(scr_sub, sizeof(scr_sub), os_lang_vi ? "%us Cho" : "%us Sleep", (unsigned)os_sleep_timeout_sec);
 
     const char *st_subs[6] = {
-        os_lang_vi ? "6 Kenh Live" : "6 CH Setup",
+        os_lang_vi ? "6 Kenh" : "6 CH Setup",
         os_lang_vi ? "Tieng Viet" : "English",
         os_cal_done_flash ? (os_lang_vi ? "Da luu OK!" : "Saved OK!")
                           : (os_lang_vi ? "Chinh Min/Max" : "Calibrate"),
-        (os_stick_mode == 2) ? "Mode 2 (THR-L)" : "Mode 1 (THR-R)",
+        (os_stick_mode == 2) ? (os_lang_vi ? "Che do 2 (Ga-T)" : "Mode 2 (THR-L)")
+                             : (os_lang_vi ? "Che do 1 (Ga-P)" : "Mode 1 (THR-R)"),
         scr_sub,
         os_thr_lock_on ? (os_lang_vi ? "Dang Khoa" : "Active")
                        : (os_lang_vi ? "Da Mo" : "Unlocked")
@@ -3744,6 +3962,32 @@ static void f_build_settings_menu_page(lv_obj_t *p) {
 /* ============================================================================
  * PAGE 8: TYVOR ABOUT PAGE (Swipe Right from Settings — Figma Node 2070:287)
  * ========================================================================== */
+static void f_about_format_vals(char *elrs_info, size_t elrs_sz,
+                                char *mod_info, size_t mod_sz,
+                                char *adc_info, size_t adc_sz,
+                                char *link_info, size_t link_sz) {
+    const tyvor_core_snapshot_t *snap = &ui_endpoint.state.snapshot;
+    int link_ok = ui_endpoint.link.ready && ui_endpoint.state.valid;
+    snprintf(elrs_info, elrs_sz, "%umW | %uHz",
+             (unsigned)k_power_mw_table[os_power_idx],
+             (unsigned)k_elrs_rate_table[os_elrs_rate_idx]);
+    snprintf(mod_info, mod_sz, "%s (%s)",
+             k_os_models[os_active_model].tab_name,
+             get_drone_flight_mode_name(snap, link_ok, os_active_model));
+    int n_conn = (int)gimbal_connected[0] + (int)gimbal_connected[1] +
+                 (int)gimbal_connected[2] + (int)gimbal_connected[3];
+    if (n_conn > 0) {
+        snprintf(adc_info, adc_sz, "%d/4 ADC1 (M%d)", n_conn, os_stick_mode);
+    } else if (link_ok && snap->input_valid) {
+        snprintf(adc_info, adc_sz, "4/4 STM32 (M%d)", os_stick_mode);
+    } else {
+        snprintf(adc_info, adc_sz, "0/4 (M%d)", os_stick_mode);
+    }
+    snprintf(link_info, link_sz, "%s (%" PRIu32 "f)",
+             ui_endpoint.link.ready ? "100Hz OK" : (os_lang_vi ? "Doc lap" : "Standalone"),
+             ui_endpoint.link.parser.stats.frames);
+}
+
 static void f_build_about_page(lv_obj_t *p) {
     f_build_menu_row_header(p, FIGMA_PAGE_ABOUT);
 
@@ -3759,22 +4003,21 @@ static void f_build_about_page(lv_obj_t *p) {
     f_tyvor_logo(hero, 64, 10, 0xFFFFFF);
     f_label(hero, 64, 30, 216, "TYVOR Transmitter OS v1.0.0",
             &lv_font_montserrat_12, 0x38BDF8, LV_TEXT_ALIGN_LEFT);
-    f_label(hero, 64, 46, 216, "Dual-MCU: STM32F407 + ESP32-S3",
+    f_label(hero, 64, 46, 216, "STM32F407 + ESP32-S3 | CRSFv2",
             &lv_font_montserrat_12, 0x94A3B8, LV_TEXT_ALIGN_LEFT);
 
     /* 4 Live System Specification Cards */
-    static const char *ab_titles[4] = {"ELRS Firmware", "Active Model", "Gimbal ADC1", "Protocol v2"};
+    const char *ab_titles[4] = {
+        os_lang_vi ? "Song ELRS TX" : "ELRS TX",
+        os_lang_vi ? "Mau dang dung" : "Active Model",
+        os_lang_vi ? "Can & Che do" : "Gimbal & Mode",
+        os_lang_vi ? "Ket noi MCU" : "MCU Link v2"
+    };
     char elrs_info[32], mod_info[32], adc_info[32], link_info[32];
-    snprintf(elrs_info, sizeof(elrs_info), "v3.6.3 | %umW", (unsigned)k_power_mw_table[os_power_idx]);
-    snprintf(mod_info, sizeof(mod_info), "%s (%s)",
-             k_os_models[os_active_model].tab_name,
-             k_os_models[os_active_model].mode_name);
-    int n_conn = (int)gimbal_connected[0] + (int)gimbal_connected[1] +
-                 (int)gimbal_connected[2] + (int)gimbal_connected[3];
-    snprintf(adc_info, sizeof(adc_info), "%d/4 Axes (M%d)", n_conn, os_stick_mode);
-    snprintf(link_info, sizeof(link_info), "%s (%" PRIu32 "f)",
-             ui_endpoint.link.ready ? "100Hz OK" : "Standalone",
-             ui_endpoint.link.parser.stats.frames);
+    f_about_format_vals(elrs_info, sizeof(elrs_info),
+                        mod_info, sizeof(mod_info),
+                        adc_info, sizeof(adc_info),
+                        link_info, sizeof(link_info));
 
     const char *ab_vals[4] = {elrs_info, mod_info, adc_info, link_info};
     for (int i = 0; i < 4; ++i) {
@@ -3832,6 +4075,25 @@ static void f_build_sleep_saver_page(lv_obj_t *p) {
     last_sleep_mood_tick = -1;
 }
 
+static void f_clean_invalidated_pages(void) {
+    if (in_lvgl_handler) {
+        deferred_clean_invalidated = 1;
+        return;
+    }
+    deferred_clean_invalidated = 0;
+    for (unsigned i = 0; i < FIGMA_PAGE_COUNT; ++i) {
+        if (!page_built[i] && i != figma_page && page_containers[i]) {
+            lv_anim_delete(page_containers[i], f_page_anim_x_cb);
+            lv_anim_delete(page_containers[i], f_page_anim_y_cb);
+            if (i == FIGMA_PAGE_MODELS && w_mod_track) {
+                lv_anim_delete(w_mod_track, f_mod_track_anim_x_cb);
+            }
+            lv_obj_clean(page_containers[i]);
+            reset_page_widgets(i);
+        }
+    }
+}
+
 /* Ensure persistent root & specific page container are built without reloading other screens */
 static void f_ensure_page_built(unsigned page) {
     if (page >= FIGMA_PAGE_COUNT) return;
@@ -3863,6 +4125,16 @@ static void f_ensure_page_built(unsigned page) {
     }
 
     if (!page_built[page]) {
+        if (in_lvgl_handler && page_containers[page] &&
+            lv_obj_get_child_count(page_containers[page]) > 0) {
+            /* Safety guard: never run lv_obj_clean() on an existing container inside lv_timer_handler() */
+            return;
+        }
+        lv_anim_delete(page_containers[page], f_page_anim_x_cb);
+        lv_anim_delete(page_containers[page], f_page_anim_y_cb);
+        if (page == FIGMA_PAGE_MODELS && w_mod_track) {
+            lv_anim_delete(w_mod_track, f_mod_track_anim_x_cb);
+        }
         lv_obj_clean(page_containers[page]);
         reset_page_widgets(page);
         g_building_page = page;
@@ -3943,11 +4215,6 @@ static void on_thr_warn_dismiss_cb(lv_event_t *e) {
     }
 }
 
-static int in_lvgl_handler = 0;
-static int deferred_open_page = -1;
-static int deferred_enter_x = 0;
-static int deferred_enter_y = 0;
-
 static void f_open_page_dir(unsigned page, int enter_x, int enter_y) {
     page %= FIGMA_PAGE_COUNT;
     if (in_lvgl_handler && page_containers[page] && !page_built[page]) {
@@ -3997,6 +4264,16 @@ static int ch_raw_to_pct(int16_t raw) {
     return pct;
 }
 
+static int calc_drone_bat_pct(unsigned mv) {
+    if (mv == 0u) return 0;
+    unsigned cells = (mv < 5000u) ? 1u : (mv < 9000u) ? 2u : (mv < 13200u) ? 3u : (mv < 17600u) ? 4u : 6u;
+    unsigned vmin = cells * 3300u;
+    unsigned vmax = cells * 4200u;
+    if (mv <= vmin) return 0;
+    if (mv >= vmax) return 100;
+    return (int)(((mv - vmin) * 100u) / (vmax - vmin));
+}
+
 static void f_update_live_ui(uint64_t now) {
     static unsigned prev_page = 0xFFu;
     static int prev_sig_ok = -1;
@@ -4005,6 +4282,7 @@ static void f_update_live_ui(uint64_t now) {
     static int prev_sats = -1;
     static int prev_rol = 9999, prev_pit = 9999, prev_thr = 9999, prev_yaw = 9999;
     static int prev_sig_mode = -1;
+    static unsigned prev_bat_mv = 0xFFFFFFFFu;
 
     int page_changed = (prev_page != figma_page);
     if (page_changed) {
@@ -4015,25 +4293,29 @@ static void f_update_live_ui(uint64_t now) {
         prev_sats = -1;
         prev_rol = 9999;
         prev_sig_mode = -1;
+        prev_bat_mv = 0xFFFFFFFFu;
     }
 
     const tyvor_core_snapshot_t *snap = &ui_endpoint.state.snapshot;
     int link_ok = ui_endpoint.link.ready && ui_endpoint.state.valid;
-    if (link_ok && now >= os_qs_local_grace_ms) {
-        if ((int)snap->throttle_lock != os_thr_lock_on) {
-            os_thr_lock_on = (int)snap->throttle_lock;
-            f_invalidate_page(FIGMA_PAGE_SETTINGS_MENU);
-        }
-        if ((int)(snap->rf_enabled != 0u) != os_rf_output_on) {
-            os_rf_output_on = (snap->rf_enabled != 0u) ? 1 : 0;
-            f_invalidate_page(FIGMA_PAGE_QUICKSET_MENU);
-            f_invalidate_page(FIGMA_PAGE_RF_OUTPUT);
-        }
-    }
     int local_gimbal = any_local_gimbal_connected();
-    /* Strict STM32 Safety Authority: ARM and RF ON are controlled exclusively by STM32 Core */
-    int armed = link_ok ? (snap->safety_state == TYVOR_BENCH_ARMED) : 0;
-    int rf_active = link_ok ? (snap->rf_enabled != 0u) : 0;
+    /* ARM follows CH8 Aux Arm (Red Toggle Switch out of Nấc 1: ch5_raw >= -300 -> ARMED) */
+    int ch5_raw = get_live_ch_raw(4, snap, link_ok);
+    int armed = (ch5_raw >= -300);
+    int rf_active = os_rf_output_on;
+
+    /* Flight Timer: resets to 00:00 on each new ARM, counts while ARMED, holds total on DISARM */
+    static uint64_t flight_time_ms = 0;
+    static uint64_t last_flight_tick_ms = 0;
+    static int was_armed_timer = 0;
+    if (armed && !was_armed_timer) {
+        flight_time_ms = 0;
+    }
+    was_armed_timer = armed;
+    if (last_flight_tick_ms != 0 && now > last_flight_tick_ms && armed) {
+        flight_time_ms += (now - last_flight_tick_ms);
+    }
+    last_flight_tick_ms = now;
 
     /* 1. Update Shared Top Header on active page (only when signal state changes) */
     unsigned cur_p = (figma_page < FIGMA_PAGE_COUNT) ? figma_page : 0;
@@ -4049,25 +4331,38 @@ static void f_update_live_ui(uint64_t now) {
                                         lv_color_hex(rf_active ? 0xD8E0E8 : 0xEF4444), 0);
         }
     }
-    int sig_ok = (rf_active && link_ok) || local_gimbal;
-    if (sig_ok != prev_sig_ok) {
-        prev_sig_ok = sig_ok;
+    int rx_connected = rf_active && link_ok &&
+                       ((strcmp(snap->model_name, "FM:RX BOUND") == 0) ||
+                        ((snap->telemetry.valid & (TYVOR_T_LQ | TYVOR_T_RSSI)) && snap->telemetry.lq > 0));
+    int sig_bars = 0;
+    if (rx_connected) {
+        uint8_t lq = (snap->telemetry.valid & TYVOR_T_LQ) ? snap->telemetry.lq : 100u;
+        if (lq >= 80u) sig_bars = 4;
+        else if (lq >= 50u) sig_bars = 3;
+        else if (lq >= 20u) sig_bars = 2;
+        else sig_bars = 1;
+    }
+    if (sig_bars != prev_sig_ok) {
+        prev_sig_ok = sig_bars;
+        uint32_t bar_col = (sig_bars >= 3) ? 0x5ECA62 : (sig_bars >= 1 ? 0xF59E0B : 0x465160);
         if (w_hdr_sig_bars[cur_p][0]) {
             for (int i = 0; i < 4; ++i) {
                 lv_obj_set_style_bg_color(w_hdr_sig_bars[cur_p][i],
-                                          lv_color_hex(sig_ok ? 0x5ECA62 : 0x465160), 0);
+                                          lv_color_hex((i < sig_bars) ? bar_col : 0x465160), 0);
             }
         }
         if (w_hdr_sig_x[cur_p]) {
-            if (sig_ok) lv_obj_add_flag(w_hdr_sig_x[cur_p], LV_OBJ_FLAG_HIDDEN);
+            if (sig_bars > 0) lv_obj_add_flag(w_hdr_sig_x[cur_p], LV_OBJ_FLAG_HIDDEN);
             else lv_obj_remove_flag(w_hdr_sig_x[cur_p], LV_OBJ_FLAG_HIDDEN);
         }
     }
+    /* Top-right header battery icon = Handset (TX) battery; Bottom-left Home card = Drone battery */
+    unsigned live_bat_mv = (link_ok && (snap->telemetry.valid & TYVOR_T_BATTERY)) ? (unsigned)snap->telemetry.battery_mv : 0u;
 
     /* 2. Update HOME Screen */
     if (figma_page == FIGMA_PAGE_HOME) {
-        uint64_t elapsed_s = (now - boot_epoch_ms) / 1000ULL;
-        if (elapsed_s != prev_sec) {
+        uint64_t elapsed_s = flight_time_ms / 1000ULL;
+        if (elapsed_s != prev_sec || armed != prev_armed) {
             prev_sec = elapsed_s;
             unsigned mm = (unsigned)((elapsed_s / 60ULL) % 100ULL);
             unsigned ss = (unsigned)(elapsed_s % 60ULL);
@@ -4075,12 +4370,16 @@ static void f_update_live_ui(uint64_t now) {
                 char tbuf[16];
                 snprintf(tbuf, sizeof(tbuf), "%02u:%02u", mm, ss);
                 tyvor_ui321_text(w_home_timer_lbl, tbuf);
+                lv_obj_set_style_text_color(w_home_timer_lbl,
+                                            lv_color_hex(armed ? 0x22C55E : 0x38BDF8), 0);
             }
         }
         if (armed != prev_armed) {
             prev_armed = armed;
             if (w_home_arm_lbl && w_home_arm_dot) {
-                tyvor_ui321_text(w_home_arm_lbl, armed ? "ARMED" : "DISARMED");
+                tyvor_ui321_text(w_home_arm_lbl,
+                                 os_lang_vi ? (armed ? "DA ARM" : "CHUA ARM")
+                                            : (armed ? "ARMED" : "DISARMED"));
                 lv_obj_set_style_text_color(w_home_arm_lbl,
                                             lv_color_hex(armed ? 0x22C55E : 0xEF4444), 0);
                 lv_obj_set_style_bg_color(w_home_arm_dot,
@@ -4109,12 +4408,33 @@ static void f_update_live_ui(uint64_t now) {
                 tyvor_ui321_text(w_home_sig_lbl, sbuf);
                 lv_obj_set_style_text_color(w_home_sig_lbl, lv_color_hex(0x5ECA62), 0);
             } else {
-                tyvor_ui321_text(w_home_sig_lbl, "READY • PLUG GIMBAL");
+                tyvor_ui321_text(w_home_sig_lbl, os_lang_vi ? "SAN SANG • CAM CAN" : "READY • PLUG GIMBAL");
                 lv_obj_set_style_text_color(w_home_sig_lbl, lv_color_hex(0x38BDF8), 0);
             }
         }
-        if (w_home_mode_lbl && page_changed) {
-            tyvor_ui321_text(w_home_mode_lbl, k_os_models[os_active_model].mode_name);
+        if (w_home_mode_lbl) {
+            tyvor_ui321_text(w_home_mode_lbl, get_drone_flight_mode_name(snap, link_ok, os_active_model));
+        }
+        if (live_bat_mv != prev_bat_mv) {
+            prev_bat_mv = live_bat_mv;
+            int bpct = calc_drone_bat_pct(live_bat_mv);
+            uint32_t bcol = (live_bat_mv == 0u) ? 0x475569 : (bpct > 40 ? 0x5ECA62 : (bpct > 20 ? 0xF59E0B : 0xEF4444));
+            if (w_home_volt_lbl) {
+                char vbuf[16];
+                if (live_bat_mv > 0u) {
+                    snprintf(vbuf, sizeof(vbuf), "%u.%02uV", live_bat_mv / 1000u, (live_bat_mv % 1000u) / 10u);
+                } else {
+                    snprintf(vbuf, sizeof(vbuf), "--.-V");
+                }
+                tyvor_ui321_text(w_home_volt_lbl, vbuf);
+                lv_obj_set_style_text_color(w_home_volt_lbl,
+                                            lv_color_hex(live_bat_mv > 0u ? 0xF1F5F9 : 0x94A3B8), 0);
+            }
+            if (w_home_bat_bar) {
+                int bw = (live_bat_mv > 0u) ? (4 + (bpct * 52) / 100) : 4;
+                lv_obj_set_width(w_home_bat_bar, bw);
+                lv_obj_set_style_bg_color(w_home_bat_bar, lv_color_hex(bcol), 0);
+            }
         }
         int sats = (int)((link_ok && snap->telemetry.valid) ? snap->telemetry.satellites : 0u);
         if (w_home_gps_val && sats != prev_sats) {
@@ -4145,41 +4465,55 @@ static void f_update_live_ui(uint64_t now) {
         }
     }
 
-    /* 3. Update CH VIEW Screen (Live Gimbal + Switch Bars) */
+    /* 2b. Update MODELS Screen Flight Mode badge from Drone FC setting (or model default) */
+    if (figma_page == FIGMA_PAGE_MODELS && w_mod_prev_mode) {
+        tyvor_ui321_text(w_mod_prev_mode, get_drone_flight_mode_name(snap, link_ok, os_viewed_model));
+    }
+
+    /* 3. Update CH VIEW Screen (Live 10CH Independent Transmitter Channels — dirty-cached) */
     if (figma_page == FIGMA_PAGE_CH_VIEW) {
+        static int prev_chv_pct[10];
+        if (page_changed) {
+            for (int i = 0; i < 10; ++i) prev_chv_pct[i] = -9999;
+        }
         for (int i = 0; i < 10; ++i) {
-            int pct = 0;
-            if (i < 6) {
-                pct = ch_raw_to_pct(get_live_ch_raw(i, snap, link_ok));
-            } else {
-                pct = 0;
+            int pct = ch_raw_to_pct(get_live_ch_raw(i, snap, link_ok));
+            if (pct != prev_chv_pct[i]) {
+                prev_chv_pct[i] = pct;
+                if (w_chv_pct[i]) {
+                    char pbuf[12];
+                    snprintf(pbuf, sizeof(pbuf), "%d%%", pct);
+                    tyvor_ui321_text(w_chv_pct[i], pbuf);
+                }
+                int w_px = ((pct + 100) * 140) / 200;
+                if (w_px < 4) w_px = 4;
+                if (w_px > 140) w_px = 140;
+                if (w_chv_fill[i]) lv_obj_set_width(w_chv_fill[i], w_px);
+                if (w_chv_tick[i]) lv_obj_set_x(w_chv_tick[i], w_px - 2);
             }
-            if (w_chv_pct[i]) {
-                char pbuf[12];
-                snprintf(pbuf, sizeof(pbuf), "%d%%", pct);
-                tyvor_ui321_text(w_chv_pct[i], pbuf);
-            }
-            int w_px = ((pct + 100) * 140) / 200;
-            if (w_px < 4) w_px = 4;
-            if (w_px > 140) w_px = 140;
-            if (w_chv_fill[i]) lv_obj_set_width(w_chv_fill[i], w_px);
-            if (w_chv_tick[i]) lv_obj_set_x(w_chv_tick[i], w_px - 2);
         }
     }
 
-    /* 4. Update CHANNELS Screen (Live Gimbal Primary Axes + Switches) */
+    /* 4. Update CHANNELS Screen (Live Gimbal Primary Axes + Switches — dirty-cached) */
     if (figma_page == FIGMA_PAGE_CHANNELS) {
+        static int prev_chc_pct[6];
+        if (page_changed) {
+            for (int i = 0; i < 6; ++i) prev_chc_pct[i] = -9999;
+        }
         for (int i = 0; i < 6; ++i) {
             int pct = ch_raw_to_pct(get_live_ch_raw(i, snap, link_ok));
-            if (w_chc_pct[i]) {
-                char pbuf[12];
-                snprintf(pbuf, sizeof(pbuf), "%d%%", pct);
-                tyvor_ui321_text(w_chc_pct[i], pbuf);
+            if (pct != prev_chc_pct[i]) {
+                prev_chc_pct[i] = pct;
+                if (w_chc_pct[i]) {
+                    char pbuf[12];
+                    snprintf(pbuf, sizeof(pbuf), "%d%%", pct);
+                    tyvor_ui321_text(w_chc_pct[i], pbuf);
+                }
+                int w_px = ((pct + 100) * 84) / 200;
+                if (w_px < 4) w_px = 4;
+                if (w_px > 84) w_px = 84;
+                if (w_chc_fill[i]) lv_obj_set_width(w_chc_fill[i], w_px);
             }
-            int w_px = ((pct + 100) * 84) / 200;
-            if (w_px < 4) w_px = 4;
-            if (w_px > 84) w_px = 84;
-            if (w_chc_fill[i]) lv_obj_set_width(w_chc_fill[i], w_px);
         }
     }
 
@@ -4196,8 +4530,8 @@ static void f_update_live_ui(uint64_t now) {
         if (!tel_scrolling && now >= next_tel_ms) {
             next_tel_ms = now + 200;
             uint8_t tv = (link_ok) ? snap->telemetry.valid : 0u;
-            int has_rssi = rf_active && ((tv & TYVOR_T_RSSI) != 0u);
-            int has_lq   = rf_active && ((tv & TYVOR_T_LQ) != 0u);
+            int has_rssi = link_ok && ((tv & TYVOR_T_RSSI) != 0u);
+            int has_lq   = link_ok && ((tv & TYVOR_T_LQ) != 0u);
             int has_bat  = link_ok && ((tv & TYVOR_T_BATTERY) != 0u);
             int has_gps  = link_ok && ((tv & TYVOR_T_GPS) != 0u);
 
@@ -4245,9 +4579,9 @@ static void f_update_live_ui(uint64_t now) {
                 vals[10] = b_rxbt; cols[10] = (bpct > 25) ? 0x5ECA62 : 0xF59E0B;
                 vals[13] = b_batp; cols[13] = (bpct > 25) ? 0x5ECA62 : 0xF59E0B;
             }
-            if (link_ok) {
-                vals[17] = k_os_models[os_active_model].mode_name;
-                cols[17] = 0x38BDF8;
+            if (link_ok && strncmp(snap->model_name, "FM:", 3) == 0 && snap->model_name[3] != '\0') {
+                vals[17] = &snap->model_name[3];
+                cols[17] = 0x5ECA62;
             }
             if (has_gps) {
                 double lat = (double)snap->telemetry.latitude_e7 / 1e7;
@@ -4270,15 +4604,19 @@ static void f_update_live_ui(uint64_t now) {
         }
     }
 
-    /* 6. Update STICK CAL Screen (Live 4-axis Gimbal ADC + Min/Max Capture) */
+    /* 6. Update STICK CAL Screen (Live 4-axis Gimbal ADC from STM32 or ESP32 + Min/Max Capture) */
     if (figma_page == FIGMA_PAGE_STICK_CAL) {
+        int stm32_ok = (link_ok && snap && snap->input_valid);
         for (int i = 0; i < 4; ++i) {
+            int16_t live_raw = gimbal_connected[i] ? gimbal_raw_val[i]
+                                                   : (stm32_ok ? snap->inputs[i] : ((i == 2) ? -1000 : 0));
+            int32_t v = gimbal_connected[i] ? gimbal_adc_filt[i]
+                                            : (2048 + ((int32_t)live_raw * 1700) / 1000);
             if (os_stick_cal_active) {
-                int32_t v = gimbal_adc_filt[i];
                 if (v < os_cal_live_min[i]) os_cal_live_min[i] = v;
                 if (v > os_cal_live_max[i]) os_cal_live_max[i] = v;
             }
-            int pct = ch_raw_to_pct(gimbal_raw_val[i]);
+            int pct = ch_raw_to_pct(live_raw);
             if (w_cal_pct[i]) {
                 char pbuf[12];
                 snprintf(pbuf, sizeof(pbuf), "%d%%", pct);
@@ -4298,19 +4636,89 @@ static void f_update_live_ui(uint64_t now) {
         }
     }
 
-    /* 7. Update ABOUT Screen (Live Model, Power, Gimbal Axes, Protocol v2) */
+    /* 7. Update BIND Screen & Auto-Exit Bind Mode when setup finishes (RX bound or TX rebooted out of WiFi) */
+    if (os_bind_active && link_ok) {
+        int is_wifi_on = (strcmp(snap->model_name, "FM:WIFI ON") == 0);
+        int is_rx_bound = (strcmp(snap->model_name, "FM:RX BOUND") == 0) ||
+                          ((snap->telemetry.valid & (TYVOR_T_LQ | TYVOR_T_RSSI)) && snap->telemetry.lq > 0);
+        if (is_wifi_on) {
+            os_bind_saw_wifi_on = 1;
+        } else if (!os_bind_saw_wifi_on && !is_rx_bound && now >= os_bind_until_ms) {
+            /* Keep asserting 0xB1u every 700ms until STM32 confirms FM:WIFI ON */
+            os_bind_until_ms = now + 700u;
+            esp_send_quickset_cmd(0xB1u);
+        }
+        int setup_done = is_rx_bound ||
+                         (os_bind_saw_wifi_on && !is_wifi_on &&
+                          (now - os_bind_started_ms >= 5000u) &&
+                          strncmp(snap->model_name, "FM:", 3) == 0);
+        if (setup_done) {
+            os_bind_active = 0;
+            os_tx_wifi_on = 0;
+            os_bind_saw_wifi_on = 0;
+            os_bind_started_ms = 0u;
+            f_invalidate_page(FIGMA_PAGE_HOME);
+            f_invalidate_page(FIGMA_PAGE_QUICKSET_MENU);
+            f_invalidate_page(FIGMA_PAGE_BIND);
+            if (figma_page == FIGMA_PAGE_BIND) {
+                f_navigate_back();
+            }
+        }
+    }
+    if (figma_page == FIGMA_PAGE_BIND) {
+        int rx_bound = link_ok && ((strcmp(snap->model_name, "FM:RX BOUND") == 0) ||
+                                   ((snap->telemetry.valid & (TYVOR_T_LQ | TYVOR_T_RSSI)) && snap->telemetry.lq > 0));
+        int elrs_ok  = link_ok && (strncmp(snap->model_name, "FM:", 3) == 0);
+        int wifi_on  = os_bind_active || os_tx_wifi_on || (link_ok && strcmp(snap->model_name, "FM:WIFI ON") == 0);
+
+        uint32_t ring_col = wifi_on ? 0x22C55E : (rx_bound ? 0x22C55E : 0x38BDF8);
+        const char *ring_txt = wifi_on ? "WIFI" : (rx_bound ? "OK" : (elrs_ok ? "ELRS" : "CRSF"));
+        const char *st_txt   = wifi_on ? (os_lang_vi ? "Da bat WiFi ELRS!" : "ELRS WiFi ON!") :
+                               rx_bound ? (os_lang_vi ? "Da ket noi RX!" : "RX Bound OK!") :
+                               os_bind_sent_once ? (os_lang_vi ? "Da tat WiFi" : "WiFi Stopped") :
+                               elrs_ok  ? (os_lang_vi ? "ELRS TX San sang" : "ELRS TX Ready") :
+                                          (os_lang_vi ? "Dang cho TX..." : "Waiting for TX");
+        const char *sub_txt  = wifi_on ? "ExpressLRS TX" :
+                               rx_bound ? (os_lang_vi ? "Da nhan song RX!" : "Receiver Linked!") :
+                               elrs_ok  ? (os_lang_vi ? "Bam Bat dau Bind" : "Tap Start Bind") :
+                                          (os_lang_vi ? "Kiem tra day ELRS" : "Check ELRS Wire");
+
+        if (w_bind_ring) {
+            lv_obj_set_style_border_color(w_bind_ring, lv_color_hex(ring_col), 0);
+        }
+        if (w_bind_ring_lbl) {
+            tyvor_ui321_text(w_bind_ring_lbl, ring_txt);
+            lv_obj_set_style_text_color(w_bind_ring_lbl,
+                                        lv_color_hex((wifi_on || rx_bound) ? 0x5ECA62 : 0xFFFFFF), 0);
+        }
+        if (w_bind_status_lbl) {
+            tyvor_ui321_text(w_bind_status_lbl, st_txt);
+            lv_obj_set_style_text_color(w_bind_status_lbl,
+                                        lv_color_hex((wifi_on || rx_bound) ? 0x5ECA62 : 0xFFFFFF), 0);
+        }
+        if (w_bind_sub_lbl) {
+            tyvor_ui321_text(w_bind_sub_lbl, sub_txt);
+            lv_obj_set_style_text_color(w_bind_sub_lbl,
+                                        lv_color_hex(wifi_on ? 0x38BDF8 : 0x94A3B8), 0);
+        }
+        if (w_bind_btn) {
+            lv_obj_set_style_bg_color(w_bind_btn, lv_color_hex(os_bind_active ? 0xC83233 : 0x23476E), 0);
+            lv_obj_set_style_border_color(w_bind_btn, lv_color_hex(os_bind_active ? 0xEF4444 : 0x22C55E), 0);
+        }
+        if (w_bind_btn_lbl) {
+            tyvor_ui321_text(w_bind_btn_lbl,
+                             os_lang_vi ? (os_bind_active ? "Huy" : "Bat dau")
+                                        : (os_bind_active ? "Cancel" : "Start Bind"));
+        }
+    }
+
+    /* 8. Update ABOUT Screen (Live ELRS Power/Rate, Model, Gimbal Source, MCU Link v2) */
     if (figma_page == FIGMA_PAGE_ABOUT) {
         char elrs_info[32], mod_info[32], adc_info[32], link_info[32];
-        snprintf(elrs_info, sizeof(elrs_info), "v3.6.3 | %umW", (unsigned)k_power_mw_table[os_power_idx]);
-        snprintf(mod_info, sizeof(mod_info), "%s (%s)",
-                 k_os_models[os_active_model].tab_name,
-                 k_os_models[os_active_model].mode_name);
-        int n_conn = (int)gimbal_connected[0] + (int)gimbal_connected[1] +
-                     (int)gimbal_connected[2] + (int)gimbal_connected[3];
-        snprintf(adc_info, sizeof(adc_info), "%d/4 Axes (M%d)", n_conn, os_stick_mode);
-        snprintf(link_info, sizeof(link_info), "%s (%" PRIu32 "f)",
-                 ui_endpoint.link.ready ? "100Hz OK" : "Standalone",
-                 ui_endpoint.link.parser.stats.frames);
+        f_about_format_vals(elrs_info, sizeof(elrs_info),
+                            mod_info, sizeof(mod_info),
+                            adc_info, sizeof(adc_info),
+                            link_info, sizeof(link_info));
         const char *ab_vals[4] = {elrs_info, mod_info, adc_info, link_info};
         for (int i = 0; i < 4; ++i) {
             if (w_about_vals[i]) tyvor_ui321_text(w_about_vals[i], ab_vals[i]);
@@ -4386,24 +4794,24 @@ static void f_update_live_ui(uint64_t now) {
 
     /* 8. Safety: THROTTLE WARNING Overlay (Figma SAOLALINK — THROTTLE WARNING) */
     int thr_pct = ch_raw_to_pct(get_live_ch_raw(2, snap, link_ok));
-    int thr_high = (link_ok && ((snap->safety_reasons & TYVOR_SAFE_THROTTLE) != 0u)) ||
-                   (gimbal_connected[2] && thr_pct > -70 && !armed);
-    if (!thr_high) {
-        thr_warn_dismissed = 0;
+    int has_thr_src = (link_ok && snap && snap->input_valid) || gimbal_connected[2];
+    int thr_high = has_thr_src && (thr_pct > -70) && !armed;
+    if (has_thr_src && !thr_high) {
+        thr_warn_dismissed = 1;
         if (w_thr_warn_overlay) {
             lv_obj_del(w_thr_warn_overlay);
             w_thr_warn_overlay = NULL;
             w_thr_warn_bar = NULL;
             w_thr_warn_pct = NULL;
         }
-    } else if (!thr_warn_dismissed && !sleep_active && figma_page != FIGMA_PAGE_STICK_CAL) {
+    } else if (thr_high && !thr_warn_dismissed && !sleep_active && figma_page != FIGMA_PAGE_STICK_CAL) {
         if (!w_thr_warn_overlay) {
             w_thr_warn_overlay = f_rect(lv_layer_top(), 0, 0, 320, 240, 0x050C18, 210, 0, 0, 0);
             lv_obj_add_flag(w_thr_warn_overlay, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_t *card = f_rect(w_thr_warn_overlay, 24, 24, 272, 192, 0x1E1418, 250, 16, 2, 0xEF4444);
             lv_obj_t *ico_bg = f_rect(card, 114, 12, 44, 44, 0x3F1D1D, LV_OPA_COVER, 22, 2, 0xF59E0B);
             f_icon_centered(ico_bg, LV_SYMBOL_WARNING, &lv_font_montserrat_20, 0xF59E0B);
-            f_label(card, 12, 62, 248, "THROTTLE WARNING",
+            f_label(card, 12, 62, 248, os_lang_vi ? "CANH BAO CAN GA" : "THROTTLE WARNING",
                     &lv_font_montserrat_14, 0xF59E0B, LV_TEXT_ALIGN_CENTER);
             f_label(card, 12, 82, 248,
                     os_lang_vi ? "Ha can ga ve muc thap nhat!" : "Throttle not at zero! Lower stick.",
@@ -4415,6 +4823,7 @@ static void f_update_live_ui(uint64_t now) {
             lv_obj_t *btn = f_rect(card, 66, 146, 140, 34, 0x7F1D1D, LV_OPA_COVER, 10, 1, 0xEF4444);
             f_icon_centered(btn, os_lang_vi ? "Bo qua" : "Dismiss", &lv_font_montserrat_14, 0xFFFFFF);
             lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_set_ext_click_area(btn, 24);
             lv_obj_add_event_cb(btn, on_thr_warn_dismiss_cb, LV_EVENT_CLICKED, NULL);
         }
         if (w_thr_warn_bar && w_thr_warn_pct) {
@@ -4505,7 +4914,9 @@ void app_main(void) {
             os_sync_all_to_stm32();
         } else if (!ui_endpoint.link.ready) {
             prev_link_ready = 0;
+            os_boot_sync_step = -1;
         }
+        os_sync_poll(now);
 
         /* Automatic UART TX/RX crossover detection (17/18 <-> 18/17) if no frames received */
         if (ui_endpoint.link.parser.stats.frames == 0 && now - last_pin_check_ms >= 1500) {
@@ -4600,26 +5011,42 @@ void app_main(void) {
             in_lvgl_handler = 1;
             (void)lv_timer_handler();
             in_lvgl_handler = 0;
+            if (deferred_clean_invalidated) {
+                f_clean_invalidated_pages();
+            }
             if (deferred_open_page >= 0) {
                 int dp = deferred_open_page;
                 int dx = deferred_enter_x;
                 int dy = deferred_enter_y;
+                int mx = deferred_mod_track_x;
                 deferred_open_page = -1;
-                f_open_page_dir((unsigned)dp, dx, dy);
+                deferred_mod_track_x = 0;
+                if (dp == (int)FIGMA_PAGE_MODELS && mx != 0) {
+                    f_refresh_models_page_dir(mx);
+                } else {
+                    f_open_page_dir((unsigned)dp, dx, dy);
+                }
             }
         }
 
         if (now >= next_log_ms) {
             next_log_ms = now + 1000;
-            ESP_LOGI(TAG, "LINK ready=%u frames=%" PRIu32 " gimbal=[%d:%d%%, %d:%d%%, %d:%d%%, %d:%d%%] page=%u sleep=%d",
+            const tyvor_telemetry_view_t *tv = &ui_endpoint.state.snapshot.telemetry;
+            ESP_LOGI(TAG, "LINK ready=%u frames=%" PRIu32 " elrs=\"%s\" tvalid=0x%02X rssi=%ddBm lq=%u%% bat=%umV gimbal=[%d%%, %d%%, %d%%, %d%%] aux=[CH5:%d%%, CH6:%d%%] page=%u",
                      ui_endpoint.link.ready,
                      ui_endpoint.link.parser.stats.frames,
-                     gimbal_connected[0], ch_raw_to_pct(get_live_ch_raw(0, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
-                     gimbal_connected[1], ch_raw_to_pct(get_live_ch_raw(1, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
-                     gimbal_connected[2], ch_raw_to_pct(get_live_ch_raw(2, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
-                     gimbal_connected[3], ch_raw_to_pct(get_live_ch_raw(3, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
-                     figma_page,
-                     sleep_active);
+                     ui_endpoint.state.snapshot.model_name,
+                     tv->valid,
+                     (int)tv->rssi_dbm,
+                     (unsigned)tv->lq,
+                     (unsigned)tv->battery_mv,
+                     ch_raw_to_pct(get_live_ch_raw(0, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     ch_raw_to_pct(get_live_ch_raw(1, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     ch_raw_to_pct(get_live_ch_raw(2, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     ch_raw_to_pct(get_live_ch_raw(3, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     ch_raw_to_pct(get_live_ch_raw(4, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     ch_raw_to_pct(get_live_ch_raw(5, &ui_endpoint.state.snapshot, ui_endpoint.state.valid)),
+                     figma_page);
         }
 
         vTaskDelay(pdMS_TO_TICKS(1));

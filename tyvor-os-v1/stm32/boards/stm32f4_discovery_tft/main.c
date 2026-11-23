@@ -615,7 +615,17 @@ void USART2_IRQHandler(void) {
     }
 }
 
+static int16_t g_stm32_ch5_val = 0;
+static int16_t g_stm32_ch6_val = 0;
+static int16_t g_stm32_ch7_val = 0;
+static int16_t g_stm32_ch8_val = 0;
+static int16_t g_stm32_crsf_ch[16];
+
 static int receive_core_cb(void *ctx, const uint8_t *b, size_t n, uint64_t now) {
+    tyvor_discovery_demo.core.channels[4] = g_stm32_ch5_val;
+    tyvor_discovery_demo.core.channels[5] = g_stm32_ch6_val;
+    tyvor_discovery_demo.core.channels[6] = g_stm32_ch7_val;
+    tyvor_discovery_demo.core.channels[7] = g_stm32_ch8_val;
     return tyvor_core_bridge_feed(ctx, b, n, now);
 }
 
@@ -627,13 +637,15 @@ static volatile uint8_t crsf_rx_ring[256];
 static volatile uint16_t crsf_rx_head = 0;
 static volatile uint16_t crsf_rx_tail = 0;
 static uint64_t crsf_last_rc_ms = 0;
-static uint64_t crsf_last_ping_ms = 0;
 static const uint16_t crsf_rate_period_ms[4] = {20u, 7u, 4u, 2u}; /* 50/150/250/500 Hz */
+
+static volatile uint32_t crsf_raw_rx_bytes = 0;
 
 void USART6_IRQHandler(void) {
     uint32_t sr = USART6->SR;
     if (sr & (USART_SR_RXNE | USART_SR_ORE | USART_SR_FE | USART_SR_NE | USART_SR_PE)) {
         uint8_t b = (uint8_t)USART6->DR;
+        crsf_raw_rx_bytes++;
         if (!(sr & (USART_SR_ORE | USART_SR_FE | USART_SR_NE | USART_SR_PE))) {
             uint16_t next = (uint16_t)((crsf_rx_head + 1u) & 255u);
             if (next != crsf_rx_tail) {
@@ -839,15 +851,24 @@ static int hardware_init(void) {
     TOUCH_CS_PORT->BSRR = TOUCH_CS_PIN;
     TFT_SCK_PORT->BSRR = (uint32_t)TFT_SCK_PIN << 16;
 
-    /* GPIOE Input: Touch IRQ (PE12) + Gimbal Switches SA (PE7) & SB (PE8) with pull-up */
-    g.Pin = TOUCH_IRQ_PIN | GPIO_PIN_7 | GPIO_PIN_8;
+    /* GPIOE Input: Touch IRQ (PE12) + Switches SA(PE5/PE4), SB(PE3/PE2), SC(PE1/PE0) on P2 + P1(PE7/PE8) with pull-up */
+    g.Pin = TOUCH_IRQ_PIN | GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 |
+            GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_7 | GPIO_PIN_8;
     g.Mode = GPIO_MODE_INPUT;
     g.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOE, &g);
 
-    /* Hardware Gimbal ADC1 Inputs: PC1(IN11=Roll), PC2(IN12=Pitch), PC4(IN14=Thr), PC5(IN15=Yaw) */
+    /* GPIOB Input: Switches SD(PB9/PB8), SE(PB7/PB6), SF(PB5/PB4) on P2 with pull-up */
+    g.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9;
+    g.Mode = GPIO_MODE_INPUT;
+    g.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOB, &g);
+
+    /* Hardware Gimbal & Pot ADC1 Inputs on P1:
+     * PC0(IN10=Pot S1), PC3(IN13=Pot S2), PC1(IN11=Roll), PC2(IN12=Yaw), PC4(IN14=Pitch), PC5(IN15=Thr) */
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_ADC1_CLK_ENABLE();
-    g.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5;
+    g.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;
     g.Mode = GPIO_MODE_ANALOG;
     g.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &g);
@@ -949,13 +970,28 @@ static void select_next_model(void) {
 static uint8_t stm32_qs_power_idx = 2;
 static uint8_t stm32_qs_rate_idx = 2;
 static uint8_t stm32_qs_finder_on = 0;
-static uint8_t stm32_qs_rf_on = 0;
+static uint8_t stm32_qs_rf_on = 1;
 static uint8_t stm32_qs_bind_on = 0;
 static uint8_t stm32_qs_telem_idx = 2;
-static uint8_t stm32_qs_model_match = 1;
+static uint8_t stm32_qs_model_match = 0;
 static uint8_t stm32_qs_ext_tx = 0;
 static uint8_t stm32_qs_thr_lock = 1;
 static uint8_t stm32_qs_stick_mode = 2;
+static uint8_t stm32_active_model_idx = 0;
+static uint8_t stm32_pending_elrs_mask = 0; /* bit0=pwr, bit1=rate, bit2=tlm, bit3=mm */
+static uint8_t stm32_cal_cmd = 0; /* 0=none, 1=start, 2=save, 3=reset */
+
+static int16_t stm32_clamp_ch(int32_t v) {
+    if (v < -1000) return -1000;
+    if (v > 1000) return 1000;
+    return (int16_t)v;
+}
+
+static int16_t stm32_apply_expo(int16_t x, int expo_pct) {
+    int32_t v = x;
+    int32_t x3 = ((v * v) / 1000) * v / 1000;
+    return stm32_clamp_ch((x3 * expo_pct + v * (100 - expo_pct)) / 100);
+}
 
 static uint8_t on_remote_ui_request(void *ctx, uint8_t opcode, uint8_t page) {
     (void)ctx;
@@ -972,19 +1008,70 @@ static uint8_t on_remote_ui_request(void *ctx, uint8_t opcode, uint8_t page) {
     } else if (opcode == TYVOR_REQ_QUICKSET) {
         uint8_t group = page & 0xF0u;
         uint8_t val   = page & 0x0Fu;
-        if (group == 0x00u && val < 5u) { stm32_qs_power_idx = val; (void)tyvor_crsf_send_param(&crsf_link, 6u, val); }
-        else if (group == 0x10u && val < 4u) { stm32_qs_rate_idx = val; (void)tyvor_crsf_send_param(&crsf_link, 1u, val); }
+        if (group == 0x00u && val < 5u) {
+            static const uint16_t k_mw[5] = {50u, 100u, 200u, 400u, 500u};
+            stm32_qs_power_idx = val;
+            if (crsf_link.power_param_id > 0u) {
+                (void)tyvor_crsf_set_power_mw(&crsf_link, k_mw[val]);
+            } else {
+                stm32_pending_elrs_mask |= 0x01u;
+            }
+        }
+        else if (group == 0x10u && val < 4u) {
+            static const uint16_t k_hz[4] = {50u, 150u, 250u, 500u};
+            stm32_qs_rate_idx = val;
+            if (crsf_link.rate_param_id > 0u) {
+                (void)tyvor_crsf_set_rate_hz(&crsf_link, k_hz[val]);
+            } else {
+                stm32_pending_elrs_mask |= 0x02u;
+            }
+        }
         else if (group == 0x20u) stm32_qs_finder_on = (val != 0u);
         else if (group == 0x30u) stm32_qs_rf_on = (val != 0u);
-        else if (group == 0x40u) { stm32_qs_bind_on = (val != 0u); if (val != 0u) (void)tyvor_crsf_send_param(&crsf_link, 0xFFu, 1u); }
-        else if (group == 0x50u && val < 4u) { stm32_qs_telem_idx = val; (void)tyvor_crsf_send_param(&crsf_link, 2u, val); }
-        else if (group == 0x60u) { stm32_qs_model_match = (val != 0u); (void)tyvor_crsf_send_param(&crsf_link, 4u, val ? 1u : 0u); }
+        else if (group == 0x40u) {
+            stm32_qs_bind_on = (val != 0u);
+            if (val != 0u) {
+                stm32_qs_rf_on = 1u; /* Ensure RF CRSF stream is active when Binding */
+                (void)tyvor_crsf_send_bind(&crsf_link, board_millis());
+            } else {
+                (void)tyvor_crsf_cancel_bind(&crsf_link);
+            }
+        }
+        else if (group == 0x50u && val < 4u) {
+            static const uint16_t k_tlm[4] = {2u, 16u, 64u, 128u};
+            stm32_qs_telem_idx = val;
+            if (crsf_link.tlm_param_id > 0u) {
+                (void)tyvor_crsf_set_tlm_ratio(&crsf_link, k_tlm[val]);
+            } else {
+                stm32_pending_elrs_mask |= 0x04u;
+            }
+        }
+        else if (group == 0x60u) {
+            stm32_qs_model_match = (val != 0u);
+            if (crsf_link.model_match_param_id > 0u) {
+                (void)tyvor_crsf_send_param(&crsf_link, crsf_link.model_match_param_id, val ? 1u : 0u);
+            } else {
+                stm32_pending_elrs_mask |= 0x08u;
+            }
+        }
         else if (group == 0x70u) stm32_qs_ext_tx = (val != 0u);
         else if (group == 0x80u) {
             stm32_qs_thr_lock = (val != 0u);
             tyvor_discovery_demo.mode = stm32_qs_thr_lock ? DISCOVERY_SAFE : DISCOVERY_MIXER;
         } else if (group == 0x90u) {
             stm32_qs_stick_mode = (val != 0u) ? 2u : 1u;
+        } else if (group == 0xA0u && val < 4u) {
+            stm32_active_model_idx = val;
+            if (stm32_qs_model_match) {
+                (void)tyvor_crsf_send_param(&crsf_link, 5u, val);
+            }
+        } else if (group == 0xB0u) {
+            stm32_qs_bind_on = 0u;
+            (void)tyvor_crsf_set_wifi(&crsf_link, val != 0u, board_millis());
+        } else if (group == 0xC0u) {
+            if (val == 1u) stm32_cal_cmd = 1u;      /* Start Cal */
+            else if (val == 2u) stm32_cal_cmd = 2u; /* Save Cal */
+            else stm32_cal_cmd = 3u;                /* Reset Default Cal */
         }
         uart_bridge.last_read_ms = 0;
     }
@@ -1011,63 +1098,314 @@ static uint16_t stm32_read_adc1_ch(uint32_t ch) {
     ADC_ChannelConfTypeDef sConfig = {0};
     sConfig.Channel = ch;
     sConfig.Rank = 1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) return 2048u;
-    if (HAL_ADC_Start(&hadc1) != HAL_OK) return 2048u;
-    if (HAL_ADC_PollForConversion(&hadc1, 2) != HAL_OK) {
+    uint32_t sum = 0;
+    for (int s = 0; s < 2; ++s) {
+        if (HAL_ADC_Start(&hadc1) != HAL_OK) return 2048u;
+        if (HAL_ADC_PollForConversion(&hadc1, 2) != HAL_OK) {
+            (void)HAL_ADC_Stop(&hadc1);
+            return 2048u;
+        }
+        sum += (uint16_t)HAL_ADC_GetValue(&hadc1);
         (void)HAL_ADC_Stop(&hadc1);
-        return 2048u;
     }
-    uint16_t v = (uint16_t)HAL_ADC_GetValue(&hadc1);
-    (void)HAL_ADC_Stop(&hadc1);
-    return v;
+    return (uint16_t)(sum / 2u);
 }
 
 static void stm32_poll_gimbal_adc(uint64_t now) {
     static const uint32_t adc_chs[4] = {
         ADC_CHANNEL_11, /* PC1 -> CH1 Roll */
-        ADC_CHANNEL_12, /* PC2 -> CH2 Pitch */
-        ADC_CHANNEL_14, /* PC4 -> CH3 Throttle */
-        ADC_CHANNEL_15  /* PC5 -> CH4 Yaw */
+        ADC_CHANNEL_15, /* PC5 -> CH3 Throttle */
+        ADC_CHANNEL_14, /* PC4 -> CH2 Pitch */
+        ADC_CHANNEL_12  /* PC2 -> CH4 Yaw */
     };
-    static uint8_t hw_present[4] = {0, 0, 0, 0};
     static int32_t filt[4] = {2048, 2048, 2048, 2048};
+    static int32_t center_cal[4] = {2048, 2048, 2048, 2048};
+    static int32_t min_cal[4] = {1500, 1500, 1500, 1500};
+    static int32_t max_cal[4] = {2600, 2600, 2600, 2600};
+    static int32_t cal_live_min[4] = {2048, 2048, 2048, 2048};
+    static int32_t cal_live_max[4] = {2048, 2048, 2048, 2048};
+    static uint8_t cal_active = 0u;
+    static uint8_t inited[4] = {0, 0, 0, 0};
     static uint32_t seq = 1u;
     static uint64_t next_ms = 0;
 
     if (now < next_ms) return;
     next_ms = now + TYVOR_CORE_PERIOD_MS;
 
-    int any_hw = 0;
-    int16_t axes[4] = {0, 0, -1000, 0};
-    for (int i = 0; i < 4; ++i) {
-        uint16_t raw = stm32_read_adc1_ch(adc_chs[i]);
-        if (raw >= 120u && raw <= 3975u) {
-            hw_present[i] = 1;
+    if (stm32_cal_cmd == 1u) {
+        stm32_cal_cmd = 0u;
+        cal_active = 1u;
+        for (int i = 0; i < 4; ++i) {
+            cal_live_min[i] = filt[i];
+            cal_live_max[i] = filt[i];
         }
-        if (hw_present[i]) {
-            any_hw = 1;
-            filt[i] = (filt[i] * 3 + (int32_t)raw) / 4;
-            /* Map ~300..3795 -> -1000..+1000 */
-            int32_t v = ((filt[i] - 2048) * 1000) / 1747;
-            if (v < -1000) v = -1000;
-            if (v > 1000) v = 1000;
-            if (i != 2 && v > -18 && v < 18) v = 0; /* Center deadband for Roll/Pitch/Yaw */
-            axes[i] = (int16_t)v;
+    } else if (stm32_cal_cmd == 2u) {
+        stm32_cal_cmd = 0u;
+        cal_active = 0u;
+        for (int i = 0; i < 4; ++i) {
+            if (cal_live_max[i] - cal_live_min[i] > 200) {
+                min_cal[i] = cal_live_min[i];
+                max_cal[i] = cal_live_max[i];
+                if (adc_chs[i] == ADC_CHANNEL_15) {
+                    center_cal[i] = (min_cal[i] + max_cal[i]) / 2;
+                }
+            }
+        }
+    } else if (stm32_cal_cmd == 3u) {
+        stm32_cal_cmd = 0u;
+        cal_active = 0u;
+        for (int i = 0; i < 4; ++i) {
+            min_cal[i] = 1500;
+            max_cal[i] = 2600;
+            inited[i] = 0u;
         }
     }
 
-    if (any_hw) {
-        int8_t sw[2] = {
-            (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_7) == GPIO_PIN_RESET) ? 1 : 0, /* SA (PE7) */
-            (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_8) == GPIO_PIN_RESET) ? 1 : 0  /* SB (PE8) */
-        };
-        tyvor_input_sample_t sample = tyvor_bench_input(&tyvor_discovery_demo.core.models.active,
-                                                        axes, sw, ++seq, now);
-        (void)tyvor_core_input(&tyvor_discovery_demo.core, &sample, now);
-        (void)tyvor_core_poll(&tyvor_discovery_demo.core, now);
-        tyvor_discovery_demo.next_input_ms = now + 100u; /* Prevent synthetic bench overwrite */
+    int16_t axes[4] = {0, 0, -1000, 0};
+    for (int i = 0; i < 4; ++i) {
+        int is_thr = (adc_chs[i] == ADC_CHANNEL_15);
+        uint16_t raw = stm32_read_adc1_ch(adc_chs[i]);
+        if (!inited[i]) {
+            inited[i] = 1;
+            filt[i] = (int32_t)raw;
+            /* Auto-zero resting center for spring-centered axes (Roll, Pitch, Yaw) */
+            if (!is_thr && raw >= 1500u && raw <= 2600u) {
+                center_cal[i] = (int32_t)raw;
+                min_cal[i] = center_cal[i] - 550;
+                max_cal[i] = center_cal[i] + 550;
+            }
+        } else {
+            /* Fast low-latency EMA filter (alpha = 5/8) for instant 60Hz stick response */
+            filt[i] = (filt[i] * 3 + (int32_t)raw * 5) / 8;
+        }
+
+        int32_t f = filt[i];
+        if (cal_active) {
+            if (f < cal_live_min[i]) cal_live_min[i] = f;
+            if (f > cal_live_max[i]) cal_live_max[i] = f;
+        }
+        if (f < min_cal[i]) min_cal[i] = (f < 20) ? 20 : f;
+        if (f > max_cal[i]) max_cal[i] = (f > 4075) ? 4075 : f;
+
+        int32_t c = center_cal[i];
+        int32_t db = is_thr ? 0 : 22; /* Center deadband for spring-centered sticks */
+        int32_t v = 0;
+        if (f < c - db) {
+            int32_t span = (c - db) - min_cal[i];
+            if (span < 120) span = 120;
+            v = -(((c - db) - f) * 1000) / span;
+        } else if (f > c + db) {
+            int32_t span = max_cal[i] - (c + db);
+            if (span < 120) span = 120;
+            v = ((f - (c + db)) * 1000) / span;
+        }
+        if (v < -1000) v = -1000;
+        if (v > 1000) v = 1000;
+        axes[i] = (int16_t)v;
     }
+
+    int pos1_low = (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5) == GPIO_PIN_RESET) ||
+                   (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_7) == GPIO_PIN_RESET);
+    int pos3_low = (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_4) == GPIO_PIN_RESET) ||
+                   (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_8) == GPIO_PIN_RESET);
+    int8_t sw[2] = {
+        pos1_low ? 1 : 0, /* SA (PE5 on P2 / PE7 on P1) */
+        pos3_low ? 1 : 0  /* SB (PE4 on P2 / PE8 on P1) */
+    };
+    tyvor_input_sample_t sample = tyvor_bench_input(&tyvor_discovery_demo.core.models.active,
+                                                    axes, sw, ++seq, now);
+    (void)tyvor_core_input(&tyvor_discovery_demo.core, &sample, now);
+    (void)tyvor_core_poll(&tyvor_discovery_demo.core, now);
+
+    /* CH5: 3-position Toggle Switch on P2 (PE5/PE4) or P1 (PE7/PE8) -> -1000 / 0 / +1000 */
+    int16_t ch5_val = pos1_low ? -1000 : (pos3_low ? 1000 : 0);
+
+    /* CH6: Auxiliary Rotary Potentiometer on PC0 (ADC1_IN10, Pin 4 Inner on P1 -> -1000..+1000) */
+    static int32_t pot_filt = 2048;
+    static uint8_t pot_inited = 0;
+    uint16_t pot_raw = stm32_read_adc1_ch(ADC_CHANNEL_10);
+    if (!pot_inited) {
+        pot_inited = 1;
+        pot_filt = (int32_t)pot_raw;
+    } else {
+        pot_filt = (pot_filt * 3 + (int32_t)pot_raw * 5) / 8;
+    }
+    int32_t ch6_v = ((pot_filt - 2048) * 1000) / 1980;
+    if (ch6_v < -1000) ch6_v = -1000;
+    if (ch6_v > 1000) ch6_v = 1000;
+
+    g_stm32_ch5_val = ch5_val;
+    g_stm32_ch6_val = (int16_t)ch6_v;
+
+    /* Compute full 8-channel Transmitter Output (CRU / QUAD / FIXED / VTAIL) for CRSFv2 TX */
+    int16_t rol = axes[0];
+    int16_t pit = (stm32_qs_stick_mode == 1u) ? axes[1] : axes[2];
+    int16_t thr = (stm32_qs_stick_mode == 1u) ? axes[2] : axes[1];
+    int16_t yaw = axes[3];
+    int16_t sa  = g_stm32_ch5_val;
+    int16_t sb  = g_stm32_ch6_val;
+
+    int16_t out0 = rol, out1 = pit, out2 = thr, out3 = yaw;
+    if (stm32_active_model_idx == 0u) {
+        int rate = (sa > 300) ? 100 : 85;
+        out0 = stm32_clamp_ch(((int32_t)stm32_apply_expo(rol, 25) * rate) / 100);
+        out1 = stm32_clamp_ch(((int32_t)stm32_apply_expo(pit, 25) * rate) / 100);
+        out3 = stm32_clamp_ch(((int32_t)stm32_apply_expo(yaw, 20) * rate) / 100);
+    } else if (stm32_active_model_idx == 1u) {
+        int rate = 80 + ((int)sb * 20) / 1000;
+        out0 = stm32_clamp_ch(((int32_t)stm32_apply_expo(rol, 35) * rate) / 100);
+        out1 = stm32_clamp_ch(((int32_t)stm32_apply_expo(pit, 35) * rate) / 100);
+        out3 = stm32_clamp_ch(((int32_t)stm32_apply_expo(yaw, 25) * rate) / 100);
+    } else if (stm32_active_model_idx == 2u) {
+        int rate = (sa < -300) ? 70 : ((sa > 300) ? 100 : 85);
+        int32_t r_e = ((int32_t)stm32_apply_expo(rol, 20) * rate) / 100;
+        int32_t p_e = ((int32_t)stm32_apply_expo(pit, 20) * rate) / 100;
+        int32_t flap = ((int32_t)sb * 200) / 1000;
+        out0 = stm32_clamp_ch((r_e * 75 + p_e * 75) / 100 + flap);
+        out1 = stm32_clamp_ch((r_e * 75 - p_e * 75) / 100 - flap);
+    } else if (stm32_active_model_idx == 3u) {
+        int32_t r_e = stm32_apply_expo(rol, 20);
+        int32_t p_e = stm32_apply_expo(pit, 20);
+        int32_t y_e = stm32_apply_expo(yaw, 20);
+        int32_t crow = ((int32_t)sb * 250) / 1000;
+        out0 = stm32_clamp_ch(r_e + crow);
+        out1 = stm32_clamp_ch((p_e * 75 + y_e * 75) / 100);
+        out3 = stm32_clamp_ch((p_e * 75 - y_e * 75) / 100);
+    }
+
+    if (stm32_qs_thr_lock && g_stm32_ch5_val < -300) {
+        out2 = -1000;
+    }
+
+    /* Read 6 Physical Switches on Header P2 (-1000 / 0 / +1000 each):
+     * SA: Col 7 (PE5/PE4), SB: Col 8 (PE3/PE2), SC: Col 9 (PE1/PE0)
+     * SD: Col 10 (PB9/PB8), SE: Col 12 (PB7/PB6), SF: Col 13 (PB5/PB4) */
+    int16_t sw_sa = pos1_low ? -1000 : (pos3_low ? 1000 : 0);
+    int16_t sw_sb = (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) == GPIO_PIN_RESET) ? -1000 :
+                    ((HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_2) == GPIO_PIN_RESET) ? 1000 : 0);
+    int16_t sw_sc = (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_1) == GPIO_PIN_RESET) ? -1000 :
+                    ((HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_0) == GPIO_PIN_RESET) ? 1000 : 0);
+    int16_t sw_sd = (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == GPIO_PIN_RESET) ? -1000 :
+                    ((HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == GPIO_PIN_RESET) ? 1000 : 0);
+    int16_t sw_se = (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == GPIO_PIN_RESET) ? -1000 :
+                    ((HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_RESET) ? 1000 : 0);
+    int16_t sw_sf = (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == GPIO_PIN_RESET) ? -1000 :
+                    ((HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) ? 1000 : 0);
+
+    /* Pot S2 on PC3 (ADC1_IN13, Col 5 Outer on P1 -> auto-detect connection, 0% when open) */
+    static int32_t pot2_filt = 2048;
+    static uint8_t pot2_conn = 0;
+    GPIOC->MODER &= ~(3u << 6);                        /* PC3 Digital Input */
+    GPIOC->PUPDR = (GPIOC->PUPDR & ~(3u << 6)) | (1u << 6); /* Pull-Up */
+    for (volatile int d = 0; d < 40; ++d) __NOP();
+    GPIOC->MODER |= (3u << 6);                         /* Analog */
+    GPIOC->PUPDR &= ~(3u << 6);
+    uint16_t p2_pu = stm32_read_adc1_ch(ADC_CHANNEL_13);
+
+    GPIOC->MODER &= ~(3u << 6);                        /* PC3 Digital Input */
+    GPIOC->PUPDR = (GPIOC->PUPDR & ~(3u << 6)) | (2u << 6); /* Pull-Down */
+    for (volatile int d = 0; d < 40; ++d) __NOP();
+    GPIOC->MODER |= (3u << 6);                         /* Analog */
+    GPIOC->PUPDR &= ~(3u << 6);
+    uint16_t p2_pd = stm32_read_adc1_ch(ADC_CHANNEL_13);
+
+    int p2_spread = (int)p2_pu - (int)p2_pd;
+    if (p2_spread < 0) p2_spread = -p2_spread;
+    int16_t pot_s2 = 0;
+    if (p2_spread < 1200) {
+        uint16_t pot2_raw = stm32_read_adc1_ch(ADC_CHANNEL_13);
+        if (!pot2_conn) {
+            pot2_conn = 1;
+            pot2_filt = (int32_t)pot2_raw;
+        } else {
+            pot2_filt = (pot2_filt * 3 + (int32_t)pot2_raw * 5) / 8;
+        }
+        pot_s2 = stm32_clamp_ch(((pot2_filt - 2048) * 1000) / 1980);
+    } else {
+        pot2_conn = 0;
+    }
+
+    g_stm32_ch5_val = sw_sa;
+    g_stm32_ch6_val = (int16_t)ch6_v;
+    /* Pure independent transmitter channels: CH7 = Switch SB, CH8 = Switch SC (functions set on Drone FC) */
+    g_stm32_ch7_val = sw_sb;
+    g_stm32_ch8_val = sw_sc;
+
+    /* Pack CH9 (Pot S2) and CH10 (Switch SD) into active.id so UI CH View displays all 10 channels */
+    uint32_t u_ch9  = (uint32_t)(pot_s2 + 1000) & 0xFFFu;
+    uint32_t u_ch10 = (uint32_t)(sw_sd  + 1000) & 0xFFFu;
+    tyvor_discovery_demo.core.models.active.id = (1u << 30) | (u_ch10 << 12) | u_ch9;
+
+    /* If Drone FC or ELRS TX module is replying on PC7, forward status in model_name.
+     * Continuous Bind stays active indefinitely until RX links up or user presses Cancel! */
+    if (!crsf_link.binding_active && stm32_qs_bind_on) {
+        /* RX just bound & linked inside tyvor_crsf_poll -> sync stm32_qs_bind_on */
+        stm32_qs_bind_on = 0u;
+    }
+    memset(tyvor_discovery_demo.core.models.active.name, 0, TYVOR_MODEL_NAME_CAP);
+    if (crsf_link.wifi_active) {
+        memcpy(tyvor_discovery_demo.core.models.active.name, "FM:WIFI ON", 10);
+    } else if (crsf_link.binding_active || stm32_qs_bind_on) {
+        if (crsf_link.bind_ack_count > 0u) {
+            memcpy(tyvor_discovery_demo.core.models.active.name, "FM:BIND ACK", 11);
+        } else {
+            memcpy(tyvor_discovery_demo.core.models.active.name, "FM:BINDING..", 12);
+        }
+    } else if (tyvor_crsf_telem_live(&crsf_link, now)) {
+        if (crsf_link.flight_mode[0] != '\0') {
+            snprintf(tyvor_discovery_demo.core.models.active.name, TYVOR_MODEL_NAME_CAP,
+                     "FM:%.11s", crsf_link.flight_mode);
+        } else if (crsf_link.elrs_flags & 0x01u) {
+            memcpy(tyvor_discovery_demo.core.models.active.name, "FM:RX BOUND", 11);
+        } else {
+            snprintf(tyvor_discovery_demo.core.models.active.name, TYVOR_MODEL_NAME_CAP,
+                     "FM:B%uW%u/%lu",
+                     (unsigned)(crsf_link.bind_param_id % 100u),
+                     (unsigned)(crsf_link.wifi_param_id % 100u),
+                     (unsigned long)(crsf_link.rx_frames % 100u));
+        }
+    } else if (crsf_raw_rx_bytes > 0u) {
+        snprintf(tyvor_discovery_demo.core.models.active.name, TYVOR_MODEL_NAME_CAP,
+                 "ELRS:%lu/%lu",
+                 (unsigned long)(crsf_link.rx_frames % 1000u),
+                 (unsigned long)(crsf_raw_rx_bytes % 10000u));
+    } else {
+        memcpy(tyvor_discovery_demo.core.models.active.name, "BENCH MODEL A", 13);
+    }
+
+    tyvor_discovery_demo.core.desired[0]  = out0;
+    tyvor_discovery_demo.core.desired[1]  = out1;
+    tyvor_discovery_demo.core.desired[2]  = out2;
+    tyvor_discovery_demo.core.desired[3]  = out3;
+    tyvor_discovery_demo.core.channels[4] = g_stm32_ch5_val;
+    tyvor_discovery_demo.core.desired[4]  = g_stm32_ch5_val;
+    tyvor_discovery_demo.core.channels[5] = g_stm32_ch6_val;
+    tyvor_discovery_demo.core.desired[5]  = g_stm32_ch6_val;
+    tyvor_discovery_demo.core.channels[6] = g_stm32_ch7_val;
+    tyvor_discovery_demo.core.desired[6]  = g_stm32_ch7_val;
+    tyvor_discovery_demo.core.channels[7] = g_stm32_ch8_val;
+    tyvor_discovery_demo.core.desired[7]  = g_stm32_ch8_val;
+
+    /* Pack full 12-Channel (4 Gimbal + 2 Pots + 6 Switches) + CH13..CH16 into CRSFv2 TX array */
+    g_stm32_crsf_ch[0]  = out0;           /* CH1: Roll / Elevon-L */
+    g_stm32_crsf_ch[1]  = out1;           /* CH2: Pitch / Elevon-R / VTail-L */
+    g_stm32_crsf_ch[2]  = out2;           /* CH3: Throttle */
+    g_stm32_crsf_ch[3]  = out3;           /* CH4: Yaw / VTail-R */
+    g_stm32_crsf_ch[4]  = sw_sa;          /* CH5: Switch SA */
+    g_stm32_crsf_ch[5]  = (int16_t)ch6_v; /* CH6: Pot S1 */
+    g_stm32_crsf_ch[6]  = g_stm32_ch7_val;/* CH7: Switch SB / Mode */
+    g_stm32_crsf_ch[7]  = g_stm32_ch8_val;/* CH8: Switch SC / ARM */
+    g_stm32_crsf_ch[8]  = pot_s2;         /* CH9: Pot S2 (PC3) */
+    g_stm32_crsf_ch[9]  = sw_sd;          /* CH10: Switch SD (PB9/PB8) */
+    g_stm32_crsf_ch[10] = sw_se;          /* CH11: Switch SE (PB7/PB6) */
+    g_stm32_crsf_ch[11] = sw_sf;          /* CH12: Switch SF (PB5/PB4) */
+    for (int k = 12; k < 15; ++k) g_stm32_crsf_ch[k] = 0;
+    g_stm32_crsf_ch[15] = stm32_qs_finder_on ? 1000 : -1000; /* CH16 (AUX12): Finder Beeper */
+
+    tyvor_discovery_demo.next_input_ms = now + 100u;      /* Prevent synthetic bench input overwrite */
+    tyvor_discovery_demo.next_telemetry_ms = now + 1000u; /* Prevent synthetic bench telemetry overwrite; real CRSFv2 only */
 }
 
 static void service_core_and_uart(void) {
@@ -1077,7 +1415,9 @@ static void service_core_and_uart(void) {
         uint64_t step = tyvor_discovery_demo.last_poll_ms + TYVOR_CORE_PERIOD_MS;
         (void)discovery_demo_poll(&tyvor_discovery_demo, step, 0);
         tyvor_core_bridge_poll(&uart_bridge, step);
-        tyvor_ui_endpoint_poll(&ui_endpoint, step);
+        if (!external_uart_peer) {
+            tyvor_ui_endpoint_poll(&ui_endpoint, step);
+        }
     }
     if (target >= tyvor_discovery_demo.last_poll_ms) {
         (void)discovery_demo_poll(&tyvor_discovery_demo, target, 0);
@@ -1089,19 +1429,52 @@ static void service_core_and_uart(void) {
         uint8_t b = crsf_rx_ring[crsf_rx_tail];
         __DMB();
         crsf_rx_tail = (uint16_t)((crsf_rx_tail + 1u) & 255u);
-        if (tyvor_crsf_feed_byte(&crsf_link, b, target) > 0) {
+        int crsf_ret = tyvor_crsf_feed_byte(&crsf_link, b, target);
+        if (crsf_ret == 1) {
             (void)tyvor_core_telemetry(&tyvor_discovery_demo.core, &crsf_link.telem, target);
         }
     }
-    if (!tyvor_crsf_telem_live(&crsf_link, target) && (target - crsf_last_ping_ms) >= 2000u) {
-        crsf_last_ping_ms = target;
-        (void)tyvor_crsf_send_ping(&crsf_link);
+    static uint8_t prev_crsf_live = 0u;
+    int crsf_live_now = tyvor_crsf_telem_live(&crsf_link, target);
+    if (crsf_live_now) {
+        prev_crsf_live = 1u;
+    } else if (prev_crsf_live) {
+        prev_crsf_live = 0u;
+        tyvor_telemetry_sample_t clr = {0};
+        clr.present = (uint8_t)(TYVOR_T_RSSI | TYVOR_T_LQ);
+        clr.values.valid = 0u;
+        clr.sampled_ms = target;
+        (void)tyvor_core_telemetry(&tyvor_discovery_demo.core, &clr, target);
     }
-    if (stm32_qs_rf_on && tyvor_core_rf_enabled()) {
+    int crsf_cmd_sent = tyvor_crsf_poll(&crsf_link, target);
+    if (!crsf_cmd_sent && stm32_pending_elrs_mask != 0u) {
+        if ((stm32_pending_elrs_mask & 0x01u) && crsf_link.power_param_id > 0u) {
+            static const uint16_t k_mw[5] = {50u, 100u, 200u, 400u, 500u};
+            stm32_pending_elrs_mask &= (uint8_t)~0x01u;
+            (void)tyvor_crsf_set_power_mw(&crsf_link, k_mw[stm32_qs_power_idx % 5u]);
+            crsf_cmd_sent = 1;
+        } else if ((stm32_pending_elrs_mask & 0x02u) && crsf_link.rate_param_id > 0u) {
+            static const uint16_t k_hz[4] = {50u, 150u, 250u, 500u};
+            stm32_pending_elrs_mask &= (uint8_t)~0x02u;
+            (void)tyvor_crsf_set_rate_hz(&crsf_link, k_hz[stm32_qs_rate_idx & 3u]);
+            crsf_cmd_sent = 1;
+        } else if ((stm32_pending_elrs_mask & 0x04u) && crsf_link.tlm_param_id > 0u) {
+            static const uint16_t k_tlm[4] = {2u, 16u, 64u, 128u};
+            stm32_pending_elrs_mask &= (uint8_t)~0x04u;
+            (void)tyvor_crsf_set_tlm_ratio(&crsf_link, k_tlm[stm32_qs_telem_idx & 3u]);
+            crsf_cmd_sent = 1;
+        } else if ((stm32_pending_elrs_mask & 0x08u) && crsf_link.model_match_param_id > 0u) {
+            stm32_pending_elrs_mask &= (uint8_t)~0x08u;
+            (void)tyvor_crsf_send_param(&crsf_link, crsf_link.model_match_param_id, stm32_qs_model_match ? 1u : 0u);
+            crsf_cmd_sent = 1;
+        }
+    }
+    if (!crsf_cmd_sent && (stm32_qs_rf_on || crsf_link.binding_active || crsf_link.bind_seq_step > 0u)) {
         uint16_t period = crsf_rate_period_ms[stm32_qs_rate_idx & 3u];
         if ((target - crsf_last_rc_ms) >= period) {
             crsf_last_rc_ms = target;
-            (void)tyvor_crsf_send_rc(&crsf_link, tyvor_discovery_demo.core.channels, TYVOR_CHANNELS);
+            /* Transmit full 16-channel CRSFv2 frame (CH1..CH12 mapped to 2 Gimbals + 2 Pots + 6 Switches) */
+            (void)tyvor_crsf_send_rc(&crsf_link, g_stm32_crsf_ch, 16u);
         }
     }
 
@@ -1113,10 +1486,24 @@ static void service_core_and_uart(void) {
         tyvor_bench_transport_error(&uart_transport, &uart_bridge.transport.link, rx_err == 2);
     } else if (rx_n) {
         external_uart_peer = 1;
+        /* Allow high-rate (~60-75 Hz) snapshot reads across 460800 bps UART2 link */
+        if (uart_bridge.last_read_ms && target >= uart_bridge.last_read_ms &&
+            (target - uart_bridge.last_read_ms) >= 12u) {
+            uart_bridge.last_read_ms = 0;
+        }
         (void)tyvor_bench_transport_receive(&uart_transport, rx_buf, rx_n, target, receive_core_cb, &uart_bridge);
     }
+    /* Stream snapshot fragments at full 460800 bps speed (~1-2ms spacing instead of 10ms) */
+    if (uart_bridge.response_active && uart_bridge.next_tx_ms > target + 2u) {
+        uart_bridge.next_tx_ms = target;
+    }
     tyvor_core_bridge_poll(&uart_bridge, target);
-    tyvor_ui_endpoint_poll(&ui_endpoint, target);
+    if (uart_bridge.response_active && uart_bridge.next_tx_ms > target + 2u) {
+        uart_bridge.next_tx_ms = target + 1u;
+    }
+    if (!external_uart_peer) {
+        tyvor_ui_endpoint_poll(&ui_endpoint, target);
+    }
     tyvor_async_tx_poll(&tx_queue, board_millis());
 
     uint16_t leds = tyvor_discovery_demo.leds;
@@ -1158,6 +1545,8 @@ int main(void) {
     uint64_t now = board_millis();
     (void)discovery_demo_init(&tyvor_discovery_demo, now, 0);
     tyvor_discovery_demo.mode = DISCOVERY_SAFE;
+    tyvor_telemetry_init(&tyvor_discovery_demo.core.telemetry);
+    tyvor_discovery_demo.next_telemetry_ms = now + 10000u;
 
     tyvor_bench_transport_init(&uart_transport, uart_write_cb, NULL, 1);
     (void)tyvor_core_bridge_init(&uart_bridge, &tyvor_discovery_demo.core,
@@ -1211,8 +1600,8 @@ int main(void) {
         }
         btn_prev = btn;
 
-        /* Update LVGL Oxbot UI at ~30 FPS strictly from Protocol v2 UI Endpoint (mock = 0 -> CORE) */
-        if (now >= next_ui_ms) {
+        /* Only render local SPI2 TFT if no external ESP32-S3 UI peer is connected */
+        if (!external_uart_peer && now >= next_ui_ms) {
             next_ui_ms = now + 33;
             tyvor_ui321_view_t ui_view;
             if (tyvor_ui321_project(&ui_endpoint.state, now, 0, now, &ui_view) == 0) {

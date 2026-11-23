@@ -5,7 +5,8 @@ static void request(void *ctx,const tyvor_frame_t *frame,uint64_t now) {
     if(frame->type==TYVOR_DIAGNOSTIC && b->read_packet) {b->read_packet(b->packet_context,frame,now);return;}
     if (frame->type!=TYVOR_UI_REQUEST) return;
     ++b->requests;
-    if (b->ack_sent && now>=b->last_ack_ms && now-b->last_ack_ms<100) {
+    if (frame->payload[0] != TYVOR_REQ_QUICKSET &&
+        b->ack_sent && now>=b->last_ack_ms && now-b->last_ack_ms<100) {
         ++b->rate_limited;return;
     }
     uint8_t result=b->read_service?b->read_service(b->read_context,frame->payload[0],frame->payload[1]):1;

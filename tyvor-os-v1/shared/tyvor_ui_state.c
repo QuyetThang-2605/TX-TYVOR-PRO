@@ -83,7 +83,24 @@ void tyvor_ui_state_receive(tyvor_ui_state_t *s,const tyvor_link_t *l,const tyvo
     s->generation_seen=1;s->generation=candidate.generation;
     uint64_t expires=deadline(now,capture_age,TYVOR_UI_CORE_STALE_MS);
     if(expires<s->pending_expires_ms)s->pending_expires_ms=expires;
-    if(kind==TYVOR_CORE_INPUTS)s->pending_input_expires_ms=deadline(now,(uint32_t)capture_age+s->pending.input_age_ms,TYVOR_UI_CORE_STALE_MS);
+    if(kind==TYVOR_CORE_MODEL && s->valid) {
+        s->snapshot.model_id=s->pending.model_id;
+        memcpy(s->snapshot.model_name,s->pending.model_name,sizeof(s->snapshot.model_name));
+    }
+    if(kind==TYVOR_CORE_INPUTS) {
+        s->pending_input_expires_ms=deadline(now,(uint32_t)capture_age+s->pending.input_age_ms,TYVOR_UI_CORE_STALE_MS);
+        /* Zero-latency fast path: apply fresh gimbal inputs to active snapshot immediately */
+        if(s->valid && s->pending.input_valid) {
+            memcpy(s->snapshot.inputs,s->pending.inputs,sizeof(s->snapshot.inputs));
+            memcpy(s->snapshot.switches,s->pending.switches,sizeof(s->snapshot.switches));
+            s->snapshot.input_valid=1;
+            s->input_expires_ms=s->pending_input_expires_ms;
+        }
+    }
+    if(kind==TYVOR_CORE_OUTPUTS && s->valid) {
+        memcpy(s->snapshot.channels,s->pending.channels,sizeof(s->snapshot.channels));
+        s->snapshot.outputs_valid=s->pending.outputs_valid;
+    }
     if(kind==TYVOR_CORE_TELEMETRY)for(unsigned i=0;i<4;++i)
         s->pending_telemetry_expires_ms[i]=deadline(now,(uint32_t)capture_age+s->pending.telemetry.age_ms[i],tyvor_telemetry_ttl(i));
     s->parts|=bit;
